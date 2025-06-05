@@ -1,3 +1,14 @@
-<p class="text-red-500">
-  home works!
-</p>
+<div class="text-center">
+
+  <p class="text-red-500">
+    home works!
+  </p>
+  
+  <h1>Prueba de api:</h1>
+  
+  <p *ngIf="cargando">Cargando...</p>
+  
+  <div *ngIf="!cargando">
+    <p *ngFor="let persona of personas" >{{persona.nombre}}</p>
+  </div>
+</div>
