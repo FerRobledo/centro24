@@ -16,8 +16,8 @@ import { LoginComponent } from './componentes/auth/login/login.component';
     AppComponent,
     HomeComponent,
     RegisterComponent,
-    LoginComponent
-    DashboardComponent
+    LoginComponent,
+    DashboardComponent,
   ],
   imports: [
     BrowserModule,
