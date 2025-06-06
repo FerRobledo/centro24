@@ -26,6 +26,7 @@
     "pg": "^8.16.0",
     "rxjs": "^7.8.1",
     "tslib": "^2.4.0",
+    "vercel": "^42.3.0",
     "zone.js": "^0.14.10"
   },
   "devDependencies": {

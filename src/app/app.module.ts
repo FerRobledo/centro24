@@ -8,6 +8,7 @@ import { HttpClientModule } from '@angular/common/http';
 import {MatCardModule} from '@angular/material/card';
 import { RegisterComponent } from './componentes/auth/register/register.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { DashboardComponent } from './componentes/dashboard/dashboard.component';
 import { LoginComponent } from './componentes/auth/login/login.component';
 
 @NgModule({
@@ -16,6 +17,7 @@ import { LoginComponent } from './componentes/auth/login/login.component';
     HomeComponent,
     RegisterComponent,
     LoginComponent
+    DashboardComponent
   ],
   imports: [
     BrowserModule,

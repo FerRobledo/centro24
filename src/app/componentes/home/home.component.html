@@ -1,4 +1,25 @@
+
 <div class="h-screen w-screen flex items-center justify-center">
 
   <router-outlet></router-outlet>
+<div class="grid grid-cols-12 ">
+
+
+  <app-dashboard class="col-span-6 sm:col-span-4 lg:col-span-2 "></app-dashboard>
+  <div class="text-center col-auto">
+
+    <p class="text-red-500">
+      home works!
+    </p>
+
+    <h1>Prueba de api:
+
+    </h1>
+
+    <p *ngIf="cargando">Cargando...</p>
+
+    <div *ngIf="!cargando">
+      <p *ngFor="let persona of personas">{{persona.nombre}}</p>
+    </div>
+  </div>
 </div>
