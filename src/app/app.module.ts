@@ -9,6 +9,7 @@ import { AuthComponent } from './componentes/auth/auth.component';
 import {MatCardModule} from '@angular/material/card';
 import { RegisterComponent } from './componentes/register/register.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { DashboardComponent } from './componentes/dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     HomeComponent,
     AuthComponent,
     RegisterComponent,
+    DashboardComponent,
   ],
   imports: [
     BrowserModule,
