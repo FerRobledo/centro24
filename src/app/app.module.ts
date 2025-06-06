@@ -5,18 +5,26 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './componentes/home/home.component';
 import { HttpClientModule } from '@angular/common/http';
+import { AuthComponent } from './componentes/auth/auth.component';
+import {MatCardModule} from '@angular/material/card';
+import { RegisterComponent } from './componentes/register/register.component';
+import { ReactiveFormsModule } from '@angular/forms';
 import { DashboardComponent } from './componentes/dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    DashboardComponent
+    AuthComponent,
+    RegisterComponent,
+    DashboardComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    MatCardModule,
+    ReactiveFormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
