@@ -6,12 +6,18 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './componentes/home/home.component';
 import { HttpClientModule } from '@angular/common/http';
 import { DashboardComponent } from './componentes/dashboard/dashboard.component';
+import { SideMenuComponent } from './componentes/sideMenu/sideMenu.component';
+import { CardComponent } from './componentes/card/card.component';
+import { InformacionComponent } from './componentes/informacion/informacion.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    DashboardComponent
+    SideMenuComponent,
+    DashboardComponent,
+    CardComponent,
+    InformacionComponent
   ],
   imports: [
     BrowserModule,
