@@ -18,6 +18,10 @@ import { InformacionComponent } from './componentes/informacion/informacion.comp
   declarations: [
     AppComponent,
     HomeComponent,
+    SideMenuComponent,
+    CardComponent,
+    InformacionComponent
+    AuthComponent,
     RegisterComponent,
     LoginComponent,
     SideMenuComponent,

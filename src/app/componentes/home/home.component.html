@@ -6,11 +6,16 @@
 
   <app-informacion class="col-span-12 sm:col-span-12 lg:col-span-3"></app-informacion>
 
+<div class="grid grid-cols-12 gap-4">
+  
+  <app-sideMenu class="col-span-12 sm:col-span-4 lg:col-span-2 row-span-2"></app-sideMenu>
+
 <div class="h-screen w-screen flex items-center justify-center">
 
   <router-outlet></router-outlet>
 <div class="grid grid-cols-12 ">
 
+  <app-dashboard class="col-span-12 sm:col-span-8 lg:col-span-7 w-2/4"></app-dashboard>
 
   <app-dashboard class="col-span-6 sm:col-span-4 lg:col-span-2 "></app-dashboard>
   <div class="text-center col-auto">
@@ -29,4 +34,5 @@
       <p *ngFor="let persona of personas">{{persona.nombre}}</p>
     </div>
   </div>
+  <app-informacion class="col-span-12 sm:col-span-12 lg:col-span-3"></app-informacion>
 </div>
