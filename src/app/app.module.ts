@@ -12,8 +12,7 @@ import { SideMenuComponent } from './componentes/sideMenu/sideMenu.component';
 import { CardComponent } from './componentes/card/card.component';
 import { InformacionComponent } from './componentes/informacion/informacion.component';
 import { EstadisticasComponent } from './componentes/estadisticas/estadisticas.component';
-import { RouterModule } from '@angular/router';
-
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
   declarations: [
@@ -29,7 +28,7 @@ import { RouterModule } from '@angular/router';
   ],
   imports: [
     BrowserModule,
-    RouterModule,
+    AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
   ],
