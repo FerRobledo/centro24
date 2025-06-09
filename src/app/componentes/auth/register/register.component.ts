@@ -55,10 +55,7 @@ export class RegisterComponent implements OnInit {
   }
 
   onRegister(): void {
-    console.log("registrando");
-    console.log(this.username, this.password, this.confirmPassword)
     if (this.registerForm.invalid) {
-      console.log("invalido");
       return;
     }
 

@@ -1,3 +1,6 @@
+<p>
+  login works!
+</p>
 <div class="flex w-[30vw] h-[70vh] m-auto flex-col justify-center rounded border-2 shadow-xl px-6 py-12">
     <div class="flex flex-col items-center">
         <div class="w-16 h-16 mb-3 rounded bg-indigo-600 flex items-center justify-center">
@@ -8,11 +11,11 @@
     </div>
 
     <div class="w-full max-w-sm mx-auto">
-        <form class="space-y-6" action="#" method="POST">
+        <form class="space-y-6" (submit)="onLogin()" [formGroup]="loginForm">
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-900">Usuario</label>
+                <label for="username" class="block text-sm font-medium text-gray-900">Usuario</label>
                 <div class="mt-2">
-                    <input type="email" name="email" id="email" autocomplete="email" required
+                    <input type="text" name="username" id="username" formControlName="username" autocomplete="username" required
                         class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600">
                 </div>
             </div>
@@ -20,7 +23,7 @@
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-900">Contraseña</label>
                 <div class="mt-2">
-                    <input type="password" name="password" id="password" autocomplete="current-password" required
+                    <input type="password" name="password" id="password" formControlName="password" autocomplete="current-password" required
                         class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600">
                 </div>
             </div>
