@@ -7,6 +7,14 @@ import { DashboardComponent } from './componentes/dashboard/dashboard.component'
 
 const routes: Routes = [
   {
+    path: 'login',
+    component: LoginComponent,
+  },
+  {
+    path: 'register',
+    component: RegisterComponent,
+  },
+  {
     path: '',
     component: HomeComponent,
     children: [
@@ -18,9 +26,8 @@ const routes: Routes = [
         path: 'cobranza',
         component: RegisterComponent,
       }
-    ]
+    ],
   },
-
 ];
 
 @NgModule({
