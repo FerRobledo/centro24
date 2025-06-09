@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './componentes/home/home.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -14,6 +13,8 @@ import { CardComponent } from './componentes/card/card.component';
 import { InformacionComponent } from './componentes/informacion/informacion.component';
 import { EstadisticasComponent } from './componentes/estadisticas/estadisticas.component';
 import { ProductosComponent } from './componentes/productos/productos.component';
+import { RouterModule } from '@angular/router';
+
 import { UsuariosComponent } from './componentes/usuarios/usuarios/usuarios.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { UsuarioModalComponent } from './componentes/usuarios/usuarioModal/UsuarioModal.component';
@@ -37,7 +38,7 @@ import {MatInputModule} from '@angular/material/input';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
+    RouterModule,
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
