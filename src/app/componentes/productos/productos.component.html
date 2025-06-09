@@ -1,0 +1,42 @@
+<div class="container mx-auto p-6">
+  <h2 class="text-2xl font-bold mb-4">Lista de Productos</h2>
+  <table class="w-full border-collapse bg-white shadow-md rounded-lg">
+    <thead>
+      <tr class="bg-gray-200">
+        <th class="p-2 border">Imagen</th>
+        <th class="p-2 border">Producto</th>
+        <th class="p-2 border">Descripción</th>
+        <th class="p-2 border">Categoría</th>
+        <th class="p-2 border">Precio</th>
+        <th class="p-2 border">Stock</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of products; let i = index" class="border-t">
+        <td class="p-2 border text-center">
+          <div class="w-16 h-16 bg-gray-200 flex items-center justify-center mx-auto">Imagen: null</div>
+        </td>
+        <td class="p-2 border">{{ product.name }}</td>
+        <td class="p-2 border">{{ product.description }}</td>
+        <td class="p-2 border">{{ product.category }}</td>
+        <td class="p-2 border">${{ product.price }}</td>
+        <td class="p-2 border flex items-center justify-center gap-2">
+          <button (click)="decreaseStock(i)" class="bg-red-500 text-white px-2 py-1 rounded">-</button>
+          <span>{{ product.stock }}</span>
+          <button (click)="increaseStock(i)" class="bg-green-500 text-white px-2 py-1 rounded">+</button>
+          <button (click)="openQuantityModal(i)" class="bg-blue-500 text-white px-2 py-1 rounded ml-2">Agregar en cantidad</button>
+          <div *ngIf="showModal && selectedIndex === i" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white p-4 rounded-lg shadow-lg">
+              <h3 class="text-lg font-semibold mb-2">Agregar cantidad</h3>
+              <input [(ngModel)]="quantity" type="number" min="1" class="border p-1 rounded w-full mb-2" placeholder="Ingrese cantidad" />
+              <div class="flex justify-end gap-2">
+                <button (click)="addQuantity(i)" class="bg-green-500 text-white px-2 py-1 rounded">Aceptar</button>
+                <button (click)="closeModal()" class="bg-red-500 text-white px-2 py-1 rounded">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
