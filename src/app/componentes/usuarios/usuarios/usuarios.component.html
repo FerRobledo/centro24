@@ -1,0 +1,20 @@
+<div class="w-full h-full p-20 border shadow-2xl rounded-2xl">
+
+    <div class="flex justify-between">
+        <div>
+            <h1>Gestión de usuarios</h1>
+            <h2>Administra usuarios y sus permisos de acceso</h2>
+        </div>
+        <div class="p-4 md:p-0">
+            <input matInput name="filtro" class="rounded border p-2 w-56" (keyup)="applyFilter($event)"
+                placeholder="Buscar">
+        </div>
+        <div>
+            <button
+                (click)="nuevoUsuario()"
+                class="w-40 bg-zinc-800 border-zinc-800 border rounded p-3 text-white hover:text-zinc-800 hover:bg-white transition">+
+                Nuevo Usuario
+            </button>
+        </div>
+    </div>
+</div>

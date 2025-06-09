@@ -6,6 +6,7 @@ import { LoginComponent } from './componentes/auth/login/login.component';
 import { DashboardComponent } from './componentes/dashboard/dashboard.component';
 import { ProductosComponent } from './componentes/productos/productos.component';
 import { authGuard } from './auth-guard.guard';
+import { UsuariosComponent } from './componentes/usuarios/usuarios/usuarios.component';
 
 const routes: Routes = [
   {
@@ -31,6 +32,10 @@ const routes: Routes = [
       {
         path: 'productos',
         component: ProductosComponent
+      },
+      {
+        path: 'usuarios',
+        component: UsuariosComponent,
       }
     ],
     canActivate: [authGuard],
