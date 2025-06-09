@@ -10,11 +10,17 @@ import {MatCardModule} from '@angular/material/card';
 import { RegisterComponent } from './componentes/register/register.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DashboardComponent } from './componentes/dashboard/dashboard.component';
+import { SideMenuComponent } from './componentes/sideMenu/sideMenu.component';
+import { CardComponent } from './componentes/card/card.component';
+import { InformacionComponent } from './componentes/informacion/informacion.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
+    SideMenuComponent,
+    CardComponent,
+    InformacionComponent
     AuthComponent,
     RegisterComponent,
     DashboardComponent,
