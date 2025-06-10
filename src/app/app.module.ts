@@ -12,10 +12,15 @@ import { SideMenuComponent } from './componentes/sideMenu/sideMenu.component';
 import { CardComponent } from './componentes/card/card.component';
 import { InformacionComponent } from './componentes/informacion/informacion.component';
 import { EstadisticasComponent } from './componentes/estadisticas/estadisticas.component';
-
-import { AppRoutingModule } from './app-routing.module';
-
 import { ProductosComponent } from './componentes/productos/productos.component';
+
+import { UsuariosComponent } from './componentes/usuarios/usuarios/usuarios.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { UsuarioModalComponent } from './componentes/usuarios/usuarioModal/UsuarioModal.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import {MatInputModule} from '@angular/material/input';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
   declarations: [
@@ -28,7 +33,9 @@ import { ProductosComponent } from './componentes/productos/productos.component'
     DashboardComponent,
     InformacionComponent,
     EstadisticasComponent,
-    ProductosComponent
+    ProductosComponent,
+    UsuariosComponent,
+    UsuarioModalComponent,
   ],
   imports: [
     BrowserModule,
@@ -36,8 +43,13 @@ import { ProductosComponent } from './componentes/productos/productos.component'
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
+    MatDialogModule,
+    MatSlideToggleModule,
+    MatInputModule,
   ],
-  providers: [],
+  providers: [
+    provideAnimationsAsync()
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,0 +1,60 @@
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from 'src/app/services/auth.service';
+import { UsuarioService } from 'src/app/services/usuario.service';
+import { MatTableDataSource } from '@angular/material/table';
+import { Usuario } from 'src/assets/dto/usuario';
+import { MatDialog } from '@angular/material/dialog';
+import { UsuarioModalComponent } from '../usuarioModal/UsuarioModal.component';
+
+@Component({
+  selector: 'app-usuarios',
+  templateUrl: './usuarios.component.html',
+  styleUrls: ['./usuarios.component.css']
+})
+export class UsuariosComponent implements OnInit {
+
+  constructor(
+    private usuarioService: UsuarioService,
+    private authService: AuthService,
+    public dialog: MatDialog,
+  ) { }
+
+  filtroUsuarios = new MatTableDataSource();
+  usuarios: Usuario[] = []
+  cargando: Boolean = true;
+
+  ngOnInit() {
+    this.cargarUsuarios();
+  }
+
+  cargarUsuarios() {
+    this.cargando = true;
+    const userId = this.authService.getUserId();
+    if (userId) {
+
+      // this.usuarioService.getUsuarios(userId).subscribe({
+      //   next: usuarios => {
+      //     this.usuarios = usuarios;
+      //   },
+      //   error: error => { console.log(error) },
+      //   complete: () => { this.cargando = false },
+      // })
+    }
+  }
+
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.filtroUsuarios.filter = filterValue.trim().toLowerCase();
+  }
+
+  nuevoUsuario() {
+    const dialogRef = this.dialog.open(UsuarioModalComponent, {
+      maxWidth: '100%',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+    });
+  }
+
+}
