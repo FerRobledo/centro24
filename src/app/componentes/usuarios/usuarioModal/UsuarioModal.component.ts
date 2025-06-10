@@ -1,27 +1,36 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { RolService } from 'src/app/services/rol.service';
+import { Rol } from 'src/assets/dto/rol';
+import { Usuario, newUsuario } from 'src/assets/dto/usuario';
 
 @Component({
-  selector: 'app-register',
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+  selector: 'app-UsuarioModal',
+  templateUrl: './UsuarioModal.component.html',
+  styleUrls: ['./UsuarioModal.component.css']
 })
-export class RegisterComponent implements OnInit {
+export class UsuarioModalComponent implements OnInit {
 
   registerForm!: FormGroup;
   registerError: string | null = null;
+  roles: Rol[] = [];
+  rolesUsuario: Rol [] = [];
+  cargando: Boolean = false;
 
   constructor(
+    public dialogRef: MatDialogRef<UsuarioModalComponent>,
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
+    private rolService: RolService,
   ) { }
 
 
   ngOnInit(): void {
-    // Crear el formulario reactivo con validaciones
+    this.getRoles();
     this.registerForm = this.fb.group(
       {
         username: ['', [Validators.required]],
@@ -32,6 +41,9 @@ export class RegisterComponent implements OnInit {
     );
   }
 
+  getRoles(){
+    this.roles = this.rolService.getRoles()
+  }
   get username() {
     return this.registerForm.get('username');
   }
@@ -54,23 +66,41 @@ export class RegisterComponent implements OnInit {
     return null;
   }
 
-  onRegister(): void {
+  crearUsuario(): void {
+    this.cargando = true;
     if (this.registerForm.invalid) {
+      this.registerError = "Formulario invalido"
       return;
     }
 
     const { username, password } = this.registerForm.value;
 
-    this.authService.register(username, password, [{id: 4, nombre: 'Admin'}]).subscribe({
-      next: (response: any) => {
-        // Redirige al login después de un registro exitoso
-        this.router.navigate(['/login']);
+    const idPadre = this.authService.getUserId();
+
+
+    this.authService.register(username, password, this.rolesUsuario, idPadre).subscribe({
+      next: () => {
+        this.router.navigate(['/usuarios']).then(() => {
+          location.reload()
+        });
       },
-      error: (error: any) => {
-        // Muestra el error si la solicitud de registro falla
-        this.registerError = 'Hubo un error al registrar el usuario. Intente nuevamente.';
+      error: (error) => {
+        this.registerError = error.error.message;
       },
     });
   }
 
+  onTogglePermiso(rol: Rol): void {
+    const index = this.rolesUsuario.indexOf(rol);
+
+    if (index === -1) {
+      // No está el rol → lo agregamos
+      this.rolesUsuario.push(rol);
+    } else {
+      // Ya está el rol → lo quitamos
+      this.rolesUsuario.splice(index, 1);
+    }
+  }
+
 }
+
