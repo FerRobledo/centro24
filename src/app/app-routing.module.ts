@@ -6,6 +6,7 @@ import { LoginComponent } from './componentes/auth/login/login.component';
 import { DashboardComponent } from './componentes/dashboard/dashboard.component';
 import { ProductosComponent } from './componentes/productos/productos.component';
 import { authGuard } from './auth-guard.guard';
+import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
 
 const routes: Routes = [
   {
@@ -26,7 +27,7 @@ const routes: Routes = [
       },
       {
         path: 'cobranza',
-        component: RegisterComponent,
+        component: CobranzaComponent,
       },
       {
         path: 'productos',

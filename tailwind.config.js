@@ -1,10 +1,13 @@
-// tailwind.config.js
 module.exports = {
   content: [
     "./src/**/*.{html,ts}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        xs: { max: '500px' },
+      },
+    },
   },
   plugins: [],
 }
