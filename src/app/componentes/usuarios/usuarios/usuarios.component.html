@@ -1,20 +1,16 @@
-<div class="w-full h-full p-20 border shadow-2xl rounded-2xl bg-white">
+<div class="w-full max-w-7xl mx-auto m-auto h-full p-4 sm:p-6 lg:p-20 border shadow-2xl rounded-2xl bg-white">
 
-    <div class="flex justify-between">
+    <div class="flex justify-between mb-6 sm:mb-10 gap-4 sm:gap-0">
         <div>
-            <h1>Gestión de usuarios</h1>
-            <h2>Administra usuarios y sus permisos de acceso</h2>
+            <h1 class="text-xl sm:text-2xl font-bold">Gestión de usuarios</h1>
+            <h2 class="text-base sm:text-xl font-semibold">Administra usuarios y sus permisos de acceso</h2>
         </div>
-        <div class="p-4 md:p-0">
-            <input matInput name="filtro" class="rounded border p-2 w-56" (keyup)="applyFilter($event)"
-                placeholder="Buscar">
-        </div>
-        <div>
-            <button
-                (click)="nuevoUsuario()"
-                class="w-40 bg-zinc-800 border-zinc-800 border rounded p-3 text-white hover:text-zinc-800 hover:bg-white transition">+
+        <div class="flex-shrink-0">
+            <button (click)="nuevoUsuario()"
+                class="w-full sm:w-40 bg-zinc-800 border-zinc-800 border rounded p-3 text-white hover:text-zinc-800 hover:bg-white transition">+
                 Nuevo Usuario
             </button>
         </div>
     </div>
+    <app-usuarioCard></app-usuarioCard>
 </div>

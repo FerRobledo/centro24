@@ -1,0 +1,28 @@
+<div class="w-full border rounded-lg p-4">
+
+  <div class="flex flex-col sm:flex-row sm:justify-between text-center p-2 gap-2">
+    <div class="flex justify-center sm:justify-start items-center text-center">
+      <i class="fa-solid fa-circle-user text-4xl mr-3 text-green-600"></i>
+      <p class="text-xl font-bold text-center m-0">{{usuario.nombre}}</p>
+    </div>
+
+    <div class="flex justify-center sm:justify-end px-2">
+      <button title="Eliminar" class="pointer hover:scale-105">
+        <i class="fa-solid fa-trash text-xl text-red-500"></i>
+      </button>
+    </div>
+  </div>
+  
+  <h1 class="font-semibold mt-4 mb-2">Permisos de acceso</h1>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div class="flex items-center border justify-between p-3 rounded" style="margin: 0;" *ngFor="let rol of roles">
+      <div class="pr-6">
+        <label for="{{rol}}">{{rol}}</label>
+        <p class="text-zinc-600 text-sm">Gestión de {{rol}}</p>
+      </div>
+      <mat-slide-toggle id="{{rol}}" (change)="onTogglePermiso(rol)">
+      </mat-slide-toggle>
+    </div>
+  </div>
+</div>

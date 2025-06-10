@@ -19,6 +19,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatInputModule } from '@angular/material/input';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { AppRoutingModule } from './app-routing.module';
+import { UsuarioCardComponent } from './componentes/usuarios/usuarioCard/usuarioCard.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { AppRoutingModule } from './app-routing.module';
     ProductosComponent,
     UsuariosComponent,
     UsuarioModalComponent,
+    UsuarioCardComponent,
   ],
   imports: [
     BrowserModule,

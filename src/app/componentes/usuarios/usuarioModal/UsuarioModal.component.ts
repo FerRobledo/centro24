@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { RolService } from 'src/app/services/rol.service';
 import { Usuario, newUsuario } from 'src/assets/dto/usuario';
 
 @Component({
@@ -14,7 +15,7 @@ export class UsuarioModalComponent implements OnInit {
 
   registerForm!: FormGroup;
   registerError: string | null = null;
-  roles: string[] = ['Cobranza', 'Cliente', 'Productos'];
+  roles: string[] = [];
   rolesUsuario: string [] = [];
 
   constructor(
@@ -22,11 +23,12 @@ export class UsuarioModalComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
+    private rolService: RolService,
   ) { }
 
 
   ngOnInit(): void {
-    // Crear el formulario reactivo con validaciones
+    this.getRoles();
     this.registerForm = this.fb.group(
       {
         username: ['', [Validators.required]],
@@ -37,6 +39,9 @@ export class UsuarioModalComponent implements OnInit {
     );
   }
 
+  getRoles(){
+    this.roles = this.rolService.getRoles()
+  }
   get username() {
     return this.registerForm.get('username');
   }
