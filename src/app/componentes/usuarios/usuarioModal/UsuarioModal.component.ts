@@ -70,6 +70,7 @@ export class UsuarioModalComponent implements OnInit {
     this.cargando = true;
     if (this.registerForm.invalid) {
       this.registerError = "Formulario invalido"
+      this.cargando = false;
       return;
     }
 
