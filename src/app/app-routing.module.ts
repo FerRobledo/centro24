@@ -33,6 +33,10 @@ const routes: Routes = [
       {
         path: 'usuarios',
         component: UsuariosComponent,
+      },
+      {
+        path: 'usuarios',
+        component: UsuariosComponent,
       }
     ]
   },

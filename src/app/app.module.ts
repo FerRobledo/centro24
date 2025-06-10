@@ -18,9 +18,14 @@ import { UsuariosComponent } from './componentes/usuarios/usuarios/usuarios.comp
 import { MatDialogModule } from '@angular/material/dialog';
 import { UsuarioModalComponent } from './componentes/usuarios/usuarioModal/UsuarioModal.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import {MatInputModule} from '@angular/material/input';
+import { MatInputModule } from '@angular/material/input';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { AppRoutingModule } from './app-routing.module';
+import { UsuariosComponent } from './componentes/usuarios/usuarios/usuarios.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { UsuarioModalComponent } from './componentes/usuarios/usuarioModal/UsuarioModal.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatInputModule } from '@angular/material/input';
 
 @NgModule({
   declarations: [
@@ -43,6 +48,9 @@ import { AppRoutingModule } from './app-routing.module';
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
+    MatDialogModule,
+    MatSlideToggleModule,
+    MatInputModule,
     MatDialogModule,
     MatSlideToggleModule,
     MatInputModule,
