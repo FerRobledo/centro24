@@ -21,7 +21,7 @@ export class UsuariosComponent implements OnInit {
 
   filtroUsuarios = new MatTableDataSource();
   usuarios: Usuario[] = []
-  cargando: Boolean = true;
+  cargando: Boolean = false;
 
   ngOnInit() {
     this.cargarUsuarios();
@@ -32,13 +32,13 @@ export class UsuariosComponent implements OnInit {
     const userId = this.authService.getUserId();
     if (userId) {
 
-      // this.usuarioService.getUsuarios(userId).subscribe({
-      //   next: usuarios => {
-      //     this.usuarios = usuarios;
-      //   },
-      //   error: error => { console.log(error) },
-      //   complete: () => { this.cargando = false },
-      // })
+      this.usuarioService.getUsuarios(userId).subscribe({
+        next: data => {
+          this.usuarios = data.usuarios;
+        },
+        error: error => { console.log(error) },
+        complete: () => { this.cargando = false},
+      })
     }
   }
 

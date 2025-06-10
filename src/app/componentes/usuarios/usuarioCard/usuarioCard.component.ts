@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { RolService } from 'src/app/services/rol.service';
+import { UsuarioService } from 'src/app/services/usuario.service';
+import { Rol } from 'src/assets/dto/rol';
 import { newUsuario, Usuario } from 'src/assets/dto/usuario';
 
 @Component({
@@ -10,21 +12,44 @@ import { newUsuario, Usuario } from 'src/assets/dto/usuario';
 export class UsuarioCardComponent implements OnInit {
 
   constructor(
-    private rolService:RolService,
+    private rolService: RolService,
+    private userService: UsuarioService,
   ) { }
-  // @Input() usuario: Usuario = newUsuario();
-  usuario: Usuario = {
-    id: 0,
-    nombre: 'Clientes',
-    roles: ['Clientes'],
-  }
-  roles: string[] = [];
+  @Input() usuario: Usuario = newUsuario();
+  roles: Rol[] = [];
+  cargando: boolean = false;
 
   ngOnInit() {
     this.roles = this.rolService.getRoles();
   }
 
-  onTogglePermiso(rol: string){
+  onTogglePermiso(rol: Rol, event: boolean) {
+    this.cargando = true;
 
+    if (event) {
+      const yaTieneRol = this.usuario.roles.some(r => r.id === rol.id);
+      if (!yaTieneRol) {
+        this.usuario.roles.push(rol);
+      }
+    } else {
+      this.usuario.roles = this.usuario.roles.filter(r => r.id !== rol.id);
+    }
+
+    this.userService.editUsuario(this.usuario).subscribe({
+      error: error => console.log(error),
+      complete: () => this.cargando = false,
+    });
+  }
+
+  esRolAsignado(rol: Rol): boolean {
+    return this.usuario.roles.some(r => r.id === rol.id);
+  }
+
+  eliminarUsuario(){
+    this.cargando = true;
+    this.userService.eliminarUsuario(this.usuario).subscribe({
+      next: () => location.reload(),
+      error: error => console.log(error),
+    });
   }
 }

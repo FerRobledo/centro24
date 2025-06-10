@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Rol } from 'src/assets/dto/rol';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +16,8 @@ export class AuthService {
     return this.http.post(`${this.origin}/api/login`, { username, password });
   }
 
-  register(username: string, password: string, rolesUsuario: string[]): Observable<any> {
-    return this.http.post(`${this.origin}/api/register`, { username, password, rolesUsuario });
+  register(username: string, password: string, rolesUsuario: Rol[], idPadre: number = -1): Observable<any> {
+    return this.http.post(`${this.origin}/api/register`, { username, password, rolesUsuario, idPadre });
   }
 
   storeToken(token: string): void {

@@ -21,11 +21,10 @@ module.exports = async (req, res) => {
     if (req.method === 'POST') {
         try {
 
-            const { username, password, rolesUsuario } = req.body;
-            console.log(req.body)
+            const { username, password, rolesUsuario, idPadre } = req.body;
 
             // Verificar si el usuario ya existe
-            const result = await pool.query('SELECT * FROM users WHERE nombre = $1', [username]);
+            const result = await pool.query('SELECT * FROM users WHERE nombre = $1 and user_padre_id = $2', [username, idPadre]);
             if (result.rows.length > 0) {
                 return res.status(400).json({ message: 'El usuario ya existe' });
             }
@@ -33,15 +32,18 @@ module.exports = async (req, res) => {
             // Hashear la contraseña
             const passwordHash = await bcrypt.hash(password, 10);
 
-            // Insertar el nuevo usuario en la base de datos
-            const idResult = await pool.query(
-                'INSERT INTO users (nombre, password_hash, created_at) VALUES ($1, $2, now()) RETURNING id',
-                [username, passwordHash]
-            );
+            const userPadreId = idPadre === -1 ? null : idPadre;
 
-            const idUser = idResult.rows[0].id;
-            await insertRoles(idUser, rolesUsuario);
-            
+            const { rows } = await pool.query(
+                'INSERT INTO users (nombre, password_hash, user_padre_id, created_at) VALUES ($1, $2, $3, now()) RETURNING id',
+                [username, passwordHash, userPadreId]
+            );
+            const { id } = rows[0];
+
+            if (rolesUsuario.length > 0) {
+                await insertRoles(id, rolesUsuario);
+            }
+
             return res.status(201).json({ message: 'Usuario creado con éxito' });
         } catch (error) {
             console.log(error)
@@ -53,18 +55,16 @@ module.exports = async (req, res) => {
 };
 
 async function insertRoles(id, rolesUsuario) {
-    rolesUsuario.forEach(async rol => {
+    for (const rol of rolesUsuario) {
+        console.log(rol);
         try {
             await pool.query(`
-            INSERT INTO user_rol
-            (id_user, id_rol)
-            VALUES($1, $2); 
-        `, [id, rol])
+                INSERT INTO user_rol (id_user, id_rol)
+                VALUES ($1, $2)
+            `, [id, rol.id]);
         } catch (error) {
             console.log(error);
-            res.status(500).json({ message: 'Error al insertar user_rol'})
+            throw new Error('Error al insertar user_rol');
         }
-
-    });
-
+    }
 }

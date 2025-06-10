@@ -1,7 +1,9 @@
+import { Rol } from "./rol";
+
 export interface Usuario {
     id: number;
     nombre: string;
-    roles: string[];
+    roles: Rol[];
 }
 
 export function newUsuario(): Usuario{

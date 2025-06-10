@@ -25,8 +25,7 @@
       </div>
 
       <div>
-        <label for="confirmPassword" class="block text-sm font-medium text-gray-900">Repetir
-          contraseña</label>
+        <label for="confirmPassword" class="block text-sm font-medium text-gray-900">Repetir contraseña</label>
         <div class="mt-2">
           <input type="password" name="confirmPassword" formControlName="confirmPassword" id="confirmPassword" required
             class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600">
@@ -36,8 +35,8 @@
       <p class="mt-5 font-bold text-xl">Permisos</p>
       <div class="space-y-2">
         <div class="flex items-center justify-between" *ngFor="let rol of roles">
-          <label for="{{rol}}">{{rol}}</label>
-          <mat-slide-toggle id="{{rol}}" (change)="onTogglePermiso(rol)">
+          <label for="{{rol.nombre}}">Gestión de {{rol.nombre}}</label>
+          <mat-slide-toggle id="{{rol.nombre}}" (change)="onTogglePermiso(rol)" [disabled]="cargando">
           </mat-slide-toggle>
         </div>
       </div>
@@ -46,10 +45,18 @@
         {{ registerError }}
       </div>
 
-      <div>
+      <!-- Botón + Spinner -->
+      <div class="relative">
         <button type="submit"
-          class="w-full rounded-md bg-zinc-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">Agregar
-          Usuario</button>
+          [disabled]="cargando"
+          class="w-full rounded-md bg-zinc-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed">
+          Agregar Usuario
+        </button>
+
+        <!-- Spinner cargando -->
+        <div *ngIf="cargando" class="absolute top-1/2 right-4 transform -translate-y-1/2">
+          <div class="w-5 h-5 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
+        </div>
       </div>
 
     </form>

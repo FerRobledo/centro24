@@ -4,6 +4,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { RolService } from 'src/app/services/rol.service';
+import { Rol } from 'src/assets/dto/rol';
 import { Usuario, newUsuario } from 'src/assets/dto/usuario';
 
 @Component({
@@ -15,8 +16,9 @@ export class UsuarioModalComponent implements OnInit {
 
   registerForm!: FormGroup;
   registerError: string | null = null;
-  roles: string[] = [];
-  rolesUsuario: string [] = [];
+  roles: Rol[] = [];
+  rolesUsuario: Rol [] = [];
+  cargando: Boolean = false;
 
   constructor(
     public dialogRef: MatDialogRef<UsuarioModalComponent>,
@@ -65,6 +67,7 @@ export class UsuarioModalComponent implements OnInit {
   }
 
   crearUsuario(): void {
+    this.cargando = true;
     if (this.registerForm.invalid) {
       this.registerError = "Formulario invalido"
       return;
@@ -72,17 +75,22 @@ export class UsuarioModalComponent implements OnInit {
 
     const { username, password } = this.registerForm.value;
 
-    this.authService.register(username, password, this.rolesUsuario).subscribe({
+    const idPadre = this.authService.getUserId();
+
+
+    this.authService.register(username, password, this.rolesUsuario, idPadre).subscribe({
       next: () => {
-        this.router.navigate(['/usuarios']);
+        this.router.navigate(['/usuarios']).then(() => {
+          location.reload()
+        });
       },
-      error: () => {
-        this.registerError = 'Hubo un error al registrar el usuario. Intente nuevamente.';
+      error: (error) => {
+        this.registerError = error.error.message;
       },
     });
   }
 
-  onTogglePermiso(rol: string): void {
+  onTogglePermiso(rol: Rol): void {
     const index = this.rolesUsuario.indexOf(rol);
 
     if (index === -1) {
