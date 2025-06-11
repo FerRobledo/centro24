@@ -13,4 +13,8 @@ export class ProductosService {
   public getProductos(): Observable<any>{
     return this.http.get(this.origin + '/api/productos');
   }
+
+  public actualizarStock(id: number, stock: number): Observable<any> {
+    return this.http.put(this.origin + '/api/productos', { id, stock });
+  }
 }

@@ -29,4 +29,23 @@ module.exports = async (req, res) => {
         }
     }
 
+    // PUT para actualizar el stock
+    if (req.method === 'PUT') {
+        try {
+            const { id, stock } = req.body; // Espera id y nuevo valor de stock en el cuerpo de la petición
+            if (!id || stock === undefined) {
+                return res.status(400).json({ error: 'ID y stock son requeridos' });
+            }
+            const query = 'UPDATE productos SET stock = $1 WHERE id = $2 RETURNING *';
+            const { rows } = await pool.query(query, [stock, id]);
+            if (rows.length === 0) {
+                return res.status(404).json({ error: 'Producto no encontrado' });
+            }
+            return res.status(200).json(rows[0]);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ error: 'Error al actualizar el stock', details: error.message });
+        }
+    }
+
 }

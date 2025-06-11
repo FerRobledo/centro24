@@ -12,6 +12,9 @@ import { ProductosService } from 'src/app/services/productos.service';
 
 export class ProductosComponent implements OnInit {
   productos: any[] = [];
+  productosFiltrados: any[] = [];
+  categoriasUnicas: string[] = [];
+  cantidadModificar: number | null = null;
 
   constructor(private productosService: ProductosService) {
     console.log('Componente AppComponent inicializado');
@@ -22,7 +25,9 @@ export class ProductosComponent implements OnInit {
     console.log('ngOnInit ejecutándose');
     this.productosService.getProductos().subscribe({
       next: (data) => {
-        this.productos = data;
+        this.productos = data.map((producto: any) => ({ ...producto, cantidadModificar: null }));
+        this.productosFiltrados = [...this.productos];
+        this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
         console.log('Datos recibidos:', data);
       },
       error: (error) => {
@@ -34,35 +39,60 @@ export class ProductosComponent implements OnInit {
     });
   }
 
-
-  increaseStock(index: number) {
-    this.productos[index].stock += 1;
-  }
-
-  decreaseStock(index: number) {
-    if (this.productos[index].stock > 0) {
-      this.productos[index].stock -= 1;
+  filtrarCategoria(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    if (value) {
+      this.productosFiltrados = this.productos.filter(p => p.categoria === value);
+    } else {
+      this.productosFiltrados = [...this.productos];
     }
   }
 
-  showModal = false;
-  selectedIndex: number | null = null;
-  quantity: number = 1;
 
-  openQuantityModal(index: number) {
-    this.selectedIndex = index;
-    this.showModal = true;
+  incrementarStock(producto: any) {
+    const nuevoStock = (producto.stock || 0) + 1;
+    this.productosService.actualizarStock(producto.id, nuevoStock).subscribe(
+      updatedProducto => {
+        producto.stock = updatedProducto.stock; // Actualiza el valor local con la respuesta del servidor
+      },
+      error => console.error('Error al incrementar stock', error)
+    );
   }
 
-  closeModal() {
-    this.showModal = false;
-    this.selectedIndex = null;
+  decrementarStock(producto: any) {
+    if (producto.stock > 0) {
+      const nuevoStock = (producto.stock || 0) - 1;
+      this.productosService.actualizarStock(producto.id, nuevoStock).subscribe(
+        updatedProducto => {
+          producto.stock = updatedProducto.stock; // Actualiza el valor local con la respuesta del servidor
+        },
+        error => console.error('Error al decrementar stock', error)
+      );
+    }
   }
 
-  addQuantity(index: number) {
-    if (this.quantity > 0) {
-      this.productos[index].stock += this.quantity;
-      this.closeModal();
+  onCantidadChange(producto: any) {
+    // Validar que la cantidad sea un número válido
+    const value = parseInt(producto.cantidadModificar, 10);
+    producto.cantidadModificar = isNaN(value) ? null : value;
+  }
+
+  modificarStock(producto: any) {
+    if (producto.cantidadModificar !== null && producto.cantidadModificar !== 0) {
+      const cambio = producto.cantidadModificar;
+      const nuevoStock = (producto.stock || 0) + cambio;
+      if (nuevoStock >= 0) {
+        this.productosService.actualizarStock(producto.id, nuevoStock).subscribe(
+          updatedProducto => {
+            producto.stock = updatedProducto.stock;
+            producto.cantidadModificar = null; // Resetear el input
+          },
+          error => console.error('Error al modificar stock', error)
+        );
+      } else {
+        alert('No puedes restar más stock del que hay disponible. Stock actual: ' + producto.stock);
+        producto.cantidadModificar = null; // Resetear si el valor es inválido
+      }
     }
   }
 }
