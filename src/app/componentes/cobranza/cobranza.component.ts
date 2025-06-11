@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from 'src/app/services/auth.service';
 import { CobranzaService } from 'src/app/services/cobranza.service';
 
 @Component({
@@ -9,26 +10,28 @@ import { CobranzaService } from 'src/app/services/cobranza.service';
 export class CobranzaComponent implements OnInit {
   clientesDelDia: any[] = [];
 
-  constructor(private cobranzaService: CobranzaService) { 
+  constructor(private cobranzaService: CobranzaService, private authService: AuthService) {
     console.log('Componente init');
   }
 
   ngOnInit() {
-    console.log('ngOnit ejecutandose');
-    this.cobranzaService.getClientesDelDia().subscribe({
-    
-      next: (data) => {
-        //si hay data entonces hago un .add
-        this.clientesDelDia = data;
-        console.log("Los clientes son: ",data);
-      },
-      error: (error) => {
-        console.log("Error en el pedido de clientes del dia: ",error)
-      },
-      complete: () => {
-        console.log("Pedido en estado OK");
-      }
-    })
+    const id = this.authService.getUserId();
+    if (id) {
+      this.cobranzaService.getClientesDelDia(id).subscribe({
+
+        next: (data) => {
+          //si hay data entonces hago un .add
+          this.clientesDelDia = data;
+          console.log("Los clientes son: ", data);
+        },
+        error: (error) => {
+          console.log("Error en el pedido de clientes del dia: ", error)
+        },
+        complete: () => {
+          console.log("Pedido en estado OK");
+        }
+      })
+    }
   }
 
 }

@@ -22,8 +22,14 @@ module.exports = async (req, res) => {
 
     //GET
     if(req.method === 'GET'){
+        //obt id user_admin de la query
+        const {id} = req.query;
+        
+        if(!id){
+            return res.status(500).json({ error: 'Error falta id para obtener los clientes del dia', details: error.message });
+        }
         try {
-            const{ rows } = await pool.query('SELECT * FROM caja');
+            const{ rows } = await pool.query('SELECT * FROM caja WHERE user_admin = $1', [id]);
 
             return res.status(200).json(rows);
         } catch(error) {

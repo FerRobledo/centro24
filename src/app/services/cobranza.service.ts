@@ -10,8 +10,7 @@ private origin = window.location.origin;
 
 constructor(private http: HttpClient) { }
 
-  public getClientesDelDia(): Observable<any>{
-    return this.http.get(this.origin + '/api/cobranza')
+  public getClientesDelDia(id: number): Observable<any>{
+    return this.http.get(this.origin + '/api/cobranza/' + id)
   } 
-
 }
