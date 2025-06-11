@@ -16,6 +16,7 @@ import { EstadisticasComponent } from './componentes/estadisticas/estadisticas.c
 import { AppRoutingModule } from './app-routing.module';
 
 import { ProductosComponent } from './componentes/productos/productos.component';
+import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { ProductosComponent } from './componentes/productos/productos.component'
     DashboardComponent,
     InformacionComponent,
     EstadisticasComponent,
-    ProductosComponent
+    ProductosComponent,
+    CobranzaComponent
   ],
   imports: [
     BrowserModule,
