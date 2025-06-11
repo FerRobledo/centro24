@@ -7,6 +7,8 @@ import { DashboardComponent } from './componentes/dashboard/dashboard.component'
 import { ProductosComponent } from './componentes/productos/productos.component';
 import { authGuard } from './auth-guard.guard';
 import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
+import { UsuarioModalComponent } from './componentes/usuarios/usuarioModal/UsuarioModal.component';
+import { UsuariosComponent } from './componentes/usuarios/usuarios/usuarios.component';
 
 const routes: Routes = [
   {
@@ -32,9 +34,16 @@ const routes: Routes = [
       {
         path: 'productos',
         component: ProductosComponent
+      },
+      {
+        path: 'usuarios',
+        component: UsuariosComponent,
+      },
+      {
+        path: 'usuarios',
+        component: UsuariosComponent,
       }
-    ],
-    canActivate: [authGuard],
+    ]
   },
 ];
 

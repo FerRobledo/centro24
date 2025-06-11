@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Rol } from 'src/assets/dto/rol';
 
 @Injectable({
   providedIn: 'root'
@@ -9,14 +10,14 @@ export class AuthService {
 
   private origin = window.location.origin;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   login(username: string, password: string): Observable<any> {
     return this.http.post(`${this.origin}/api/login`, { username, password });
   }
 
-  register(username: string, password: string): Observable<any> {
-    return this.http.post(`${this.origin}/api/register`, { username, password });
+  register(username: string, password: string, rolesUsuario: Rol[], idPadre: number = -1): Observable<any> {
+    return this.http.post(`${this.origin}/api/register`, { username, password, rolesUsuario, idPadre });
   }
 
   storeToken(token: string): void {
@@ -29,6 +30,21 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('jwtToken');
+  }
+
+  getUserId() {
+    const token = this.getToken();
+
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.userId || null;
+    } catch (error) {
+      console.error('Error al decodificar el token', error);
+      return null;
+    }
+
   }
 
 }

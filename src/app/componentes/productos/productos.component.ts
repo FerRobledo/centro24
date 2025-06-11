@@ -1,4 +1,7 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { ProductosService } from 'src/app/services/productos.service';
 
 @Component({
   selector: 'app-productos',
@@ -8,21 +11,37 @@ import { Component, OnInit } from '@angular/core';
 
 
 export class ProductosComponent implements OnInit {
-  products = [
-    { name: 'Producto 1', description: 'Descripción del Producto 1', category: 'Electrónica', price: 10.99, stock: 50, image: null },
-    { name: 'Producto 2', description: 'Descripción del Producto 2', category: 'Ropa', price: 15.50, stock: 30, image: null },
-    { name: 'Producto 3', description: 'Descripción del Producto 3', category: 'Hogar', price: 7.25, stock: 75, image: null }
-  ];
+  productos: any[] = [];
 
-  ngOnInit() {}
+  constructor(private productosService: ProductosService) {
+    console.log('Componente AppComponent inicializado');
+  }
+
+  
+  ngOnInit() {
+    console.log('ngOnInit ejecutándose');
+    this.productosService.getProductos().subscribe({
+      next: (data) => {
+        this.productos = data;
+        console.log('Datos recibidos:', data);
+      },
+      error: (error) => {
+        console.error('Error al obtener productos:', error);
+      },
+      complete: () => {
+        console.log('Solicitud completada');
+      }
+    });
+  }
+
 
   increaseStock(index: number) {
-    this.products[index].stock += 1;
+    this.productos[index].stock += 1;
   }
 
   decreaseStock(index: number) {
-    if (this.products[index].stock > 0) {
-      this.products[index].stock -= 1;
+    if (this.productos[index].stock > 0) {
+      this.productos[index].stock -= 1;
     }
   }
 
@@ -42,7 +61,7 @@ export class ProductosComponent implements OnInit {
 
   addQuantity(index: number) {
     if (this.quantity > 0) {
-      this.products[index].stock += this.quantity;
+      this.productos[index].stock += this.quantity;
       this.closeModal();
     }
   }

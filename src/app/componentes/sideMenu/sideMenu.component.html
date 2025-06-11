@@ -1,3 +1,4 @@
+
 <div class="flex h-screen flex-col justify-between border-e border-gray-100 bg-white xs:w-full xs:h-auto xs:border-0">
   <div class="px-6 pt-10 xs:px-4 xs:pt-6">
     <div class="mb-5 mt-2 mx-auto w-[120px] rounded-xl border-2 border-gray-300 shadow-md xs:w-[100px]">
@@ -5,7 +6,6 @@
     </div>
 
     <div class="w-[120px] border-t-2 border-green-600 mx-auto mb-2 rounded xs:w-[100px]"></div>
-
     <ul class="space-y-2 rounded-xl xs:space-y-1">
       <li>
         <a
@@ -39,6 +39,12 @@
           class="block rounded-lg px-4 py-2 font-medium text-gray-600 hover:bg-gray-100 hover:text-green-700 xs:text-base xs:px-3 xs:py-1.5"
         >
           Productos
+        </a>
+      </li>
+      <li>
+        <a [routerLink]="['/usuarios']"
+          class="block rounded-lg px-4 py-2 font-medium text-gray-600 hover:bg-gray-100 hover:text-green-700">
+          Usuarios
         </a>
       </li>
     </ul>
