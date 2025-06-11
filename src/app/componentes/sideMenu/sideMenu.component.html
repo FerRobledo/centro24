@@ -1,17 +1,16 @@
-<div class="flex h-screen flex-col justify-between border-e border-gray-100 bg-white">
-  <div class="px-6 pt-10">
 
-    <div class="mb-2 mt-2 mx-auto w-[150px] rounded-xl border-2 border-gray-300 shadow-md ">
+<div class="flex h-screen flex-col justify-between border-e border-gray-100 bg-white xs:w-full xs:h-auto xs:border-0">
+  <div class="px-6 pt-10 xs:px-4 xs:pt-6">
+    <div class="mb-5 mt-2 mx-auto w-[120px] rounded-xl border-2 border-gray-300 shadow-md xs:w-[100px]">
       <img src="../../../assets/images/centro24.webp" alt="" class="w-full">
     </div>
 
-    <div class="w-[150px] border-t-2 border-green-600 mx-auto mb-2 rounded"></div>
-
-    <ul class="space-y-1  rounded-xl">
+    <div class="w-[120px] border-t-2 border-green-600 mx-auto mb-2 rounded xs:w-[100px]"></div>
+    <ul class="space-y-2 rounded-xl xs:space-y-1">
       <li>
         <a
           [routerLink]="['/']"
-          class="block rounded-lg  px-4 py-2 text-2xl font-medium text-gray-900"
+          class="block rounded-lg px-4 py-2 text-xl font-medium text-gray-900 xs:text-lg xs:px-3 xs:py-1.5"
         >
           Centro 24
         </a>
@@ -20,8 +19,8 @@
       <li>
         <a
           [routerLink]="['/cobranza']"
-          class="block rounded-lg px-4 py-2 text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-green-700"
-          >
+          class="block rounded-lg px-4 py-2 text-lg font-medium text-gray-600 hover:bg-gray-100 hover:text-green-700 xs:text-base xs:px-3 xs:py-1.5"
+        >
           <p>Cobranza</p>
         </a>
       </li>
@@ -29,14 +28,16 @@
       <li>
         <a
           href="#"
-          class="block rounded-lg px-4 py-2 text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-green-700"
+          class="block rounded-lg px-4 py-2 text-lg font-medium text-gray-600 hover:bg-gray-100 hover:text-green-700 xs:text-base xs:px-3 xs:py-1.5"
         >
           Clientes
         </a>
       </li>
       <li>
-        <a [routerLink]="['/productos']"
-          class="block rounded-lg px-4 py-2 font-medium text-gray-600 hover:bg-gray-100 hover:text-green-700">
+        <a
+          [routerLink]="['/productos']"
+          class="block rounded-lg px-4 py-2 font-medium text-gray-600 hover:bg-gray-100 hover:text-green-700 xs:text-base xs:px-3 xs:py-1.5"
+        >
           Productos
         </a>
       </li>
@@ -49,14 +50,15 @@
     </ul>
   </div>
 
-  <div class="sticky bg-green-100 inset-x-0 bottom-0 border-t-2 border-gray-300">
-    <a href="#" class="flex items-center gap-2 bg-white p-4 hover:bg-gray-50">
-      <img alt=""
+  <div class="sticky bg-green-100 inset-x-0 bottom-0 border-t-2 border-gray-300 xs:relative xs:bg-transparent xs:border-0">
+    <a href="#" class="flex items-center gap-2 bg-white p-4 hover:bg-gray-50 xs:p-3 xs:gap-1.5">
+      <img
+        alt=""
         src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-        class="size-10 rounded-full object-cover"
+        class="size-10 rounded-full object-cover xs:size-8"
       />
       <div>
-        <p class="text-base">
+        <p class="text-lg xs:text-base">
           <strong class="block font-medium">Segio Admin</strong>
         </p>
       </div>
