@@ -20,6 +20,7 @@ import { MatInputModule } from '@angular/material/input';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { AppRoutingModule } from './app-routing.module';
 import { UsuarioCardComponent } from './componentes/usuarios/usuarioCard/usuarioCard.component';
+import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { UsuarioCardComponent } from './componentes/usuarios/usuarioCard/usuario
     UsuariosComponent,
     UsuarioModalComponent,
     UsuarioCardComponent,
+    CobranzaComponent,
   ],
   imports: [
     BrowserModule,
