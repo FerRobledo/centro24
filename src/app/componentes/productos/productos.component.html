@@ -1,29 +1,66 @@
-<!-- src/app/app.component.html o src/app/productos/productos.component.html -->
-<div *ngIf="productos.length > 0">
-  <h2>Lista de Productos</h2>
-  <table style="width: 100%; border-collapse: collapse;">
-    <thead>
-      <tr style="background-color: #f2f2f2;">
-        <th style="padding: 10px; border: 1px solid #ddd;">ID</th>
-        <th style="padding: 10px; border: 1px solid #ddd;">Precio</th>
-        <th style="padding: 10px; border: 1px solid #ddd;">Descripción</th>
-        <th style="padding: 10px; border: 1px solid #ddd;">Stock</th>
-        <th style="padding: 10px; border: 1px solid #ddd;">Categoría</th>
-        <th style="padding: 10px; border: 1px solid #ddd;">Novedad</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let producto of productos" style="border: 1px solid #ddd;">
-        <td style="padding: 10px; border: 1px solid #ddd;">{{ producto.id }}</td>
-        <td style="padding: 10px; border: 1px solid #ddd;">${{ producto.precio }}</td>
-        <td style="padding: 10px; border: 1px solid #ddd;">{{ producto.descripcion }}</td>
-        <td style="padding: 10px; border: 1px solid #ddd;">{{ producto.stock }}</td>
-        <td style="padding: 10px; border: 1px solid #ddd;">{{ producto.categoria }}</td>
-        <td style="padding: 10px; border: 1px solid #ddd;">{{ producto.novedad }}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-<div *ngIf="productos.length === 0">
-  <p>Cargando productos...</p>
+<!-- src/app/productos/productos.component.html -->
+<div class="container mx-auto p-4">
+  <!-- Select en la parte superior -->
+  <div class="mb-4">
+    <label for="categoriaFiltro" class="block text-sm font-medium text-gray-700">Filtrar por Categoría:</label>
+    <select 
+      id="categoriaFiltro" 
+      (change)="filtrarCategoria($event)" 
+      class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+      <option value="">Todas</option>
+      <option *ngFor="let cat of categoriasUnicas" [value]="cat">{{ cat }}</option>
+    </select>
+  </div>
+
+  <div *ngIf="productos.length > 0">
+    <h2 class="text-2xl font-bold text-gray-900 mb-4">Lista de Productos</h2>
+    <table class="w-full border-collapse">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="p-3 border border-gray-300 text-left">ID</th>
+          <th class="p-3 border border-gray-300 text-left">Precio</th>
+          <th class="p-3 border border-gray-300 text-left">Descripción</th>
+          <th class="p-3 border border-gray-300 text-left">Stock</th>
+          <th class="p-3 border border-gray-300 text-left">Categoría</th>
+          <th class="p-3 border border-gray-300 text-left">Novedad</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let producto of productosFiltrados" class="border border-gray-300">
+          <td class="p-3 border border-gray-300">{{ producto.id }}</td>
+          <td class="p-3 border border-gray-300">${{ producto.precio }}</td>
+          <td class="p-3 border border-gray-300">{{ producto.descripcion }}</td>
+          <td class="p-3 border border-gray-300 flex items-center">
+            <button 
+              (click)="decrementarStock(producto)" 
+              class="bg-red-500 text-white px-2 py-1 rounded-l-md hover:bg-red-600">-</button>
+            <span class="px-4">{{ producto.stock }}</span>
+            <button 
+              (click)="incrementarStock(producto)" 
+              class="bg-green-500 text-white px-2 py-1 rounded-r-md hover:bg-green-600">+
+            </button>
+            <input 
+              type="number" 
+              [(ngModel)]="producto.cantidadModificar" 
+              (ngModelChange)="onCantidadChange(producto)" 
+              class="w-16 mx-2 p-1 border border-gray-300 rounded-md text-center"  
+              placeholder="Cant."
+            >
+            <button 
+              (click)="modificarStock(producto)" 
+              class="bg-blue-500 text-white px-2 py-1 rounded-md hover:bg-blue-600"
+              [disabled]="!producto.cantidadModificar || producto.cantidadModificar === 0"
+            >
+              Actualizar
+            </button>
+          </td>
+          <td class="p-3 border border-gray-300">{{ producto.categoria }}</td>
+          <td class="p-3 border border-gray-300">{{ producto.novedad }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div *ngIf="productos.length === 0" class="text-center py-10">
+    <p class="text-gray-500">Cargando productos...</p>
+  </div>
 </div>
