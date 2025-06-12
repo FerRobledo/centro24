@@ -15,6 +15,7 @@ export class ProductosComponent implements OnInit {
   productosFiltrados: any[] = [];
   categoriasUnicas: string[] = [];
   cantidadModificar: number | null = null;
+  categoriaSeleccionada: string = '';   //Filtro principal (categoria)
 
   constructor(private productosService: ProductosService) {
     console.log('Componente AppComponent inicializado');
@@ -41,27 +42,41 @@ export class ProductosComponent implements OnInit {
 
   filtrarCategoria(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
-    if (value) {
-      this.productosFiltrados = this.productos.filter(p => p.categoria === value);
-    } else {
-      this.productosFiltrados = [...this.productos];
+    this.categoriaSeleccionada = value; // Actualiza la categoría seleccionada
+    this.aplicarFiltros(); // Aplica todos los filtros
+  }
+
+  filtrarStockMayorCero() {
+    this.aplicarFiltros(true); // Aplicar filtro de stock > 0
+  }
+
+  mostrarTodos() {
+    this.aplicarFiltros(false); // Mostrar todos dentro de la categoría seleccionada
+  }
+
+  aplicarFiltros(filtrarStock: boolean = false) {
+    let resultado = [...this.productos];
+
+    // Filtro principal: categoría seleccionada
+    if (this.categoriaSeleccionada) {
+      resultado = resultado.filter(p => p.categoria === this.categoriaSeleccionada);
     }
-  }
 
-  filtrarStrockMayorCero(){
-    this.productosFiltrados = this.productos.filter(p => p.stock > 0);
-  }
+    // Filtro secundario: stock > 0 si se solicita
+    if (filtrarStock) {
+      resultado = resultado.filter(p => p.stock > 0);
+    }
 
-  mostrarTodos(){
-    this.productosFiltrados = [...this.productos];
+    this.productosFiltrados = resultado;
+    console.log('Filtros aplicados. Resultado:', this.productosFiltrados);
   }
-
 
   incrementarStock(producto: any) {
     const nuevoStock = (producto.stock || 0) + 1;
     this.productosService.actualizarStock(producto.id, nuevoStock).subscribe(
       updatedProducto => {
         producto.stock = updatedProducto.stock; // Actualiza el valor local con la respuesta del servidor
+        this.aplicarFiltros(); // Reaplicar filtros para actualizar la vista
       },
       error => console.error('Error al incrementar stock', error)
     );
@@ -73,6 +88,7 @@ export class ProductosComponent implements OnInit {
       this.productosService.actualizarStock(producto.id, nuevoStock).subscribe(
         updatedProducto => {
           producto.stock = updatedProducto.stock; // Actualiza el valor local con la respuesta del servidor
+          this.aplicarFiltros(); // Reaplicar filtros para actualizar la vista
         },
         error => console.error('Error al decrementar stock', error)
       );
@@ -94,6 +110,7 @@ export class ProductosComponent implements OnInit {
           updatedProducto => {
             producto.stock = updatedProducto.stock;
             producto.cantidadModificar = null; // Resetear el input
+            this.aplicarFiltros();
           },
           error => console.error('Error al modificar stock', error)
         );
