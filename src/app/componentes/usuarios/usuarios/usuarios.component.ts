@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
-import { UsuarioService } from 'src/app/services/usuario.service';
+import { UsuarioService } from '../../../services/usuario.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { Usuario } from 'src/assets/dto/usuario';
 import { MatDialog } from '@angular/material/dialog';
@@ -31,6 +31,7 @@ export class UsuariosComponent implements OnInit {
   cargarUsuarios() {
     this.cargando = true;
     console.log("Cargando usuarios...")
+    console.log(UsuarioService);
     const userId = this.authService.getUserId();
     if (userId) {
       this.usuarioService.getUsuarios(userId).subscribe({
