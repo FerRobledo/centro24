@@ -48,6 +48,14 @@ export class ProductosComponent implements OnInit {
     }
   }
 
+  filtrarStrockMayorCero(){
+    this.productosFiltrados = this.productos.filter(p => p.stock > 0);
+  }
+
+  mostrarTodos(){
+    this.productosFiltrados = [...this.productos];
+  }
+
 
   incrementarStock(producto: any) {
     const nuevoStock = (producto.stock || 0) + 1;
