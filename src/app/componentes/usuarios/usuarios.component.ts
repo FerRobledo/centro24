@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
-import { UsuarioService } from '../../../services/usuario.service';
+import { UsuarioService } from '../../services/usuario.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { Usuario } from 'src/assets/dto/usuario';
 import { MatDialog } from '@angular/material/dialog';
