@@ -41,7 +41,7 @@ module.exports = async (req, res) => {
             console.log(process.env.JWT_SECRET);
             // Generar el JWT
             const token = jwt.sign(
-                { userId: user.id, username: user.username },
+                { userId: user.id, username: user.username, idAdmin: user.user_padre_id },
                 process.env.JWT_SECRET,
                 { expiresIn: '12h' } // El token expira en 6 horas
             );

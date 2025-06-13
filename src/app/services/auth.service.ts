@@ -47,4 +47,24 @@ export class AuthService {
 
   }
 
+  getIdAdmin() {
+    const token = this.getToken();
+
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      let idAdmin = payload.idAdmin;
+      if(!idAdmin){
+        return this.getUserId();
+      } else {
+        return payload.idAdmin;
+      }
+    } catch (error) {
+      console.error('Error al decodificar el token', error);
+      return null;
+    }
+
+  }
+
 }

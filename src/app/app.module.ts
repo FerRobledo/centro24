@@ -23,6 +23,10 @@ import { UsuarioCardComponent } from './componentes/usuarios/usuarioCard/usuario
 import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
 import { RegisterClienteComponent } from './componentes/cobranza/registerCliente/registerCliente.component';
 
+import { ConfirmDialogComponent } from './componentes/confirmDialog/confirmDialog.component';
+import { MatIconModule } from '@angular/material/icon';
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -39,7 +43,8 @@ import { RegisterClienteComponent } from './componentes/cobranza/registerCliente
     UsuarioModalComponent,
     UsuarioCardComponent,
     CobranzaComponent,
-    RegisterClienteComponent
+    RegisterClienteComponent,
+    ConfirmDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -53,6 +58,7 @@ import { RegisterClienteComponent } from './componentes/cobranza/registerCliente
     MatDialogModule,
     MatSlideToggleModule,
     MatInputModule,
+    MatIconModule,
   ],
   providers: [
     provideAnimationsAsync()

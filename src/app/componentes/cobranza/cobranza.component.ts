@@ -28,7 +28,8 @@ export class CobranzaComponent implements OnInit {
   }
 
   private loadClientsDaily() {
-    const id = this.authService.getUserId();
+    const id = this.authService.getIdAdmin();
+
     if (id) {
       this.cobranzaService.getClientsOfDay(id).subscribe({
 

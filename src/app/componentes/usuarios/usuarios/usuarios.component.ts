@@ -29,15 +29,14 @@ export class UsuariosComponent implements OnInit {
 
   cargarUsuarios() {
     this.cargando = true;
-    const userId = this.authService.getUserId();
+    const userId = this.authService.getIdAdmin();
     if (userId) {
-
       this.usuarioService.getUsuarios(userId).subscribe({
         next: data => {
           this.usuarios = data.usuarios;
         },
         error: error => { console.log(error) },
-        complete: () => { this.cargando = false},
+        complete: () => { this.cargando = false },
       })
     }
   }
