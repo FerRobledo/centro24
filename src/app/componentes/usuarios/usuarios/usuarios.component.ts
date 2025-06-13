@@ -36,7 +36,7 @@ export class UsuariosComponent implements OnInit {
           this.usuarios = data.usuarios;
         },
         error: error => { console.log(error) },
-        complete: () => { this.cargando = false},
+        complete: () => { this.cargando = false },
       })
     }
   }
