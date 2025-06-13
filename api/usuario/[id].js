@@ -91,21 +91,21 @@ module.exports = async (req, res) => {
     } if (req.method === "DELETE") {
         const { id } = req.query;
         console.log(id);
-        if(!id){
-            res.status(500)({ message: 'Faltan datos para eliminar usuario'});
+        if (!id) {
+            res.status(500)({ message: 'Faltan datos para eliminar usuario' });
         }
-        try{
+        try {
 
-            
+
             await pool.query('DELETE FROM user_rol WHERE id_user = $1', [id]);
-            
+
             await pool.query('DELETE FROM users WHERE id = $1', [id]);
-            
-            res.status(200).json({ message: 'Usuario eliminado con exito'});
-        } catch (error){
+
+            res.status(200).json({ message: 'Usuario eliminado con exito' });
+        } catch (error) {
             console.log(error);
-            res.status(500).json({ message: 'Error al eliminar usuario'});
-        }    
+            res.status(500).json({ message: 'Error al eliminar usuario' });
+        }
     } else {
         res.status(405).json({ message: 'Método no permitido' });
     }

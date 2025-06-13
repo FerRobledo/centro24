@@ -31,7 +31,6 @@ export class UsuariosComponent implements OnInit {
     this.cargando = true;
     const userId = this.authService.getIdAdmin();
     if (userId) {
-
       this.usuarioService.getUsuarios(userId).subscribe({
         next: data => {
           this.usuarios = data.usuarios;
