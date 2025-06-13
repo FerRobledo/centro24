@@ -15,7 +15,7 @@ export class CobranzaComponent implements OnInit {
   }
 
   ngOnInit() {
-    const id = this.authService.getUserId();
+    const id = this.authService.getIdAdmin();
     if (id) {
       this.cobranzaService.getClientesDelDia(id).subscribe({
 

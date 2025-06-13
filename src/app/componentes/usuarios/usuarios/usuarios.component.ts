@@ -24,22 +24,19 @@ export class UsuariosComponent implements OnInit {
   cargando: Boolean = false;
 
   ngOnInit() {
-    console.log("Iniciando usuarios component");
     this.cargarUsuarios();
   }
 
   cargarUsuarios() {
     this.cargando = true;
-    console.log("Cargando usuarios...")
-    console.log(UsuarioService);
-    const userId = this.authService.getUserId();
+    const userId = this.authService.getIdAdmin();
     if (userId) {
       this.usuarioService.getUsuarios(userId).subscribe({
         next: data => {
           this.usuarios = data.usuarios;
         },
         error: error => { console.log(error) },
-        complete: () => { this.cargando = false; console.log("Carga completa")},
+        complete: () => { this.cargando = false },
       })
     }
   }
