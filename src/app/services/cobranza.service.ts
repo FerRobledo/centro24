@@ -10,7 +10,11 @@ private origin = window.location.origin;
 
 constructor(private http: HttpClient) { }
 
-  public getClientesDelDia(id: number): Observable<any>{
+  public getClientsOfDay(id: number): Observable<any>{
     return this.http.get(this.origin + '/api/cobranza/' + id)
   } 
+
+  public postClientDaily(id: number): Observable<any>{
+    return this.http.post(this.origin + '/api/cobranza', { id });
+  }
 }

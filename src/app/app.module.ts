@@ -21,6 +21,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { AppRoutingModule } from './app-routing.module';
 import { UsuarioCardComponent } from './componentes/usuarios/usuarioCard/usuarioCard.component';
 import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
+import { RegisterClienteComponent } from './componentes/cobranza/registerCliente/registerCliente.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
     UsuarioModalComponent,
     UsuarioCardComponent,
     CobranzaComponent,
+    RegisterClienteComponent
   ],
   imports: [
     BrowserModule,
