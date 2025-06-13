@@ -47,4 +47,19 @@ export class AuthService {
 
   }
 
+  getIdAdmin() {
+    const token = this.getToken();
+
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.user_padre_id || null;
+    } catch (error) {
+      console.error('Error al decodificar el token', error);
+      return null;
+    }
+
+  }
+
 }

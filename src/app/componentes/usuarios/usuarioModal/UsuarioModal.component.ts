@@ -76,7 +76,7 @@ export class UsuarioModalComponent implements OnInit {
 
     const { username, password } = this.registerForm.value;
 
-    const idPadre = this.authService.getUserId();
+    const idPadre = this.authService.getIdAdmin();
 
 
     this.authService.register(username, password, this.rolesUsuario, idPadre).subscribe({

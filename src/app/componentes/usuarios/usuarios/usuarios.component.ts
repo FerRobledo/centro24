@@ -29,7 +29,7 @@ export class UsuariosComponent implements OnInit {
 
   cargarUsuarios() {
     this.cargando = true;
-    const userId = this.authService.getUserId();
+    const userId = this.authService.getIdAdmin();
     if (userId) {
 
       this.usuarioService.getUsuarios(userId).subscribe({

@@ -21,6 +21,8 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { AppRoutingModule } from './app-routing.module';
 import { UsuarioCardComponent } from './componentes/usuarios/usuarioCard/usuarioCard.component';
 import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
+import { ConfirmDialogComponent } from './componentes/confirmDialog/confirmDialog.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -38,6 +40,7 @@ import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
     UsuarioModalComponent,
     UsuarioCardComponent,
     CobranzaComponent,
+    ConfirmDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -51,6 +54,7 @@ import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
     MatDialogModule,
     MatSlideToggleModule,
     MatInputModule,
+    MatIconModule,
   ],
   providers: [
     provideAnimationsAsync()
