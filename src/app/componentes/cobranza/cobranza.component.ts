@@ -24,7 +24,6 @@ export class CobranzaComponent implements OnInit {
 
   handleClick() {
     this.clicked = true;
-    this.insertClientDaily();
   }
 
   private loadClientsDaily() {
@@ -47,7 +46,7 @@ export class CobranzaComponent implements OnInit {
       })
     }
   }
-
+/*
   private insertClientDaily() {
     console.log("entre");
     
@@ -67,5 +66,5 @@ export class CobranzaComponent implements OnInit {
         }
       })
     }
-  }
+  }*/
 }

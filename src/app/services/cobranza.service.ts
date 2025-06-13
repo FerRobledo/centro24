@@ -14,7 +14,7 @@ constructor(private http: HttpClient) { }
     return this.http.get(this.origin + '/api/cobranza/' + id)
   } 
 
-  public postClientDaily(id: number): Observable<any>{
-    return this.http.post(this.origin + '/api/cobranza', { id });
+  public postClientDaily(payload: any, idAdmin: number): Observable<any>{
+    return this.http.post(this.origin + '/api/cobranza/' + idAdmin, payload);
   }
 }

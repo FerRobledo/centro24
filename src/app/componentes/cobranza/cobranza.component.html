@@ -1,6 +1,6 @@
 <div class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl bg-clip-border">
-  <div class="relative mx-4 mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border">
-    <div class="flex items-center justify-between ">
+  <div class="relative mx-4 mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border" *ngIf="!clicked">
+    <div class="flex items-center justify-between">
         <div>
             <h3 class="text-lg font-semibold text-slate-800">Caja de cobranza</h3>
             <p class="text-slate-500">Listar clientes diarios</p>
@@ -22,7 +22,7 @@
     </div>
    
   </div>
-  <div class="p-0 overflow-y-scroll">
+  <div class="p-0 overflow-y-scroll" *ngIf="!clicked">
     <table class="w-full mt-4 text-left table-auto min-w-max">
       <thead>
         <tr>
@@ -189,29 +189,11 @@
           </td>
           -->
         </tr>
-        <div *ngIf="clientsOfDay.length === 0"><p>cargandoooo....</p></div>
-        <app-registerCliente *ngIf="clicked"></app-registerCliente>
+        <!--<div *ngIf="clientsOfDay.length === 0"><p>cargandoooo....</p></div>-->
       </tbody>
     </table>
   </div>
-  <!--  <div class="flex bottom-0 items-center justify-between p-3">
-    <p class="block text-sm text-slate-500">
-      Page 1 of 10
-    </p>
-    <div class="flex gap-1">
-      <button
-        class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-        type="button">
-        Previous
-      </button>
-      <button
-        class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-        type="button">
-        Next
-      </button>
-    </div>
-  </div>
-  -->
+  <app-registerCliente class="justify-center" *ngIf="clicked" (closeForm)="clicked = false"></app-registerCliente>
 
 </div>
  
