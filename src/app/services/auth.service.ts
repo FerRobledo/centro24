@@ -54,7 +54,13 @@ export class AuthService {
 
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.user_padre_id || null;
+      let idAdmin = payload.user_padre_id;
+
+      if(!idAdmin){
+        return this.getUserId();
+      } else {
+        return payload.user_padre_id;
+      }
     } catch (error) {
       console.error('Error al decodificar el token', error);
       return null;
