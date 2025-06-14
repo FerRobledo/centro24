@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
+import { compileComponentFromMetadata } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ProductosService } from 'src/app/services/productos.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-productos',
@@ -17,7 +19,19 @@ export class ProductosComponent implements OnInit {
   cantidadModificar: number | null = null;
   categoriaSeleccionada: string = '';   //Filtro principal (categoria)
 
-  constructor(private productosService: ProductosService) {
+  mostrarFormulario: boolean = false;
+  mensaje: string = ''; // Declarada como propiedad de la clase
+  nuevoProducto = { // Declarado como propiedad de la clase
+    id: '',
+    precio: 0,
+    descripcion: '',
+    imagen: '',
+    stock: 0,
+    categoria: '',
+    userId: ''
+  };
+
+  constructor(private productosService: ProductosService, private authService: AuthService) {
     console.log('Componente AppComponent inicializado');
   }
 
@@ -120,4 +134,71 @@ export class ProductosComponent implements OnInit {
       }
     }
   }
+
+  // Funcion para agregar un producto
+  addProducto(producto: any) {
+
+    this.mensaje = '';   // Reseteo el mensaje
+
+    if (!this.nuevoProducto.id || !this.nuevoProducto.precio || !this.nuevoProducto.descripcion || 
+        !this.nuevoProducto.stock || !this.nuevoProducto.categoria) {
+      this.mensaje = 'Por favor, completa todos los campos requeridos.';
+      return;
+    }
+
+    const user_id = this.authService.getUserId();
+    if(!user_id) {
+      alert('Debes estar logeado para agregar un producto');
+      return;
+    }
+
+    if(this.nuevoProducto.stock < 0) {
+      this.mensaje = 'El stock no puede ser negativo. Se ha ajustado a 0.';
+      this.nuevoProducto.stock = 0; // Resetear a un valor válido
+      return;
+    }
+
+    if (this.nuevoProducto.precio < 0) {
+      this.mensaje = 'El precio no puede ser negativo. Se ha ajustado a 0.';
+      this.nuevoProducto.precio = 0; // Resetear a un valor válido
+      return;
+    }
+
+    this.productosService.addProducto(
+      this.nuevoProducto.id,
+      this.nuevoProducto.precio,
+      this.nuevoProducto.descripcion,
+      this.nuevoProducto.imagen,
+      this.nuevoProducto.stock,
+      this.nuevoProducto.categoria,
+      user_id
+    ).subscribe(
+      (respuesta: any) => {
+        this.mensaje = respuesta.message || 'Producto agregado con éxito.';
+        this.cancelar(); // Resetea y cierra el formulario
+      },
+      (error: any) => {
+        console.error('Error al agregar producto', error);
+        this.mensaje = 'Hubo un problema al agregar el producto. Por favor, intenta de nuevo.';
+      }
+    );
+  }
+
+
+  // Cancelar
+  cancelar() {
+    this.mostrarFormulario = false;
+    this.nuevoProducto = {
+      id: '',
+      precio: 0,
+      descripcion: '',
+      imagen: '',
+      stock: 0,
+      categoria: '',
+      userId: ''
+    };
+    this.mensaje = '';
+  }
+
+  
 }
