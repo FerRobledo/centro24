@@ -136,7 +136,7 @@ export class ProductosComponent implements OnInit {
   }
 
   // Funcion para agregar un producto
-  addProducto(producto: any) {
+  addProducto() {
 
     this.mensaje = '';   // Reseteo el mensaje
 
