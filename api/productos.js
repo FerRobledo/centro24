@@ -48,4 +48,34 @@ module.exports = async (req, res) => {
         }
     }
 
+    //POST para agregar un producto.
+    if (req.method === 'POST') {
+        try{
+
+            const { id, precio, descripcion, imagen, stock, categoria, user_id } = req.body
+
+            // Verifico si el producto ya existe
+            const result = await pool.query('SELECT * FROM productos WHERE id = $1 and user_id = $2', [id, user_id]);
+            if (result.rows.length > 0) {
+                return res.status(400).json({ message: 'El producto ya existe'});
+            }
+
+            // Si no encuentra un user_id lo setea NULL
+            const id_padre = user_id === -1 ? null : user_id;
+
+            const { rows } = await pool.query(
+                'INSERT INTO productos (id, precio, descripcion, imagen, stock, categoria, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+                [id, precio, descripcion, imagen, stock, categoria, user_id]
+            );
+
+            return res.status(201).json({ message: 'Producto agregado a la base de datos'})
+
+        }catch (error) {
+            console.log(error)
+            return res.status(500).json({ message: 'Error al crear el producto' });
+        }
+    } else {
+        res.status(405).json({ message: 'Método no permitido' });
+    }
+    
 }
