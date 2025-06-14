@@ -48,4 +48,10 @@ module.exports = async (req, res) => {
         }
     }
 
+
+
+    // POST para crear un nuevo producto
+    
+
+
 }
