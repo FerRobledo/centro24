@@ -22,9 +22,15 @@
       class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
       Mi Stock
     </button>
+    <!-- Boton Agregar Producto -->
+    <button
+      (click)="addProducto()"
+      class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+      Agregar producto
+    </button>
   </div>
 
-  <!-- Boton Agregar Producto -->
+
   
 
   <div *ngIf="productos.length > 0">
