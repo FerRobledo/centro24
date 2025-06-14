@@ -146,7 +146,7 @@ export class ProductosComponent implements OnInit {
       return;
     }
 
-    const user_id = this.authService.getUserId();
+    const user_id = this.authService.getUserId();   // Se busca el id del usuario creador del producto
     if(!user_id) {
       alert('Debes estar logeado para agregar un producto');
       return;
