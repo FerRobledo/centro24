@@ -11,8 +11,8 @@ import { AuthService } from 'src/app/services/auth.service';
 export class LoginComponent implements OnInit {
 
   loginForm!: FormGroup;
-  loginError: string | null = null;
-  cargando: Boolean = true;
+  errorMessage: string | null = null;
+  cargando: Boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -47,7 +47,7 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/']); // Redirige al dashboard
       },
       error: (error) => {
-        this.loginError = 'Credenciales incorrectas. Intente nuevamente.'; // Muestra mensaje de error
+        this.errorMessage = 'Credenciales incorrectas. Intente nuevamente.'; // Muestra mensaje de error
         this.cargando = false;
       },
       complete: () => {

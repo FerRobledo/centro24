@@ -67,4 +67,19 @@ export class AuthService {
 
   }
 
+    getUserRoles() {
+    const token = this.getToken();
+
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      let roles = payload.roles;
+      return roles || null;
+    } catch (error) {
+      console.error('Error al decodificar el token', error);
+      return null;
+    }
+
+  }
 }
