@@ -38,7 +38,6 @@ module.exports = async (req, res) => {
                 return res.status(401).json({ message: 'Contraseña incorrecta' });
             }
 
-            console.log(process.env.JWT_SECRET);
             // Generar el JWT
             const token = jwt.sign(
                 { userId: user.id, username: user.username, idAdmin: user.user_padre_id },
