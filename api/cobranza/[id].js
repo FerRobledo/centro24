@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
 
     //GET
     if(req.method === 'GET'){
-        //obt id user_admin de la query
+        //leer el id desde la query
         const {id} = req.query;
         
         if(!id){
@@ -36,6 +36,31 @@ module.exports = async (req, res) => {
             console.log(error);
             return res.status(500).json({ error: 'Error no se pudo obtener los clientes del dia', details: error.message });
 
+        }
+    }
+
+    //POST
+    if(req.method === 'POST'){
+        console.log(req.body );
+        //leer el id desde el body
+        const {id} = req.query;
+        const payload = req.body;
+
+        console.log(payload.detalle);
+
+        if(!id){
+            return res.status(500).json({ error: 'Error falta id para insertar usuario', details: 'No se recibió el ID en el cuerpo de la petición' });
+                        
+        } try {
+            const { rows } = await pool.query(
+                "INSERT INTO public.caja" +
+                " (fecha, detalle, efectivo, debito, credito, transferencia, cheque, retiro, observacion, gasto, user_admin)" +
+                " VALUES (CURRENT_DATE, $2, $3, $4, $5, $6, $7, $8, $9, $10, $1)", [id, payload.detalle, payload.efectivo, payload.debito, payload.credito, payload.transferencia, payload.cheque, payload.retiro, payload.observacion, payload.retiro]
+              );
+              return res.status(200).json(rows);
+        }catch(error) {
+            console.log(error);
+            return res.status(500).json({ error: 'Error no se pudo insertar el cliente', details: error.message });
         }
     }
 }
