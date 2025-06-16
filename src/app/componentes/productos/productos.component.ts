@@ -5,6 +5,11 @@ import { Observable } from 'rxjs';
 import { ProductosService } from 'src/app/services/productos.service';
 import { AuthService } from 'src/app/services/auth.service';
 
+interface AddProductoResponse {
+  message: string;
+  producto?: any;
+}
+
 @Component({
   selector: 'app-productos',
   templateUrl: './productos.component.html',
@@ -143,8 +148,7 @@ export class ProductosComponent implements OnInit {
 
     this.cargando = true; // Activa el spinner
 
-    if (!this.nuevoProducto.id || !this.nuevoProducto.precio || !this.nuevoProducto.descripcion || 
-        !this.nuevoProducto.stock || !this.nuevoProducto.categoria) {
+    if (!this.nuevoProducto.id || !this.nuevoProducto.descripcion || !this.nuevoProducto.categoria) {
       this.mensaje = 'Por favor, completa todos los campos requeridos.';
       this.cargando = false; // Desactiva el spinner
       return;
@@ -180,12 +184,16 @@ export class ProductosComponent implements OnInit {
       this.nuevoProducto.categoria,
       user_id
     ).subscribe(
-      (respuesta: any) => {
-        this.mensaje = respuesta.message || 'Producto agregado con éxito.';
-        this.cargando = false; // Desactiva el spinner
-        this.cancelar(); // Resetea y cierra el formulario
-        
-      },
+      (respuesta: AddProductoResponse) => {
+      this.mensaje = respuesta.message || 'Producto agregado con éxito.';
+      this.cargando = false; // Desactiva el spinner
+      // Agregar el nuevo producto a la lista local
+      if (respuesta.producto) {
+        this.productos.push(respuesta.producto);
+        this.aplicarFiltros(); // Reaplicar filtros
+      }
+      this.cancelar(); // Resetea y cierra el formulario
+    },
       (error: any) => {
         console.error('Error al agregar producto', error);
         this.mensaje = 'Hubo un problema al agregar el producto. Por favor, intenta de nuevo.';

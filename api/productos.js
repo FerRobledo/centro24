@@ -52,6 +52,7 @@ module.exports = async (req, res) => {
     if (req.method === 'POST') {
         try{
 
+            console.log('Datos recibidos en req.body:', req.body); // Depuración
             const { id, precio, descripcion, imagen, stock, categoria, user_id } = req.body
 
             // Verifico si el producto ya existe
@@ -63,12 +64,12 @@ module.exports = async (req, res) => {
             // Si no encuentra un user_id lo setea NULL
             const id_padre = user_id === -1 ? null : user_id;
 
-            const { rows } = await pool.query(
-                'INSERT INTO productos (id, precio, descripcion, imagen, stock, categoria, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+            const nuevoProducto = await pool.query(
+                'INSERT INTO productos (id, precio, descripcion, imagen, stock, categoria, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
                 [id, precio, descripcion, imagen, stock, categoria, user_id]
             );
 
-            return res.status(201).json({ message: 'Producto agregado a la base de datos'})
+            return res.status(201).json({ message: 'Producto agregado a la base de datos', producto: nuevoProducto.rows[0] });
 
         }catch (error) {
             console.log(error)
