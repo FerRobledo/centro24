@@ -2,6 +2,7 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { CobranzaService } from '../../../services/cobranza.service';
+import { CobranzaComponent } from '../cobranza.component';
 
 @Component({
   selector: 'app-registerCliente',
@@ -18,7 +19,8 @@ export class RegisterClienteComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private cobranzaService: CobranzaService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cobranzaComponent: CobranzaComponent 
   ) {
     this.form = this.fb.group({
       detalle: ['', Validators.required],
@@ -51,6 +53,7 @@ export class RegisterClienteComponent implements OnInit {
       next: (res) => {
         console.log('Éxito:', res);
         this.closeForm.emit();
+        this.cobranzaComponent.ngOnInit();
       },
       error: (err) => {
         console.error('Error al enviar:', err);

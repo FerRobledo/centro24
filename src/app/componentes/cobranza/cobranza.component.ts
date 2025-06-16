@@ -46,25 +46,5 @@ export class CobranzaComponent implements OnInit {
       })
     }
   }
-/*
-  private insertClientDaily() {
-    console.log("entre");
-    
-    const id = this.authService.getUserId();
-    if (id) {
-      this.cobranzaService.postClientDaily(id).subscribe({
 
-        next: (data) => {
-          //this.client = data;
-          console.log("Los clientes son: ", data);
-        },
-        error: (error) => {
-          console.log("Error en el pedido de clientes del dia: ", error)
-        },
-        complete: () => {
-          console.log("Pedido en estado OK");
-        }
-      })
-    }
-  }*/
 }
