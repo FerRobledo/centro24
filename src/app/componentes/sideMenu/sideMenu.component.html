@@ -1,14 +1,12 @@
 <div class="flex h-screen flex-col justify-between border-e border-gray-100 bg-white xs:w-full xs:h-auto xs:border-0">
-  <div class="px-6 py-10 xs:px-4 xs:pt-6 flex flex-col justify-between h-full">
+  <div class="px-6 py-10 xs:px-4 xs:pt-6 flex flex-col h-full">
     <div class="mb-5 mt-2 mx-auto w-[120px] rounded-xl border-2 border-gray-300 shadow-md xs:w-[100px]">
       <img src="../../../assets/images/centro24.webp" alt="Logo" class="w-full" />
     </div>
 
-    <ul class="space-y-2 rounded-xl xs:space-y-1">
-      <li *ngFor="let seccion of secciones">
-        <a
-          [routerLink]="seccion.nombre === 'Home' ? '' : seccion.nombre.toLowerCase()"
-          routerLinkActive="active-link"
+    <ul class="space-y-2 rounded-xl xs:space-y-1 flex-grow">
+      <li *ngFor="let seccion of seccionesDisponibles">
+        <a [routerLink]="seccion.nombre === 'Home' ? '' : seccion.nombre.toLowerCase()" routerLinkActive="active-link"
           [routerLinkActiveOptions]="{ exact: true }"
           class="flex items-center text-lg gap-2 px-4 py-2 font-medium text-gray-900 transition-all duration-200 ease-in-out rounded-lg xs:text-lg xs:px-3 xs:py-1.5 hover:bg-green-100 hover:text-green-700 hover:shadow-md hover:scale-[1.02]">
           <i [ngClass]="seccion.icono" class="p-2"></i>
@@ -17,17 +15,18 @@
       </li>
     </ul>
 
-    <button (click)="cerrarSesion()"
-      class="mt-6 flex w-full items-center gap-2 px-4 py-2 text-xl font-medium text-gray-900 transition-all duration-200 ease-in-out rounded-lg hover:bg-red-100 hover:text-red-600 hover:shadow-md hover:scale-[1.02] xs:text-lg xs:px-3 xs:py-1.5">
-      <i class="fa-solid fa-right-to-bracket p-2"></i>
-      <p class="text-sm">Cerrar sesión</p>
-    </button>
+    <div class="mt-auto">
+      <button (click)="cerrarSesion()"
+        class="flex w-full items-center gap-2 px-4 py-2 text-xl font-medium text-gray-900 transition-all duration-200 ease-in-out rounded-lg hover:bg-red-100 hover:text-red-600 hover:shadow-md hover:scale-[1.02] xs:text-lg xs:px-3 xs:py-1.5">
+        <i class="fa-solid fa-right-to-bracket p-2"></i>
+        <p class="text-sm">Cerrar sesión</p>
+      </button>
+    </div>
   </div>
 
   <div class="border-t-2 border-gray-300 xs:relative xs:bg-transparent xs:border-0">
     <a href="#" class="flex items-center gap-3 p-4 hover:bg-gray-50 xs:p-3 xs:gap-2">
-      <img
-        alt="User avatar"
+      <img alt="User avatar"
         src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
         class="size-10 rounded-full object-cover xs:size-8" />
       <div class="leading-tight">
