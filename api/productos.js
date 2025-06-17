@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const { AuthService } = require()
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL, // Definir en Vercel
@@ -20,9 +21,16 @@ module.exports = async (req, res) => {
     //GET
     if(req.method === 'GET'){
         try {
-            const { rows } = await pool.query(`SELECT * FROM productos`);
+            // Obtengo el id_admin
+            const { id_admin } = req.query;
 
-            return res.status(200).json(rows);
+            if (!id_admin) {
+            return res.status(400).json({ message: 'El parámetro id es requerido' });
+            }
+        
+            const result = await pool.query(`SELECT * FROM productos WHERE id = $1`, [id_admin]);
+
+            return res.status(200).json(result.rows);
         } catch (error) {
             console.log(error);
             return res.status(500).json({ error: 'Error al obtener los productos', details: error.message });
@@ -53,20 +61,18 @@ module.exports = async (req, res) => {
         try{
 
             console.log('Datos recibidos en req.body:', req.body); // Depuración
-            const { id, precio_costo, descripcion, imagen, stock, categoria, user_id, ganancia, precio_venta } = req.body
+            const { id, precio_costo, descripcion, imagen, stock, categoria, user_padre_id, ganancia, precio_venta } = req.body
 
             // Verifico si el producto ya existe
-            const result = await pool.query('SELECT * FROM productos WHERE id = $1 and user_id = $2', [id, user_id]);
+            const result = await pool.query('SELECT * FROM productos WHERE id = $1 and user_id = $2', [id, user_padre_id]);
             if (result.rows.length > 0) {
                 return res.status(400).json({ message: 'El producto ya existe'});
             }
 
-            // Si no encuentra un user_id lo setea NULL
-            const id_padre = user_id === -1 ? null : user_id;
-
+            
             const nuevoProducto = await pool.query(
-                'INSERT INTO productos (id, precio_costo, descripcion, imagen, stock, categoria, user_id, ganancia, precio_venta) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
-                [id, precio_costo, descripcion, imagen, stock, categoria, user_id, ganancia, precio_venta]
+                'INSERT INTO productos (id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+                [id, precio_costo, descripcion, imagen, stock, categoria, user_padre_id, ganancia, precio_venta]
             );
 
             return res.status(201).json({ message: 'Producto agregado a la base de datos', producto: nuevoProducto.rows[0] });

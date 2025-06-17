@@ -34,7 +34,7 @@ export class ProductosComponent implements OnInit {
     imagen: '',
     stock: 0,
     categoria: '',
-    userId: '',
+    id_admin: '',
     ganancia: 0
     //el precio de venta es calculado de acuerdo al porcentaje de ganancia
   };
@@ -45,21 +45,24 @@ export class ProductosComponent implements OnInit {
 
   
   ngOnInit() {
-    console.log('ngOnInit ejecutándose');
-    this.productosService.getProductos().subscribe({
-      next: (data) => {
-        this.productos = data.map((producto: any) => ({ ...producto, cantidadModificar: null }));
-        this.productosFiltrados = [...this.productos];
-        this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
-        console.log('Datos recibidos:', data);
-      },
-      error: (error) => {
-        console.error('Error al obtener productos:', error);
-      },
-      complete: () => {
-        console.log('Solicitud completada');
-      }
-    });
+    const id = this.authService.getIdAdmin();
+    if (id) {
+      this.productosService.getProductos(id).subscribe({
+        next: (data) => {
+          this.productos = data.map((producto: any) => ({ ...producto, cantidadModificar: null }));
+          this.productosFiltrados = [...this.productos];
+          this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
+          console.log('Datos recibidos:', data);
+        },
+        error: (error) => {
+          console.error('Error al obtener productos:', error);
+          console.log(id);
+        },
+        complete: () => {
+          console.log('Solicitud completada');
+        }
+      });
+    }
   }
 
   filtrarCategoria(event: Event) {
@@ -194,9 +197,8 @@ export class ProductosComponent implements OnInit {
       this.nuevoProducto.imagen,
       this.nuevoProducto.stock,
       this.nuevoProducto.categoria,
-      user_id,
       this.nuevoProducto.ganancia,
-      precio_venta
+      precio_venta,
     ).subscribe(
       (respuesta: AddProductoResponse) => {
       this.mensaje = respuesta.message || 'Producto agregado con éxito.';
@@ -230,7 +232,7 @@ export class ProductosComponent implements OnInit {
       imagen: '',
       stock: 0,
       categoria: '',
-      userId: '',
+      id_admin: '',
       ganancia: 0
     };
     this.mensaje = '';
