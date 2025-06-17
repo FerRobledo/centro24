@@ -1,9 +1,8 @@
 const { Pool } = require('pg');
-const { AuthService } = require()
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL, // Definir en Vercel
-    ssl: { rejectUnauthorized: false }, // Necesario si usas PostgreSQL en la nube
+    ssl: {rejectUnauthorized: false}, // Necesario si usas PostgreSQL en la nube
 });
 
 module.exports = async (req, res) => {
@@ -20,17 +19,17 @@ module.exports = async (req, res) => {
 
     //GET
     if(req.method === 'GET'){
+
+        //obt id user_admin de la query
+        const {id} = req.query;
+
+        if (!id) {
+        return res.status(500).json({ error: 'Error falta id para obtener los productos', details: error.message });
+        }
         try {
-            // Obtengo el id_admin
-            const { id_admin } = req.query;
+            const {rows} = await pool.query(`SELECT * FROM productos WHERE id_admin = $1`, [id]);
 
-            if (!id_admin) {
-            return res.status(400).json({ message: 'El parámetro id es requerido' });
-            }
-        
-            const result = await pool.query(`SELECT * FROM productos WHERE id = $1`, [id_admin]);
-
-            return res.status(200).json(result.rows);
+            return res.status(200).json(rows);
         } catch (error) {
             console.log(error);
             return res.status(500).json({ error: 'Error al obtener los productos', details: error.message });

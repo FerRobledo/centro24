@@ -26,8 +26,8 @@ export class ProductosComponent implements OnInit {
 
   mostrarFormulario: boolean = false;
   cargando: boolean = false;
-  mensaje: string = ''; // Declarada como propiedad de la clase
-  nuevoProducto = { // Declarado como propiedad de la clase
+  mensaje: string = ''; 
+  nuevoProducto = { 
     id: '',
     precio_costo: 0,
     descripcion: '',
@@ -56,7 +56,6 @@ export class ProductosComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al obtener productos:', error);
-          console.log(id);
         },
         complete: () => {
           console.log('Solicitud completada');

@@ -11,7 +11,7 @@ export class ProductosService {
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  public getProductos(id: number): Observable<any>{
+  public getProductos(id: number): Observable<any> {
     return this.http.get(this.origin + '/api/productos/' + id);
   }
 
