@@ -29,12 +29,14 @@ export class ProductosComponent implements OnInit {
   mensaje: string = ''; // Declarada como propiedad de la clase
   nuevoProducto = { // Declarado como propiedad de la clase
     id: '',
-    precio: 0,
+    precio_costo: 0,
     descripcion: '',
     imagen: '',
     stock: 0,
     categoria: '',
-    userId: ''
+    userId: '',
+    ganancia: 0
+    //el precio de venta es calculado de acuerdo al porcentaje de ganancia
   };
 
   constructor(private productosService: ProductosService, private authService: AuthService) {
@@ -168,21 +170,33 @@ export class ProductosComponent implements OnInit {
       return;
     }
 
-    if (this.nuevoProducto.precio < 0) {
+    if (this.nuevoProducto.precio_costo < 0) {
       this.mensaje = 'El precio no puede ser negativo. Se ha ajustado a 0.';
-      this.nuevoProducto.precio = 0; // Resetear a un valor válido
+      this.nuevoProducto.precio_costo = 0; // Resetear a un valor válido
       this.cargando = false; // Desactiva el spinner
       return;
     }
 
+    if (this.nuevoProducto.ganancia < 0) {
+      this.mensaje = 'El porcentaje de ganancia no puede ser negativo. Se ha ajustado a 0.';
+      this.nuevoProducto.ganancia = 0; // Resetear a un valor válido
+      this.cargando = false; // Desactiva el spinner
+      return;
+    }
+
+    //calculo el costo de venta
+    const precio_venta = this.nuevoProducto.precio_costo + (this.nuevoProducto.precio_costo * this.nuevoProducto.ganancia/100);
+
     this.productosService.addProducto(
       this.nuevoProducto.id,
-      this.nuevoProducto.precio,
+      this.nuevoProducto.precio_costo,
       this.nuevoProducto.descripcion,
       this.nuevoProducto.imagen,
       this.nuevoProducto.stock,
       this.nuevoProducto.categoria,
-      user_id
+      user_id,
+      this.nuevoProducto.ganancia,
+      precio_venta
     ).subscribe(
       (respuesta: AddProductoResponse) => {
       this.mensaje = respuesta.message || 'Producto agregado con éxito.';
@@ -191,6 +205,9 @@ export class ProductosComponent implements OnInit {
       if (respuesta.producto) {
         this.productos.push(respuesta.producto);
         this.aplicarFiltros(); // Reaplicar filtros
+      }
+      if (!this.categoriasUnicas.includes(respuesta.producto.categoria)){
+        this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
       }
       this.cancelar(); // Resetea y cierra el formulario
     },
@@ -208,12 +225,13 @@ export class ProductosComponent implements OnInit {
     this.mostrarFormulario = false;
     this.nuevoProducto = {
       id: '',
-      precio: 0,
+      precio_costo: 0,
       descripcion: '',
       imagen: '',
       stock: 0,
       categoria: '',
-      userId: ''
+      userId: '',
+      ganancia: 0
     };
     this.mensaje = '';
     this.cargando = false;
