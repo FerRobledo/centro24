@@ -23,6 +23,7 @@ import { UsuarioCardComponent } from './componentes/usuarios/usuarioCard/usuario
 import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
 import { ConfirmDialogComponent } from './componentes/confirmDialog/confirmDialog.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -55,6 +56,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatSlideToggleModule,
     MatInputModule,
     MatIconModule,
+    MatTooltipModule,
   ],
   providers: [
     provideAnimationsAsync()

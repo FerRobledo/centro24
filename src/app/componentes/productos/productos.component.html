@@ -39,9 +39,9 @@
         <thead class="bg-gray-100 sticky top-0">
           <tr class="bg-gray-100">
             <th class="p-3 border border-gray-300 text-center">ID</th>
-            <th class="p-3 border border-gray-300 text-center">Precio Costo</th>
+            <th class="p-3 border border-gray-300 text-center">Costo</th>
             <th class="p-3 border border-gray-300 text-center">Ganancia</th>
-            <th class="p-3 border border-gray-300 text-center">Precio Venta</th>
+            <th class="p-3 border border-gray-300 text-center">Venta</th>
             <th class="p-3 border border-gray-300 text-center">Descripción</th>
             <th class="p-3 border border-gray-300 text-center">Stock</th>
             <th class="p-3 border border-gray-300 text-center">Categoría</th>
@@ -53,7 +53,7 @@
             <td class="p-3 border border-gray-300">${{ producto.precio_costo }}</td>
             <td class="p-3 border border-gray-300">{{ producto.ganancia }}%</td>
             <td class="p-3 border border-gray-300">${{ producto.precio_venta }}</td>
-            <td class="p-3 border border-gray-300">{{ producto.descripcion }}</td>
+            <td class="p-3 border border-gray-300 max-w-[100px] truncate" matTooltip="{{ producto.descripcion }}">{{ producto.descripcion }}</td>
             <td class="p-3 border border-gray-300 flex items-center justify-center flex-wrap">
               <div class=" bg-gray-200">
                 <button 
@@ -80,7 +80,7 @@
                 Actualizar
               </button>
             </td>
-            <td class="p-3 border border-gray-300">{{ producto.categoria }}</td>
+            <td class="p-3 border border-gray-300 categoria max-w-[100px] truncate" matTooltip="{{ producto.categoria }}">{{ producto.categoria }}</td>
           </tr>
         </tbody>
       </table>
