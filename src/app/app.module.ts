@@ -25,6 +25,7 @@ import { RegisterClienteComponent } from './componentes/cobranza/registerCliente
 
 import { ConfirmDialogComponent } from './componentes/confirmDialog/confirmDialog.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 @NgModule({
@@ -59,6 +60,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatSlideToggleModule,
     MatInputModule,
     MatIconModule,
+    MatTooltipModule,
   ],
   providers: [
     provideAnimationsAsync()

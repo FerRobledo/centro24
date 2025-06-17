@@ -5,6 +5,11 @@ import { Observable } from 'rxjs';
 import { ProductosService } from 'src/app/services/productos.service';
 import { AuthService } from 'src/app/services/auth.service';
 
+interface AddProductoResponse {
+  message: string;
+  producto?: any;
+}
+
 @Component({
   selector: 'app-productos',
   templateUrl: './productos.component.html',
@@ -21,15 +26,17 @@ export class ProductosComponent implements OnInit {
 
   mostrarFormulario: boolean = false;
   cargando: boolean = false;
-  mensaje: string = ''; // Declarada como propiedad de la clase
-  nuevoProducto = { // Declarado como propiedad de la clase
+  mensaje: string = ''; 
+  nuevoProducto = { 
     id: '',
-    precio: 0,
+    precio_costo: 0,
     descripcion: '',
     imagen: '',
     stock: 0,
     categoria: '',
-    userId: ''
+    id_admin: '',
+    ganancia: 0
+    //el precio de venta es calculado de acuerdo al porcentaje de ganancia
   };
 
   constructor(private productosService: ProductosService, private authService: AuthService) {
@@ -38,21 +45,23 @@ export class ProductosComponent implements OnInit {
 
   
   ngOnInit() {
-    console.log('ngOnInit ejecutándose');
-    this.productosService.getProductos().subscribe({
-      next: (data) => {
-        this.productos = data.map((producto: any) => ({ ...producto, cantidadModificar: null }));
-        this.productosFiltrados = [...this.productos];
-        this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
-        console.log('Datos recibidos:', data);
-      },
-      error: (error) => {
-        console.error('Error al obtener productos:', error);
-      },
-      complete: () => {
-        console.log('Solicitud completada');
-      }
-    });
+    const id = this.authService.getIdAdmin();
+    if (id) {
+      this.productosService.getProductos(id).subscribe({
+        next: (data) => {
+          this.productos = data.map((producto: any) => ({ ...producto, cantidadModificar: null }));
+          this.productosFiltrados = [...this.productos];
+          this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
+          console.log('Datos recibidos:', data);
+        },
+        error: (error) => {
+          console.error('Error al obtener productos:', error);
+        },
+        complete: () => {
+          console.log('Solicitud completada');
+        }
+      });
+    }
   }
 
   filtrarCategoria(event: Event) {
@@ -143,8 +152,7 @@ export class ProductosComponent implements OnInit {
 
     this.cargando = true; // Activa el spinner
 
-    if (!this.nuevoProducto.id || !this.nuevoProducto.precio || !this.nuevoProducto.descripcion || 
-        !this.nuevoProducto.stock || !this.nuevoProducto.categoria) {
+    if (!this.nuevoProducto.id || !this.nuevoProducto.descripcion || !this.nuevoProducto.categoria) {
       this.mensaje = 'Por favor, completa todos los campos requeridos.';
       this.cargando = false; // Desactiva el spinner
       return;
@@ -164,28 +172,46 @@ export class ProductosComponent implements OnInit {
       return;
     }
 
-    if (this.nuevoProducto.precio < 0) {
+    if (this.nuevoProducto.precio_costo < 0) {
       this.mensaje = 'El precio no puede ser negativo. Se ha ajustado a 0.';
-      this.nuevoProducto.precio = 0; // Resetear a un valor válido
+      this.nuevoProducto.precio_costo = 0; // Resetear a un valor válido
       this.cargando = false; // Desactiva el spinner
       return;
     }
 
+    if (this.nuevoProducto.ganancia < 0) {
+      this.mensaje = 'El porcentaje de ganancia no puede ser negativo. Se ha ajustado a 0.';
+      this.nuevoProducto.ganancia = 0; // Resetear a un valor válido
+      this.cargando = false; // Desactiva el spinner
+      return;
+    }
+
+    //calculo el costo de venta
+    const precio_venta = this.nuevoProducto.precio_costo + (this.nuevoProducto.precio_costo * this.nuevoProducto.ganancia/100);
+
     this.productosService.addProducto(
       this.nuevoProducto.id,
-      this.nuevoProducto.precio,
+      this.nuevoProducto.precio_costo,
       this.nuevoProducto.descripcion,
       this.nuevoProducto.imagen,
       this.nuevoProducto.stock,
       this.nuevoProducto.categoria,
-      user_id
+      this.nuevoProducto.ganancia,
+      precio_venta,
     ).subscribe(
-      (respuesta: any) => {
-        this.mensaje = respuesta.message || 'Producto agregado con éxito.';
-        this.cargando = false; // Desactiva el spinner
-        this.cancelar(); // Resetea y cierra el formulario
-        
-      },
+      (respuesta: AddProductoResponse) => {
+      this.mensaje = respuesta.message || 'Producto agregado con éxito.';
+      this.cargando = false; // Desactiva el spinner
+      // Agregar el nuevo producto a la lista local
+      if (respuesta.producto) {
+        this.productos.push(respuesta.producto);
+        this.aplicarFiltros(); // Reaplicar filtros
+      }
+      if (!this.categoriasUnicas.includes(respuesta.producto.categoria)){
+        this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
+      }
+      this.cancelar(); // Resetea y cierra el formulario
+    },
       (error: any) => {
         console.error('Error al agregar producto', error);
         this.mensaje = 'Hubo un problema al agregar el producto. Por favor, intenta de nuevo.';
@@ -200,12 +226,13 @@ export class ProductosComponent implements OnInit {
     this.mostrarFormulario = false;
     this.nuevoProducto = {
       id: '',
-      precio: 0,
+      precio_costo: 0,
       descripcion: '',
       imagen: '',
       stock: 0,
       categoria: '',
-      userId: ''
+      id_admin: '',
+      ganancia: 0
     };
     this.mensaje = '';
     this.cargando = false;

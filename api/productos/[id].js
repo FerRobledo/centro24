@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL, // Definir en Vercel
-    ssl: { rejectUnauthorized: false }, // Necesario si usas PostgreSQL en la nube
+    ssl: {rejectUnauthorized: false}, // Necesario si usas PostgreSQL en la nube
 });
 
 module.exports = async (req, res) => {
@@ -19,8 +19,15 @@ module.exports = async (req, res) => {
 
     //GET
     if(req.method === 'GET'){
+
+        //obt id user_admin de la query
+        const {id} = req.query;
+
+        if (!id) {
+        return res.status(500).json({ error: 'Error falta id para obtener los productos', details: error.message });
+        }
         try {
-            const { rows } = await pool.query(`SELECT * FROM productos`);
+            const {rows} = await pool.query(`SELECT * FROM productos WHERE id_admin = $1`, [id]);
 
             return res.status(200).json(rows);
         } catch (error) {
@@ -52,23 +59,22 @@ module.exports = async (req, res) => {
     if (req.method === 'POST') {
         try{
 
-            const { id, precio, descripcion, imagen, stock, categoria, user_id } = req.body
+            console.log('Datos recibidos en req.body:', req.body); // Depuración
+            const { id, precio_costo, descripcion, imagen, stock, categoria, user_padre_id, ganancia, precio_venta } = req.body
 
             // Verifico si el producto ya existe
-            const result = await pool.query('SELECT * FROM productos WHERE id = $1 and user_id = $2', [id, user_id]);
+            const result = await pool.query('SELECT * FROM productos WHERE id = $1 and user_id = $2', [id, user_padre_id]);
             if (result.rows.length > 0) {
                 return res.status(400).json({ message: 'El producto ya existe'});
             }
 
-            // Si no encuentra un user_id lo setea NULL
-            const id_padre = user_id === -1 ? null : user_id;
-
-            const { rows } = await pool.query(
-                'INSERT INTO productos (id, precio, descripcion, imagen, stock, categoria, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-                [id, precio, descripcion, imagen, stock, categoria, user_id]
+            
+            const nuevoProducto = await pool.query(
+                'INSERT INTO productos (id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+                [id, precio_costo, descripcion, imagen, stock, categoria, user_padre_id, ganancia, precio_venta]
             );
 
-            return res.status(201).json({ message: 'Producto agregado a la base de datos'})
+            return res.status(201).json({ message: 'Producto agregado a la base de datos', producto: nuevoProducto.rows[0] });
 
         }catch (error) {
             console.log(error)
