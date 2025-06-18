@@ -9,6 +9,7 @@ import { authGuard } from './auth-guard.guard';
 import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
 import { UsuarioModalComponent } from './componentes/usuarios/usuarioModal/UsuarioModal.component';
 import { UsuariosComponent } from './componentes/usuarios/usuarios/usuarios.component';
+import { CargaProductosComponent } from './componentes/cargaProductos/cargaProductos.component';
 
 const routes: Routes = [
   {
@@ -40,9 +41,9 @@ const routes: Routes = [
         component: UsuariosComponent,
       },
       {
-        path: 'usuarios',
-        component: UsuariosComponent,
-      }
+        path: 'carga',
+        component: CargaProductosComponent,
+      },
     ],
     canActivate: [authGuard]
   },

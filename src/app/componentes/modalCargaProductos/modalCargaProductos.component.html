@@ -1,0 +1,31 @@
+<div class="w-max p-6">
+  <h1 class="text-xl font-semibold text-gray-800 mb-4">
+    Seleccioná las categorías que deseás actualizar
+  </h1>
+
+  <div class="flex gap-3 items-center">
+
+    <mat-checkbox color="primary" [(ngModel)]="todasSeleccionadas" (change)="toggleSeleccionarTodas()" class="mb-4">
+      Seleccionar todas
+    </mat-checkbox>
+
+  </div>
+
+  <div class="space-y-2 pr-1 grid grid-cols-2">
+    <mat-checkbox
+      *ngFor="let hoja of hojas"
+      color="primary"
+      [(ngModel)]="estadoCheckboxes[hoja]"
+      (change)="toggleSeleccion()"
+      class="block"
+      [disabled]="hoja === '¿Quienes somos?' || hoja === 'KITS' || hoja === 'OUTLET'"
+    >
+      {{ hoja }}
+    </mat-checkbox>
+  </div>
+
+  <div class="flex justify-end gap-2 mt-6">
+    <button mat-stroked-button (click)="cancelar()">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="confirmar()">Confirmar</button>
+  </div>
+</div>
