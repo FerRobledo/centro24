@@ -10,7 +10,6 @@ import { CobranzaComponent } from '../cobranza.component';
   styleUrls: ['./registerCliente.component.css']
 })
 export class RegisterClienteComponent implements OnInit {
-
   //emite eventos
   @Output() closeForm = new EventEmitter<void>();
 
@@ -24,14 +23,14 @@ export class RegisterClienteComponent implements OnInit {
   ) {
     this.form = this.fb.group({
       detalle: ['', Validators.required],
-      efectivo: [0],
-      debito: [0],
-      credito: [0],
-      transferencia: [0],
-      cheque: [0],
-      retiro: [0],
+      efectivo: [],
+      debito: [],
+      credito: [],
+      transferencia: [],
+      cheque: [],
+      retiro: [],
       observacion: [''],
-      gasto: [0],
+      gasto: [],
     });
   }
   
@@ -45,7 +44,24 @@ export class RegisterClienteComponent implements OnInit {
       console.log("Formulario inválido");
       return;
     }
-    
+
+    const camposNumericos: string[] = [
+      'efectivo',
+      'debito',
+      'credito',
+      'transferencia',
+      'cheque',
+      'retiro',
+      'gasto'
+    ];
+
+    camposNumericos.forEach((campo: string) => {
+      const control = this.form.get(campo);
+      if (control?.value === null) { //si mi campo coincide con el string, pregunto si es null y si lo es seteo (0)
+        control?.setValue(0); 
+      }
+    });
+
     const idAdmin = this.authService.getIdAdmin();
     const payload = this.form.value;
 
@@ -67,6 +83,7 @@ export class RegisterClienteComponent implements OnInit {
         console.log("Registro en estado OK");
       }
     });
+ 
     
   }
   ngOnInit() {

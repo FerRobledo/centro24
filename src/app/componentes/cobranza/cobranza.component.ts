@@ -10,7 +10,9 @@ import { CobranzaService } from 'src/app/services/cobranza.service';
 export class CobranzaComponent implements OnInit {
   clientsOfDay: any[] = [];
   clicked = false;
-  //client
+  collectionDay = 0;
+  collectionClosed = false;
+  today: Date = new Date();
 
   constructor(private cobranzaService: CobranzaService, private authService: AuthService) {
     console.log('Componente init');
@@ -24,6 +26,25 @@ export class CobranzaComponent implements OnInit {
 
   handleClick() {
     this.clicked = true;
+  }
+
+  public closeDay(){
+    this.collectionClosed = true;
+    console.log("me clickeaste");
+    const id = this.authService.getIdAdmin();
+    if(id) {
+      this.cobranzaService.closeClientsOfDay(id).subscribe({
+        next: (data) => {
+          this.collectionDay = data.total;
+          console.log("La recaudacion del dia fue: ", this.collectionDay);
+        },
+        error: (error) => {
+          console.log("Error en el calculo de recaudacion: ", error)
+        },
+        complete: () => 
+          console.log("El calculo fue exitoso")
+      })
+    }
   }
 
   private loadClientsDaily() {

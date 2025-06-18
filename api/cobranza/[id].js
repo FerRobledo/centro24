@@ -23,25 +23,31 @@ module.exports = async (req, res) => {
     //GET
     if(req.method === 'GET'){
         //leer el id desde la query
-        const {id} = req.query;
+        const {id, action} = req.query;
         
         if(!id){
-            return res.status(500).json({ error: 'Error falta id para obtener los clientes del dia', details: error.message });
+            return res.status(400).json({ error: 'Error falta id para obtener los clientes del dia', details: error.message });
         }
         try {
-            const{ rows } = await pool.query('SELECT * FROM caja WHERE user_admin = $1', [id]);
+            if(action === 'close'){
+                const result = await pool.query('SELECT SUM '
+                                            +'(efectivo + debito + transferencia + cheque + gasto + retiro) AS total'
+                                            +' FROM caja WHERE fecha = CURRENT_DATE AND user_admin = $1', [id]);
 
+                const total = result.rows[0].total ?? 0;
+
+                return res.status(200).json({ total });
+            }
+            const{ rows } = await pool.query('SELECT * FROM caja WHERE user_admin = $1', [id]);
             return res.status(200).json(rows);
         } catch(error) {
             console.log(error);
             return res.status(500).json({ error: 'Error no se pudo obtener los clientes del dia', details: error.message });
-
         }
     }
 
     //POST
     if(req.method === 'POST'){
-        console.log(req.body );
         //leer el id desde el body
         const {id} = req.query;
         const payload = req.body;
