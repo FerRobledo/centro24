@@ -145,6 +145,11 @@ export class ProductosComponent implements OnInit {
     }
   }
 
+  //Modificar Ganancia
+  ModificarGanancia(producto: any) {
+    
+  }
+
   // Funcion para agregar un producto
   addProducto() {
 
