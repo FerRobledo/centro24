@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { Usuario } from 'src/assets/dto/usuario';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,9 @@ export class ProductosService {
   }
 
   public actualizarStock(id: number, stock: number): Observable<any> {
-    return this.http.put(this.origin + '/api/productos', { id, stock });
+    // Obtengo el id_admin desde auhtService
+    const id_admin = this.authService.getIdAdmin();
+    return this.http.put(this.origin + '/api/productos/' + id_admin, { id, stock });
   }
 
   public addProducto(id: string, precio_costo: number, descripcion: string, imagen: string, stock: number, categoria: string, ganancia: number, precio_venta: number): Observable<any> {
@@ -24,6 +27,6 @@ export class ProductosService {
     const id_admin = this.authService.getIdAdmin();
 
     const nuevoProducto = {id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta }
-    return this.http.post(this.origin + '/api/productos', nuevoProducto);
+    return this.http.post(this.origin + '/api/productos/' + id_admin, nuevoProducto);
   }
 }
