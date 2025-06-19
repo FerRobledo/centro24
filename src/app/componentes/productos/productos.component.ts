@@ -1,14 +1,16 @@
 import { HttpClient } from '@angular/common/http';
-import { compileComponentFromMetadata } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ProductosService } from 'src/app/services/productos.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { Producto, ProductoDTO } from 'src/assets/dto/producto';
 
 interface AddProductoResponse {
   message: string;
-  producto?: any;
+  producto?: Producto;
 }
+
+
 
 @Component({
   selector: 'app-productos',
@@ -16,52 +18,37 @@ interface AddProductoResponse {
   styleUrls: ['./productos.component.css']
 })
 
-
 export class ProductosComponent implements OnInit {
-  productos: any[] = [];
-  productosFiltrados: any[] = [];
+  productos: Producto[] = [];
+  productosFiltrados: ProductoDTO[] = [];
   categoriasUnicas: string[] = [];
   cantidadModificar: number | null = null;
-  categoriaSeleccionada: string = '';   //Filtro principal (categoria)
+  categoriaSeleccionada: string = '';   // Filtro principal (categoría)
 
   mostrarFormulario: boolean = false;
   cargando: boolean = false;
   mensaje: string = ''; 
-  nuevoProducto = { 
-    id: '',
-    precio_costo: 0,
-    descripcion: '',
-    imagen: '',
-    stock: 0,
-    categoria: '',
-    id_admin: '',
-    ganancia: 0
-    //el precio de venta es calculado de acuerdo al porcentaje de ganancia
-  };
+  nuevoProducto: ProductoDTO = new ProductoDTO();
 
   constructor(private productosService: ProductosService, private authService: AuthService) {
     console.log('Componente AppComponent inicializado');
   }
 
-  
   ngOnInit() {
-    const id = this.authService.getIdAdmin();
-    if (id) {
-      this.productosService.getProductos(id).subscribe({
-        next: (data) => {
-          this.productos = data.map((producto: any) => ({ ...producto, cantidadModificar: null }));
-          this.productosFiltrados = [...this.productos];
-          this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
-          console.log('Datos recibidos:', data);
-        },
-        error: (error) => {
-          console.error('Error al obtener productos:', error);
-        },
-        complete: () => {
-          console.log('Solicitud completada');
-        }
-      });
-    }
+    this.productosService.getProductos().subscribe({
+      next: (data: Producto[]) => {
+        this.productos = data.map((producto: Producto) => new ProductoDTO({ ...producto, cantidadModificar: null }));
+        this.productosFiltrados = this.productos.map(p => new ProductoDTO(p));
+        this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
+        console.log('Datos recibidos:', data);
+      },
+      error: (error) => {
+        console.error('Error al obtener productos:', error);
+      },
+      complete: () => {
+        console.log('Solicitud completada');
+      }
+    });
   }
 
   filtrarCategoria(event: Event) {
@@ -81,167 +68,187 @@ export class ProductosComponent implements OnInit {
   aplicarFiltros(filtrarStock: boolean = false) {
     let resultado = [...this.productos];
 
-    // Filtro principal: categoría seleccionada
     if (this.categoriaSeleccionada) {
       resultado = resultado.filter(p => p.categoria === this.categoriaSeleccionada);
     }
 
-    // Filtro secundario: stock > 0 si se solicita
     if (filtrarStock) {
       resultado = resultado.filter(p => p.stock > 0);
     }
 
-    this.productosFiltrados = resultado;
+    this.productosFiltrados = resultado.map(p => new ProductoDTO(p));
+
     console.log('Filtros aplicados. Resultado:', this.productosFiltrados);
   }
 
-  incrementarStock(producto: any) {
-    const nuevoStock = (producto.stock || 0) + 1;
-    this.productosService.actualizarStock(producto.id, nuevoStock).subscribe(
-      updatedProducto => {
-        producto.stock = updatedProducto.stock; // Actualiza el valor local con la respuesta del servidor
-        this.aplicarFiltros(); // Reaplicar filtros para actualizar la vista
+  incrementarStock(producto: ProductoDTO) {
+    const nuevoProducto = new ProductoDTO({ ...producto, stock: (producto.stock || 0) + 1 });
+    const error = nuevoProducto.validateRequired();
+    if (error) {
+      alert(error);
+      return;
+    }
+    this.productosService.actualizarProducto(nuevoProducto).subscribe(
+      (updatedProducto: Producto) => {
+        console.log('Respuesta del servidor:', updatedProducto);
+        const index = this.productos.findIndex(p => p.id === producto.id);
+        if (index !== -1) {
+          this.productos[index] = new ProductoDTO({...this.productos[index], ...updatedProducto });
+          this.aplicarFiltros();
+        }
       },
-      error => console.error('Error al incrementar stock', error)
+      (error: any) => {
+        console.error('Error al incrementar stock:', error);
+        console.log('Detalles del error:', error.error);
+        alert('Error al incrementar el stock. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
+      }
     );
   }
 
-  decrementarStock(producto: any) {
+  decrementarStock(producto: ProductoDTO) {
     if (producto.stock > 0) {
-      const nuevoStock = (producto.stock || 0) - 1;
-      this.productosService.actualizarStock(producto.id, nuevoStock).subscribe(
-        updatedProducto => {
-          producto.stock = updatedProducto.stock; // Actualiza el valor local con la respuesta del servidor
-          this.aplicarFiltros(); // Reaplicar filtros para actualizar la vista
+      const nuevoProducto = new ProductoDTO({ ...producto, stock: (producto.stock || 0) - 1 });
+      const error = nuevoProducto.validateRequired();
+      if (error) {
+        alert(error);
+        return;
+      }
+      console.log('Intentando decrementar stock. Producto:', nuevoProducto);
+      this.productosService.actualizarProducto(nuevoProducto).subscribe(
+        (updatedProducto: Producto) => {
+          console.log('Respuesta del servidor:', updatedProducto);
+          const index = this.productos.findIndex(p => p.id === producto.id);
+          if (index !== -1) {
+            this.productos[index] = new ProductoDTO({ ...this.productos[index], ...updatedProducto });
+            this.aplicarFiltros();
+          }
         },
-        error => console.error('Error al decrementar stock', error)
+        (error: any) => {
+          console.error('Error al decrementar stock:', error);
+          console.log('Detalles del error:', error.error);
+          alert('Error al decrementar el stock. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
+        }
       );
     }
   }
-
-  onCantidadChange(producto: any) {
-    // Validar que la cantidad sea un número válido
-    const value = parseInt(producto.cantidadModificar, 10);
-    producto.cantidadModificar = isNaN(value) ? null : value;
+/*
+  onCantidadChange(producto: ProductoDTO) {
+    const value = producto.cantidadModificar;
+    producto.cantidadModificar = (value) ? null : value;
   }
+*/
+  modificarStock(producto: ProductoDTO) {
+    console.log('Se llamó a modificarStock con:', producto);
+    if (producto.cantidadModificar === null || producto.cantidadModificar === undefined || producto.cantidadModificar === 0) {
+      alert('Debe ingresar una cantidad válida para modificar el stock.');
+      producto.cantidadModificar = null;
+      return;
+    }
 
-  modificarStock(producto: any) {
-    if (producto.cantidadModificar !== null && producto.cantidadModificar !== 0) {
-      const cambio = producto.cantidadModificar;
-      const nuevoStock = (producto.stock || 0) + cambio;
-      if (nuevoStock >= 0) {
-        this.productosService.actualizarStock(producto.id, nuevoStock).subscribe(
-          updatedProducto => {
-            producto.stock = updatedProducto.stock;
-            producto.cantidadModificar = null; // Resetear el input
+    const cambio = producto.cantidadModificar;
+    const nuevoStock = (producto.stock || 0) + cambio;
+    if (nuevoStock >= 0) {
+      const nuevoProducto = new ProductoDTO({ ...producto, stock: nuevoStock });
+      const error = nuevoProducto.validateRequired();
+      if (error) {
+        alert(error);
+        return;
+      }
+      console.log('Intentando modificar stock. Producto:', nuevoProducto);
+      this.productosService.actualizarProducto(nuevoProducto).subscribe(
+        (updatedProducto: Producto) => {
+          console.log('Respuesta del servidor:', updatedProducto);
+          const index = this.productos.findIndex(p => p.id === producto.id);
+          if (index !== -1) {
+            this.productos[index] = new ProductoDTO({ ...this.productos[index], ...updatedProducto });
+            producto.cantidadModificar = null;
             this.aplicarFiltros();
-          },
-          error => console.error('Error al modificar stock', error)
-        );
-      } else {
-        alert('No puedes restar más stock del que hay disponible. Stock actual: ' + producto.stock);
-        producto.cantidadModificar = null; // Resetear si el valor es inválido
-      }
+          }
+        },
+        (error: any) => {
+          console.error('Error al modificar stock:', error);
+          console.log('Detalles del error:', error.error);
+          alert('Error al modificar el stock. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
+        }
+      );
+    } else {
+      alert('No puedes restar más stock del que hay disponible. Stock actual: ' + producto.stock);
+      producto.cantidadModificar = null;
     }
   }
 
-  //Modificar Ganancia
-  ModificarGanancia(producto: any) {
-    
-  }
-
-  // Funcion para agregar un producto
-  addProducto() {
-
-    this.mensaje = '';   // Reseteo el mensaje
-
-    this.cargando = true; // Activa el spinner
-
-    if (!this.nuevoProducto.id || !this.nuevoProducto.descripcion || !this.nuevoProducto.categoria) {
-      this.mensaje = 'Por favor, completa todos los campos requeridos.';
-      this.cargando = false; // Desactiva el spinner
+  modificarGanancia(producto: ProductoDTO) {
+    const nuevoPrecioVenta = producto.precio_costo * (1 + (producto.ganancia || 0) / 100);
+    const nuevoProducto = new ProductoDTO({ ...producto, ganancia: producto.ganancia, precio_venta: nuevoPrecioVenta });
+    const error = nuevoProducto.validateRequired();
+    if (error) {
+      alert(error);
       return;
     }
-
-    const user_id = this.authService.getUserId();   // Se busca el id del usuario creador del producto
-    if(!user_id) {
-      alert('Debes estar logeado para agregar un producto');
-      this.cargando = false; // Desactiva el spinner
-      return;
-    }
-
-    if(this.nuevoProducto.stock < 0) {
-      this.mensaje = 'El stock no puede ser negativo. Se ha ajustado a 0.';
-      this.nuevoProducto.stock = 0; // Resetear a un valor válido
-      this.cargando = false; // Desactiva el spinner
-      return;
-    }
-
-    if (this.nuevoProducto.precio_costo < 0) {
-      this.mensaje = 'El precio no puede ser negativo. Se ha ajustado a 0.';
-      this.nuevoProducto.precio_costo = 0; // Resetear a un valor válido
-      this.cargando = false; // Desactiva el spinner
-      return;
-    }
-
-    if (this.nuevoProducto.ganancia < 0) {
-      this.mensaje = 'El porcentaje de ganancia no puede ser negativo. Se ha ajustado a 0.';
-      this.nuevoProducto.ganancia = 0; // Resetear a un valor válido
-      this.cargando = false; // Desactiva el spinner
-      return;
-    }
-
-    //calculo el costo de venta
-    const precio_venta = this.nuevoProducto.precio_costo + (this.nuevoProducto.precio_costo * this.nuevoProducto.ganancia/100);
-
-    this.productosService.addProducto(
-      this.nuevoProducto.id,
-      this.nuevoProducto.precio_costo,
-      this.nuevoProducto.descripcion,
-      this.nuevoProducto.imagen,
-      this.nuevoProducto.stock,
-      this.nuevoProducto.categoria,
-      this.nuevoProducto.ganancia,
-      precio_venta,
-    ).subscribe(
-      (respuesta: AddProductoResponse) => {
-      this.mensaje = respuesta.message || 'Producto agregado con éxito.';
-      this.cargando = false; // Desactiva el spinner
-      // Agregar el nuevo producto a la lista local
-      if (respuesta.producto) {
-        this.productos.push(respuesta.producto);
-        this.aplicarFiltros(); // Reaplicar filtros
-      }
-      if (!this.categoriasUnicas.includes(respuesta.producto.categoria)){
-        this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
-      }
-      this.cancelar(); // Resetea y cierra el formulario
-    },
+    console.log('Intentando modificar ganancia. Producto:', nuevoProducto);
+    this.productosService.actualizarProducto(nuevoProducto).subscribe(
+      (updatedProducto: Producto) => {
+        console.log('Respuesta del servidor:', updatedProducto);
+        const index = this.productos.findIndex(p => p.id === producto.id);
+        if (index !== -1) {
+          this.productos[index] = new ProductoDTO({ ...this.productos[index], ...updatedProducto });
+          this.aplicarFiltros();
+        }
+      },
       (error: any) => {
-        console.error('Error al agregar producto', error);
-        this.mensaje = 'Hubo un problema al agregar el producto. Por favor, intenta de nuevo.';
-        this.cargando = false; // Desactiva el spinner
+        console.error('Error al modificar ganancia:', error);
+        console.log('Detalles del error:', error.error);
+        alert('Error al modificar la ganancia. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
       }
     );
   }
 
+  addProducto() {
+    this.mensaje = '';
+    this.cargando = true;
 
-  // Cancelar
+    const error = this.nuevoProducto.validateRequired();
+    if (error) {
+      this.mensaje = error;
+      this.cargando = false;
+      return;
+    }
+
+    const user_id = this.authService.getUserId();
+    if (!user_id) {
+      alert('Debes estar logeado para agregar un producto');
+      this.cargando = false;
+      return;
+    }
+
+    const precio_venta = this.nuevoProducto.precio_costo + (this.nuevoProducto.precio_costo * (this.nuevoProducto.ganancia || 0) / 100);
+    const productoConPrecio = new ProductoDTO({ ...this.nuevoProducto, precio_venta, id_admin: user_id });
+
+    this.productosService.addProducto(productoConPrecio).subscribe(
+      (respuesta: AddProductoResponse) => {
+        this.mensaje = respuesta.message || 'Producto agregado con éxito.';
+        this.cargando = false;
+        if (respuesta.producto) {
+          this.productos.push(new ProductoDTO(respuesta.producto));
+          this.aplicarFiltros();
+        }
+        if (respuesta.producto && !this.categoriasUnicas.includes(respuesta.producto.categoria)) {
+          this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
+        }
+        this.cancelar();
+      },
+      (error: any) => {
+        console.error('Error al agregar producto', error);
+        this.mensaje = 'Hubo un problema al agregar el producto. Por favor, intenta de nuevo.';
+        this.cargando = false;
+      }
+    );
+  }
+
   cancelar() {
     this.mostrarFormulario = false;
-    this.nuevoProducto = {
-      id: '',
-      precio_costo: 0,
-      descripcion: '',
-      imagen: '',
-      stock: 0,
-      categoria: '',
-      id_admin: '',
-      ganancia: 0
-    };
+    this.nuevoProducto = new ProductoDTO();
     this.mensaje = '';
     this.cargando = false;
   }
-
-  
 }
