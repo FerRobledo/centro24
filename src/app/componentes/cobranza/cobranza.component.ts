@@ -15,7 +15,7 @@ export class CobranzaComponent implements OnInit {
   today: Date = new Date();
 
   constructor(private cobranzaService: CobranzaService, private authService: AuthService) {
-    console.log('Componente init');
+    
   }
 
   //desglose ngOnInit asi poder agregar mas de un metodo con la accion de ejecutar cuando carga el DOM por primera vez
