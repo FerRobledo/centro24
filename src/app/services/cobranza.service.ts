@@ -17,4 +17,8 @@ constructor(private http: HttpClient) { }
   public postClientDaily(payload: any, idAdmin: number): Observable<any>{
     return this.http.post(this.origin + '/api/cobranza/' + idAdmin, payload);
   }
+
+  public closeClientsOfDay(idAmin: number): Observable<any>{
+    return this.http.get(this.origin + '/api/cobranza/' + idAmin + '?action=close');
+  }
 }

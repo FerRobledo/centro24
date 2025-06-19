@@ -2,8 +2,10 @@ const { Pool } = require('pg');
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL, // Definir en Vercel
-    ssl: {rejectUnauthorized: false}, // Necesario si usas PostgreSQL en la nube
+    ssl: { rejectUnauthorized: false }, // Necesario si usas PostgreSQL en la nube
 });
+
+const ProductoDTO = require('../models/producto.dto'); // Inyecto el dto de la api
 
 module.exports = async (req, res) => {
     const origin = req.headers.origin || '*'; // Usa * si no hay origen
@@ -17,71 +19,121 @@ module.exports = async (req, res) => {
         return res.status(200).end();
     }
 
-    //GET
-    if(req.method === 'GET'){
-
-        //obt id user_admin de la query
-        const {id} = req.query;
+    
+    // GET
+    if (req.method === 'GET') {
+        const { id } = req.query;
 
         if (!id) {
-        return res.status(500).json({ error: 'Error falta id para obtener los productos', details: error.message });
+            return res.status(400).json({ error: 'ID de administrador es requerido para obtener los productos' });
         }
         try {
-            const {rows} = await pool.query(`SELECT * FROM productos WHERE id_admin = $1`, [id]);
-
+            const { rows } = await pool.query('SELECT * FROM productos WHERE id_admin = $1', [id]);
             return res.status(200).json(rows);
         } catch (error) {
-            console.log(error);
+            console.error('Error al obtener los productos:', error);
             return res.status(500).json({ error: 'Error al obtener los productos', details: error.message });
         }
     }
 
-    // PUT para actualizar el stock
+    // PUT para actualizar cualquier campo del producto
     if (req.method === 'PUT') {
         try {
-            const { id, stock } = req.body; // Espera id y nuevo valor de stock en el cuerpo de la petición
-            if (!id || stock === undefined) {
-                return res.status(400).json({ error: 'ID y stock son requeridos' });
+            const { id } = req.query; // Extraer id de los parámetros de la URL
+            if (!id) {
+                return res.status(400).json({ error: 'ID es requerido' });
             }
-            const query = 'UPDATE productos SET stock = $1 WHERE id = $2 RETURNING *';
-            const { rows } = await pool.query(query, [stock, id]);
-            if (rows.length === 0) {
+
+            // Verificar y parsear el cuerpo de la solicitud
+            if (!req.body || typeof req.body !== 'object') {
+                return res.status(400).json({ error: 'Cuerpo de la solicitud inválido o ausente' });
+            }
+
+            // Crear instancia de ProductoDTO con los datos del cuerpo
+            let productoDTO;
+            try {
+                productoDTO = new ProductoDTO(req.body);
+                productoDTO.validateRequired();
+            } catch (error) {
+                return res.status(400).json({ error: 'Datos inválidos', details: error.message });
+            }
+
+            // Obtener el producto actual para cálculos o validaciones
+            const selectQuery = 'SELECT precio_costo, ganancia, id_admin FROM productos WHERE id = $1';
+            const { rows: currentRows } = await pool.query(selectQuery, [id]);
+            if (currentRows.length === 0) {
                 return res.status(404).json({ error: 'Producto no encontrado' });
             }
+            const currentProducto = currentRows[0];
+
+            // Calcular nuevo precio_venta si se proporciona ganancia
+            let nuevoPrecioVenta = currentProducto.precio_venta || 0;
+            if (productoDTO.ganancia !== undefined && productoDTO.ganancia !== null && productoDTO.ganancia !== currentProducto.ganancia) {
+                if (productoDTO.ganancia < 0) {
+                    return res.status(400).json({ error: 'La ganancia no puede ser negativa' });
+                }
+                nuevoPrecioVenta = currentProducto.precio_costo * (1 + productoDTO.ganancia / 100);
+                productoDTO.precio_venta = nuevoPrecioVenta;
+            }
+
+            // Obtener solo los campos a actualizar
+            const updates = productoDTO.getUpdates();
+            if (Object.keys(updates).length === 0) {
+                return res.status(400).json({ error: 'No se proporcionaron campos para actualizar' });
+            }
+
+            // Construir la consulta SQL dinámicamente
+            const updateParams = [];
+            const values = [];
+            Object.keys(updates).forEach((key, index) => {
+                updateParams.push(`${key} = $${index + 1}`);
+                values.push(updates[key]);
+            });
+            values.push(id); // Agregar id al final para la cláusula WHERE
+            const query = `UPDATE productos SET ${updateParams.join(', ')} WHERE id = $${values.length} RETURNING *`;
+
+            // Ejecutar la consulta
+            const { rows } = await pool.query(query, values);
             return res.status(200).json(rows[0]);
         } catch (error) {
-            console.log(error);
-            return res.status(500).json({ error: 'Error al actualizar el stock', details: error.message });
+            console.error('Error al actualizar el producto:', error);
+            return res.status(500).json({ error: 'Error al actualizar el producto', details: error.message });
         }
     }
 
-    //POST para agregar un producto.
+    // POST para agregar un producto
     if (req.method === 'POST') {
-        try{
-
+        try {
             console.log('Datos recibidos en req.body:', req.body); // Depuración
-            const { id, precio_costo, descripcion, imagen, stock, categoria, user_padre_id, ganancia, precio_venta } = req.body
-
-            // Verifico si el producto ya existe
-            const result = await pool.query('SELECT * FROM productos WHERE id = $1 and user_id = $2', [id, user_padre_id]);
-            if (result.rows.length > 0) {
-                return res.status(400).json({ message: 'El producto ya existe'});
+            const productoDTO = new ProductoDTO(req.body);
+            const error = productoDTO.validateRequired();
+            if (error) {
+                return res.status(400).json({ error });
             }
 
-            
-            const nuevoProducto = await pool.query(
-                'INSERT INTO productos (id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
-                [id, precio_costo, descripcion, imagen, stock, categoria, user_padre_id, ganancia, precio_venta]
-            );
+            // Verificar si el producto ya existe
+            const { id, id_admin } = productoDTO;
+            const result = await pool.query('SELECT * FROM productos WHERE id = $1 AND id_admin = $2', [id, id_admin]);
+            if (result.rows.length > 0) {
+                return res.status(400).json({ message: 'El producto ya existe' });
+            }
 
-            return res.status(201).json({ message: 'Producto agregado a la base de datos', producto: nuevoProducto.rows[0] });
+            // Insertar el nuevo producto
+            const { precio_costo, descripcion, imagen, stock, categoria, ganancia, precio_venta } = productoDTO;
+            const query = `
+                INSERT INTO productos (id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                RETURNING *
+            `;
+            const values = [id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta];
+            const { rows } = await pool.query(query, values);
 
-        }catch (error) {
-            console.log(error)
-            return res.status(500).json({ message: 'Error al crear el producto' });
+            return res.status(201).json({ message: 'Producto agregado a la base de datos', producto: rows[0] });
+        } catch (error) {
+            console.error('Error al crear el producto:', error);
+            return res.status(500).json({ message: 'Error al crear el producto', details: error.message });
         }
     } else {
         res.status(405).json({ message: 'Método no permitido' });
     }
-    
-}
+};
