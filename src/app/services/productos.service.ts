@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Usuario } from 'src/assets/dto/usuario';
+import { Producto, ProductoDTO } from 'src/assets/dto/producto';
 
 @Injectable({
   providedIn: 'root'
@@ -12,21 +13,19 @@ export class ProductosService {
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  public getProductos(id: number): Observable<any> {
-    return this.http.get(this.origin + '/api/productos/' + id);
+  public getProductos(): Observable<any[]> {
+    const id_admin = this.authService.getIdAdmin();
+    return this.http.get<any[]>(this.origin + '/api/productos/' + id_admin);
   }
 
-  public actualizarStock(id: number, stock: number): Observable<any> {
-    // Obtengo el id_admin desde auhtService
-    const id_admin = this.authService.getIdAdmin();
-    return this.http.put(this.origin + '/api/productos/' + id_admin, { id, stock });
+  public actualizarProducto(producto: ProductoDTO): Observable<Producto> {
+    const updates = producto.getUpdates();
+    return this.http.put<Producto>(this.origin + '/api/productos/' + producto.id, updates);
   }
 
-  public addProducto(id: string, precio_costo: number, descripcion: string, imagen: string, stock: number, categoria: string, ganancia: number, precio_venta: number): Observable<any> {
-    // Obtengo el id_admin desde auhtService
+  public addProducto(producto: ProductoDTO): Observable<any> {
     const id_admin = this.authService.getIdAdmin();
-
-    const nuevoProducto = {id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta }
+    const nuevoProducto = new ProductoDTO({ ...producto, id_admin });
     return this.http.post(this.origin + '/api/productos/' + id_admin, nuevoProducto);
   }
 }
