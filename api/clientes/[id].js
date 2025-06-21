@@ -35,6 +35,7 @@ module.exports = async (req, res) => {
                 return res.status(200).json({ total });
             }*/
             const{ rows } = await pool.query('SELECT * FROM clientes_mensuales WHERE user_admin = $1', [id]);
+
             return res.status(200).json(rows);
         } catch(error) {
             console.log(error);
@@ -53,8 +54,8 @@ module.exports = async (req, res) => {
         } try {
             const { rows } = await pool.query(
                 "INSERT INTO public.clientes_mensuales" +
-                " (tipo, cliente, mensual, bonificacion, semanal, user_admin)" +
-                " VALUES ($2, $3, $4, $5, $1)", [id, payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.semanal]
+                " (tipo, cliente, mensual, bonificacion, semanal, user_admin, monto_pagado)" +
+                " VALUES ($2, $3, $4, $5, $6, $1, $7)", [id, payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.semanal, payload.monto_pagado]
               );
               return res.status(200).json(rows);
         }catch(error) {

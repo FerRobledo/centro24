@@ -1,9 +1,8 @@
 <div class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl bg-clip-border">
-  <div class="relative mx-4 mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border">
+  <div class="relative  mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border">
     <div class="flex justify-between items-start w-full" *ngIf="!clicked">
 
-      <div class="flex items-start gap-8" >
-
+      <div class="flex items-start gap-8 ml-4" >
         <div class="space-y-1">
           <h3 class="text-lg font-semibold text-slate-800"><i class="fa-solid fa-user-group"></i> Clientes de Centro 24
           </h3>
@@ -35,12 +34,12 @@
               class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
               <p
                 class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Cuenta
+                Num de cliente 
 
               </p>
             </th>
             <th
-              class="p-4 w-6 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
               <p
                 class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                 Cliente
@@ -76,6 +75,7 @@
                 Monto pagado
               </p>
             </th>
+            <!--
             <th
               class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
               <p
@@ -83,6 +83,7 @@
                 Preguntar
               </p>
             </th>
+            -->
             <th
               class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
               <select class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500" [(ngModel)]="monthSelected">
@@ -94,11 +95,41 @@
             </th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td class="p-4 border-b border-slate-200">
+        <tbody *ngIf="clientsOfMonth.length > 0">
+          <tr *ngFor="let client of clientsOfMonth">
+            <td class="p-4 w-4 border-b border-slate-200">
               <p class="text-sm text-slate-500">
-                Primer fila
+                {{client.tipo}}
+              </p>
+            </td>
+            <td class="p-4 w-6 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{client.id_client}}
+              </p>
+            </td>
+            <td class="p-4 w-6 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{client.cliente}}
+              </p>
+            </td>
+            <td class="p-4 w-4 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{client.mensual}}
+              </p>
+            </td>
+            <td class="p-4 w-4 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{client.bonificacion}}
+              </p>
+            </td>
+            <td class="p-4 w-4 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{client.semanal}}
+              </p>
+            </td>
+            <td class="p-4 w-4 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{client.monto_pagado}}
               </p>
             </td>
           </tr>

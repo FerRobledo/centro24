@@ -26,6 +26,8 @@ export class ClientesComponent implements OnInit {
     const monthCurrent = new Date().toLocaleString('es-ES', { month: 'long' });//tomo el mes actual y lo paso a español
     this.monthSelected = monthCurrent.charAt(0).toUpperCase() + monthCurrent.slice(1); //convierto la primer letra en mayuscula, ya que en el array estan con mayuscula                                                                                      
     this.loadClientsMonthly();
+    console.log(this.clientsOfMonth);
+    
   }
 
   private loadClientsMonthly(){

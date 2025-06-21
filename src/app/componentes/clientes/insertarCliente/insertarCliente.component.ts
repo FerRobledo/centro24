@@ -25,6 +25,7 @@ export class InsertarClienteComponent implements OnInit {
       mensual: [0],
       bonificacion: [0],
       semanal: [0],
+      monto_pagado: [0]
     });
   }
 
