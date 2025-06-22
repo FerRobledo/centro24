@@ -251,4 +251,11 @@ export class ProductosComponent implements OnInit {
     this.mensaje = '';
     this.cargando = false;
   }
+
+
+  esAdmin(){
+    return this.authService.esAdmin();
+  }
+
+
 }
