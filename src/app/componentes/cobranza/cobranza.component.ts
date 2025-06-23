@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { CobranzaService } from 'src/app/services/cobranza.service';
+import { ViewChild } from '@angular/core';
+import { RegisterClienteComponent } from 'src/app/componentes/cobranza/registerCliente/registerCliente.component';
 
 @Component({
   selector: 'app-cobranza',
@@ -8,14 +10,17 @@ import { CobranzaService } from 'src/app/services/cobranza.service';
   styleUrls: ['./cobranza.component.css']
 })
 export class CobranzaComponent implements OnInit {
+  @ViewChild(RegisterClienteComponent) registerClienteComp!: RegisterClienteComponent;
+
   clientsOfDay: any[] = [];
   clicked = false;
+  public clientEdit: any = null;
   collectionDay = 0;
   collectionClosed = false;
   today: Date = new Date();
 
   constructor(private cobranzaService: CobranzaService, private authService: AuthService) {
-    console.log('Componente init');
+    
   }
 
   //desglose ngOnInit asi poder agregar mas de un metodo con la accion de ejecutar cuando carga el DOM por primera vez
@@ -68,4 +73,9 @@ export class CobranzaComponent implements OnInit {
     }
   }
 
+  public updateClient(client: any) {
+    this.clientEdit = client;
+    this.clicked = true;
+  }
 }
+

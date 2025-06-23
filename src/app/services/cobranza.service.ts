@@ -6,19 +6,24 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CobranzaService {
-private origin = window.location.origin;
+  private origin = window.location.origin;
 
-constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-  public getClientsOfDay(id: number): Observable<any>{
+  public getClientsOfDay(id: number): Observable<any> {
     return this.http.get(this.origin + '/api/cobranza/' + id)
-  } 
+  }
+  
+  public closeClientsOfDay(id: number): Observable<any> {
+    return this.http.get(this.origin + '/api/cobranza/' + id + '?action=close');
+  }
 
-  public postClientDaily(payload: any, idAdmin: number): Observable<any>{
+  public postClientDaily(payload: any, idAdmin: number): Observable<any> {
     return this.http.post(this.origin + '/api/cobranza/' + idAdmin, payload);
   }
 
-  public closeClientsOfDay(idAmin: number): Observable<any>{
-    return this.http.get(this.origin + '/api/cobranza/' + idAmin + '?action=close');
+  public updateClient(idClient: number, idAdmin: number, payload: any) {
+    const body = { ...payload, idAdmin };
+    return this.http.put(this.origin + '/api/cobranza/' + idClient, body);
   }
 }

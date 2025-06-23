@@ -22,10 +22,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { UsuarioCardComponent } from './componentes/usuarios/usuarioCard/usuarioCard.component';
 import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
 import { RegisterClienteComponent } from './componentes/cobranza/registerCliente/registerCliente.component';
-
 import { ConfirmDialogComponent } from './componentes/confirmDialog/confirmDialog.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ClientesComponent } from './componentes/clientes/clientes.component';
+import { InsertarClienteComponent } from './componentes/clientes/insertarCliente/insertarCliente.component';
 
 
 @NgModule({
@@ -46,6 +47,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     CobranzaComponent,
     RegisterClienteComponent,
     ConfirmDialogComponent,
+    ClientesComponent,
+    InsertarClienteComponent
   ],
   imports: [
     BrowserModule,
