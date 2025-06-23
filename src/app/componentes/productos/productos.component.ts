@@ -131,12 +131,7 @@ export class ProductosComponent implements OnInit {
       );
     }
   }
-/*
-  onCantidadChange(producto: ProductoDTO) {
-    const value = producto.cantidadModificar;
-    producto.cantidadModificar = (value) ? null : value;
-  }
-*/
+
   modificarStock(producto: ProductoDTO) {
     console.log('Se llamó a modificarStock con:', producto);
     if (producto.cantidadModificar === null || producto.cantidadModificar === undefined || producto.cantidadModificar === 0) {
@@ -257,5 +252,26 @@ export class ProductosComponent implements OnInit {
     return this.authService.esAdmin();
   }
 
+  /*
+  eliminarProducto(producto: ProductoDTO) {
+    if (!confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+      return;
+    }
+
+    this.productosService.eliminarProducto(producto).subscribe(
+      (response: any) => {
+        console.log('Producto eliminado:', response);
+        this.productos = this.productos.filter(p => p.id !== producto.id);
+        this.aplicarFiltros();
+        alert('Producto eliminado exitosamente');
+      },
+      (error: any) => {
+        console.error('Error al eliminar producto:', error);
+        alert('Error al eliminar el producto. Detalle: ' + (error.error?.error || 'Sin detalles'));
+      }
+    );
+  }
+
+*/
 
 }
