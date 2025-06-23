@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Usuario } from 'src/assets/dto/usuario';
-import { Producto, ProductoDTO } from 'src/assets/dto/producto';
+import { ProductoDTO } from 'src/assets/dto/producto';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +13,12 @@ export class ProductosService {
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
-  public getProductos(): Observable<any[]> {
-    const id_admin = this.authService.getIdAdmin();
-    return this.http.get<any[]>(this.origin + '/api/productos/' + id_admin);
+  public getProductos(id: number): Observable<any> {
+    return this.http.get(this.origin + '/api/productos/' + id);
+  }
+
+  public actualizarStock(id: number, stock: number): Observable<any> {
+    return this.http.put(this.origin + '/api/productos', { id, stock });
   }
 
   public addProducto(producto: ProductoDTO): Observable<any> {
