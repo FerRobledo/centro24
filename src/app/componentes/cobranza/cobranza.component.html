@@ -43,7 +43,7 @@
           <th
             class="p-4 w-28 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
             <p
-              class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+              class="flex items-center justify-between gap-1 font-sans text-sm font-normal leading-none text-slate-500">
               Fecha
 
             </p>
@@ -100,12 +100,19 @@
             </p>
           </th>
           <th
-            class="p-2 w-44 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+            class="p-1 w-20 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
             <p
               class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
               Observacion
             </p>
           </th>
+          <th
+          class="p-2 w-5 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+          <p
+            class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+            Modificar
+          </p>
+        </th>
         </tr>
       </thead>
       <tbody *ngIf="clientsOfDay.length > 0">
@@ -174,14 +181,23 @@
           <td class="p-4 border-b border-slate-200">
             <div class="flex flex-col">
               <p class="text-sm font-semibold text-slate-500">
-                {{cliente.observacion}}
+                {{cliente.observacion}} 
               </p>
+            </div>
+          </td>
+          <td class="p-4 border-b border-slate-200">
+            <div class="flex gap-2">
+              <button (click)="updateClient(cliente)" class="text-slate-500 hover:text-blue-600" title="Editar">
+                <i class="fa-solid fa-pencil"></i>
+              </button>
+              <button class="text-slate-500 hover:text-red-600" title="Eliminar">
+                <i class="fa-solid fa-trash"></i>
+              </button>
             </div>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
-  <app-registerCliente class="justify-center" *ngIf="clicked" (closeForm)="clicked = false"></app-registerCliente>
-
+  <app-registerCliente class="justify-center" *ngIf="clicked" [clientEdit]="clientEdit" (closeForm)="clicked = false"></app-registerCliente>
 </div>
