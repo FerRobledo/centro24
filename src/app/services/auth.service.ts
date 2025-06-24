@@ -67,9 +67,21 @@ export class AuthService {
 
   }
 
+  getUserRoles() {
+    const token = this.getToken();
 
+    if (!token) return null;
 
-  // Devuelve true si el usuario tiene NULL en la columna user_padre_id. Sino devuelve false.
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      let roles = payload.roles;
+      return roles || null;
+    } catch (error) {
+      console.error('Error al decodificar el token', error);
+      return null;
+    }
+  }
+
   esAdmin() {
     const token = this.getToken();
 
@@ -84,20 +96,8 @@ export class AuthService {
         return false;
       }
     } catch (error) {
-      console.error('Error al decodificar el token, no se puede saber si el usuario es Admin', error);
-      return null;
-    }
-  }
-
-
-  getUserRoles() {
-      let roles = payload.roles;
-      return roles || null;
-    } catch (error) {
       console.error('Error al decodificar el token', error);
-      return null;
+      return false;
     }
-
   }
-
 }
