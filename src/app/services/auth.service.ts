@@ -82,8 +82,6 @@ export class AuthService {
     }
   }
 
-
-  
   esAdmin() {
     const token = this.getToken();
 
