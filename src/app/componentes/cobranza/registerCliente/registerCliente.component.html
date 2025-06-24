@@ -1,0 +1,80 @@
+<div class="flex w-[75vw] h-[90vh] mt-6 mb-7 overflow-y-auto overflow-x-hidden">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="container flex flex-col mx-auto space-y-12">
+    <fieldset class="grid grid-cols-4 gap-6 p-6 rounded-md shadow-sm bg-white">
+      <div class="space-y-2 col-span-full lg:col-span-1 justify-center ">
+        <div class="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center">
+          <i class="fa-solid fa-user-plus text-2xl text-white"></i>
+        </div>
+        <h6 class="text-lg font-bold text-gray-900">{{ editMode ? 'Edite al cliente' : 'Registre un nuevo cliente' }}</h6>
+      </div>
+
+      <div class="grid grid-cols-6 gap-4 col-span-full lg:col-span-3">
+        <div class="col-span-full sm:col-span-3">
+          <label for="username" class="text-sm font-medium text-gray-900">Detalle</label>
+          <input type="text" name="username" id="username" formControlName="detalle" autocomplete="username" required placeholder="Nombre del cliente"
+            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
+        </div>
+
+        <div class="col-span-full sm:col-span-3">
+          <label for="efectivo" class="text-sm font-medium text-gray-900">Efectivo</label>
+          <input type="number" name="efectivo" id="efectivo" formControlName="efectivo" placeholder="$0.00"
+            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
+        </div>
+
+        <div class="col-span-full sm:col-span-3">
+          <label for="debito" class="text-sm font-medium text-gray-900">Débito</label>
+          <input type="number" name="debito" id="debito" formControlName="debito" placeholder="$0.00"
+            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
+        </div>
+
+        <div class="col-span-full sm:col-span-3">
+          <label for="credito" class="text-sm font-medium text-gray-900">Crédito</label>
+          <input type="number" name="credito" id="credito" formControlName="credito" placeholder="$0.00"
+            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
+        </div>
+
+        <div class="col-span-full sm:col-span-3">
+          <label for="transferencia" class="text-sm font-medium text-gray-900">Transferencia</label>
+          <input type="number" name="transferencia" id="transferencia" formControlName="transferencia" placeholder="$0.00"
+            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
+        </div>
+
+        <div class="col-span-full sm:col-span-3">
+          <label for="cheque" class="text-sm font-medium text-gray-900">Cheque</label>
+          <input type="number" name="cheque" id="cheque" formControlName="cheque"  placeholder="$0.00"
+            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
+        </div>
+
+        <div class="col-span-full sm:col-span-3">
+          <label for="retiro" class="text-sm font-medium text-gray-900">Retiro</label>
+          <input type="number" name="retiro" id="retiro" formControlName="retiro"  placeholder="$0.00"
+            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
+        </div>
+
+        <div class="col-span-full sm:col-span-3">
+          <label for="observacion" class="text-sm font-medium text-gray-900">Observación</label>
+          <input type="text" name="observacion" id="observacion" formControlName="observacion"
+            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
+        </div>
+
+        <div class="col-span-full sm:col-span-3">
+          <label for="gasto" class="text-sm font-medium text-gray-900">Gasto</label>
+          <input type="number" name="gasto" id="gasto" formControlName="gasto"  placeholder="$0.00"
+            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
+        </div>
+
+        <div class="col-span-full flex gap-4 mt-4">
+          <button type="submit"
+            class="w-28 rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">
+            {{ editMode ? 'Guardar cambios' : 'Crear cliente' }}
+          </button>
+
+          <button type="button" (click)="onCancel()"
+            class="w-20 rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </fieldset>
+  </form>
+</div>

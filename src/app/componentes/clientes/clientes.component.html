@@ -1,0 +1,140 @@
+<div class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl bg-clip-border">
+  <div class="relative  mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border">
+    <div class="flex justify-between items-start w-full" *ngIf="!clicked">
+
+      <div class="flex items-start gap-8 ml-4" >
+        <div class="space-y-1">
+          <h3 class="text-lg font-semibold text-slate-800"><i class="fa-solid fa-user-group"></i> Clientes de Centro 24
+          </h3>
+          <p class="text-slate-500"> Listar clientes mensuales</p>
+        </div>
+
+      </div>
+      <button (click)="handleClick()"
+        class="flex select-none items-center gap-2 rounded bg-green-600 py-2 mr-4 mt-2 px-4 text-xs font-semibold text-white"
+        type="button">
+        <i class="fa-solid fa-user-plus"></i>
+        Agregar cliente
+      </button>
+
+    </div>
+    <div class="p-0 overflow-y-scroll" *ngIf="!clicked">
+      <table class="w-full mt-4 text-left table-auto min-w-max">
+        <thead>
+          <tr>
+            <th
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+                Tipo
+
+              </p>
+            </th>
+            <th
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+                Num de cliente 
+
+              </p>
+            </th>
+            <th
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+                Cliente
+
+              </p>
+            </th>
+            <th
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+                Mensual
+
+              </p>
+            </th>
+            <th
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                Bonificacion
+              </p>
+            </th>
+            <th
+              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                Semanal
+              </p>
+            </th>
+            <th
+              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                Monto pagado
+              </p>
+            </th>
+            <!--
+            <th
+              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                Preguntar
+              </p>
+            </th>
+            -->
+            <th
+              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <select class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500" [(ngModel)]="monthSelected">
+                <option *ngFor="let month of months"  [value]="month">
+                  {{month}}
+                </option>
+              </select>
+              <p class="text-xs">seleccionado: {{ monthSelected }}</p>
+            </th>
+          </tr>
+        </thead>
+        <tbody *ngIf="clientsOfMonth.length > 0">
+          <tr *ngFor="let client of clientsOfMonth">
+            <td class="p-4 w-4 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{client.tipo}}
+              </p>
+            </td>
+            <td class="p-4 w-6 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{client.id_client}}
+              </p>
+            </td>
+            <td class="p-4 w-6 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{client.cliente}}
+              </p>
+            </td>
+            <td class="p-4 w-4 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{client.mensual}}
+              </p>
+            </td>
+            <td class="p-4 w-4 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{client.bonificacion}}
+              </p>
+            </td>
+            <td class="p-4 w-4 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{client.semanal}}
+              </p>
+            </td>
+            <td class="p-4 w-4 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{client.monto_pagado}}
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-insertarCliente class="justify-center" *ngIf="clicked" (closeForm)="clicked = false"></app-insertarCliente>
+  </div>

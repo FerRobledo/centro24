@@ -17,6 +17,8 @@ export class SideMenuComponent implements OnInit {
     private router: Router,
   ) { }
 
+  roles: string[] = []
+
   secciones: { nombre: string, icono: string }[] = [
     {
       nombre: 'Home',
@@ -39,8 +41,22 @@ export class SideMenuComponent implements OnInit {
       icono: 'fa-solid fa-user',
     }
   ];
+  seccionesDisponibles: { nombre: string, icono: string }[] = []
 
   ngOnInit() {
+    this.roles = this.authService.getUserRoles();
+    this.filtrarSecciones();
+  }
+
+  filtrarSecciones() {
+    if(this.roles.includes('Admin')){
+      this.seccionesDisponibles = this.secciones;
+    } else {
+      this.seccionesDisponibles = this.secciones.filter(seccion =>
+        seccion.nombre === 'Home' ||
+        this.roles.some(rol => rol.toLowerCase() === seccion.nombre.toLowerCase())
+      );
+    }
   }
 
   cerrarSesion(): void {

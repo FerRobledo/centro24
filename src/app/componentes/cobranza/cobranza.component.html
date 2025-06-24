@@ -1,112 +1,125 @@
 <div class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl bg-clip-border">
-  <div class="relative mx-4 mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border">
-    <div class="flex items-center justify-between ">
-        <div>
-            <h3 class="text-lg font-semibold text-slate-800">Caja de cobranza</h3>
-            <p class="text-slate-500">Listar clientes diarios</p>
+  <div class="relative mx-4 mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border" *ngIf="!clicked">
+    <div class="flex justify-between items-start w-full">
+
+      <div class="flex items-start gap-16">
+        <div class="space-y-1">
+          <h3 class="text-lg font-semibold text-slate-800"><i class="fa-solid fa-cash-register"></i> Caja de cobranza</h3>
+          <p class="text-slate-500">Listar clientes diarios</p>
         </div>
-      <div class="flex flex-col gap-2 shrink-0 sm:flex-row">
-        
-        <button
-          class="flex select-none items-center mr-8 gap-2 rounded bg-green-600 py-2.5 px-6 text-xs font-semibold text-white "
-          type="button">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
-            stroke-width="2" class="w-4 h-4">
-            <path
-              d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z">
-            </path>
-          </svg>
-          Agregar cliente
-        </button>
+
+        <div class="flex items-center justify-between w-[255px]">
+          <button (click)="closeDay()"
+            class="flex select-none items-center gap-2 rounded bg-green-600 py-2 px-2 text-xs font-semibold text-white"
+            type="button">
+            <i class="fa-solid fa-lock"></i>
+            Cerrar caja
+          </button>
+          <div class="flex flex-col items-start">
+            <p class="text-slate-800 font-medium text-sm">
+              Recaudación del día:
+              <br>
+              {{ today | date:'dd/MM/yyyy' }}
+            </p>
+            <input type="text" placeholder="$0.00" [value]="'$' + (collectionDay | number:'1.0-0')"
+              class="text-right border rounded-md px-2 py-1 w-28 text-sm">
+          </div>
+        </div>
       </div>
+
+      <button (click)="handleClick()"
+        class="flex select-none items-center gap-2 rounded bg-green-600 py-2 mr-4 mt-2 px-4 text-xs font-semibold text-white"
+        type="button">
+        <i class="fa-solid fa-user-plus"></i>
+        Agregar cliente
+      </button>
     </div>
-   
+
   </div>
-  <div class="p-0 overflow-y-scroll">
+  <div class="p-0 overflow-y-scroll " *ngIf="!clicked">
     <table class="w-full mt-4 text-left table-auto min-w-max">
       <thead>
         <tr>
           <th
-            class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+            class="p-4 w-28 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
             <p
-              class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+              class="flex items-center justify-between gap-1 font-sans text-sm font-normal leading-none text-slate-500">
               Fecha
-             
+
             </p>
           </th>
-          <th
-            class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+          <th class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
             <p
               class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
               Detalle
-             
+
             </p>
           </th>
-          <th
-            class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+          <th class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
             <p
               class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
               Efectivo
-            
+
             </p>
           </th>
-          <th
-            class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+          <th class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
             <p
               class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
               Debito
-                
+
             </p>
           </th>
-          <th
-            class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+          <th class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
             <p
               class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
               Credito
             </p>
           </th>
-          <th
-            class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+          <th class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
             <p
               class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
               Transferencia
             </p>
           </th>
-          <th
-            class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+          <th class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
             <p
               class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-              Chueque
+              Cheque
             </p>
           </th>
-          <th
-            class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+          <th class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
             <p
               class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-              Retiro
+              Gasto
             </p>
           </th>
-          <th
-            class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+          <th class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
             <p
               class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
               Retiro
             </p>
           </th>
           <th
-            class="p-2 w-44 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+            class="p-1 w-20 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
             <p
               class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
               Observacion
             </p>
           </th>
+          <th
+          class="p-2 w-5 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+          <p
+            class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+            Modificar
+          </p>
+        </th>
         </tr>
       </thead>
-      <tbody *ngIf="clientesDelDia.length > 0">
-        <tr *ngFor="let cliente of clientesDelDia">
+      <tbody *ngIf="clientsOfDay.length > 0">
+        <tr *ngFor="let cliente of clientsOfDay">
           <td class="p-4 border-b border-slate-200">
             <p class="text-sm text-slate-500">
-              {{cliente.fecha}}
+              {{cliente.fecha | date: 'yyyy-MM-dd'}}
             </p>
           </td>
           <td class="p-4 border-b border-slate-200">
@@ -119,99 +132,72 @@
           <td class="p-4 border-b border-slate-200">
             <div class="flex flex-col">
               <p class="text-sm font-semibold text-slate-500">
-                {{cliente.efectivo | currency:'USD'}}
+                ${{cliente.efectivo | number:'1.0-0'}}
               </p>
             </div>
           </td>
           <td class="p-4 border-b border-slate-200">
             <div class="flex flex-col">
               <p class="text-sm font-semibold text-slate-500">
-                {{cliente.debito | currency:'USD'}}
+                ${{cliente.debito | number:'1.0-0'}}
               </p>
             </div>
           </td>
           <td class="p-4 border-b border-slate-200">
             <div class="flex flex-col">
               <p class="text-sm font-semibold text-slate-500">
-                {{cliente.credito | currency:'USD'}}
+                ${{cliente.credito | number:'1.0-0'}}
               </p>
             </div>
           </td>
           <td class="p-4 border-b border-slate-200">
             <div class="flex flex-col">
               <p class="text-sm font-semibold text-slate-500">
-                {{cliente.transferencia | currency:'USD'}}
+                ${{cliente.transferencia | number:'1.0-0'}}
               </p>
             </div>
           </td>
           <td class="p-4 border-b border-slate-200">
             <div class="flex flex-col">
               <p class="text-sm font-semibold text-slate-500">
-                {{cliente.cheque | currency:'USD'}}
+                ${{cliente.cheque | number:'1.0-0'}}
               </p>
             </div>
           </td>
           <td class="p-4 border-b border-slate-200">
             <div class="flex flex-col">
               <p class="text-sm font-semibold text-slate-500">
-                {{cliente.gasto | currency:'USD'}}
+                ${{cliente.gasto | number:'1.0-0'}}
               </p>
             </div>
           </td>
           <td class="p-4 border-b border-slate-200">
             <div class="flex flex-col">
               <p class="text-sm font-semibold text-slate-500">
-                {{cliente.retiro | currency:'USD'}}
+                ${{cliente.retiro | number:'1.0-0'}}
               </p>
             </div>
           </td>
           <td class="p-4 border-b border-slate-200">
             <div class="flex flex-col">
               <p class="text-sm font-semibold text-slate-500">
-                {{cliente.observacion}}
+                {{cliente.observacion}} 
               </p>
             </div>
           </td>
-          <!--
           <td class="p-4 border-b border-slate-200">
-            <button
-              class="relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase text-slate-900 transition-all hover:bg-slate-900/10 active:bg-slate-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-              type="button">
-              <span class="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
-                  class="w-4 h-4">
-                  <path
-                    d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z">
-                  </path>
-                </svg>
-              </span>
-            </button>
+            <div class="flex gap-2">
+              <button (click)="updateClient(cliente)" class="text-slate-500 hover:text-blue-600" title="Editar">
+                <i class="fa-solid fa-pencil"></i>
+              </button>
+              <button class="text-slate-500 hover:text-red-600" title="Eliminar">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
           </td>
-          -->
         </tr>
-        <div *ngIf="clientesDelDia.length === 0"><p>cargandoooo....</p></div>
-       
       </tbody>
     </table>
   </div>
-  <!--  <div class="flex bottom-0 items-center justify-between p-3">
-    <p class="block text-sm text-slate-500">
-      Page 1 of 10
-    </p>
-    <div class="flex gap-1">
-      <button
-        class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-        type="button">
-        Previous
-      </button>
-      <button
-        class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-        type="button">
-        Next
-      </button>
-    </div>
-  </div>
-  -->
-
+  <app-registerCliente class="justify-center" *ngIf="clicked" [clientEdit]="clientEdit" (closeForm)="clicked = false"></app-registerCliente>
 </div>
- 
