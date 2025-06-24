@@ -28,4 +28,13 @@ export class ProductosService {
     const nuevoProducto = new ProductoDTO({ ...producto, id_admin });
     return this.http.post(this.origin + '/api/productos/' + id_admin, nuevoProducto);
   }
+
+/*
+  public eliminarProducto(producto: ProductoDTO): Observable<any> { // Cambié a any por simplicidad, ajusta si necesitas Producto
+    const id_admin = this.authService.getIdAdmin(); // Obtener id_admin del servicio de autenticación
+    const id_producto = producto.id;
+    const url = `${this.origin}/api/productos/${id_admin}`;
+    return this.http.delete<any>(url, { params: { id_producto } });
+  }
+*/
 }

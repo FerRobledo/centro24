@@ -136,4 +136,44 @@ module.exports = async (req, res) => {
     } else {
         res.status(405).json({ message: 'Método no permitido' });
     }
-};
+
+/*
+    if (req.method === 'DELETE') {
+        try {
+            // Extraer id_admin de la ruta y id_producto del query con validación
+            const {id} = req.query; // Usa el operador opcional
+            const id_producto = req.query?.id_producto;
+
+            console.log('Parámetros recibidos:', { id_producto, id });
+
+            // Validar que los parámetros existan
+            if (!id_producto || !id) {
+                return res.status(400).json({ message: 'id_producto e id_admin son requeridos' });
+            }
+
+            // Verificar si el producto existe y pertenece al admin
+            const verificacion = await pool.query(
+                'SELECT * FROM productos WHERE id = $1 AND id_admin = $2',
+                [id_producto, id]
+            );
+            console.log('Verificación:', verificacion.rowCount);
+            if (verificacion.rowCount === 0) {
+                return res.status(400).json({ message: 'No es posible eliminar el producto' });
+            }
+
+            // Eliminar el producto
+            await pool.query(
+                'DELETE FROM productos WHERE id = $1 AND id_admin = $2',
+                [id_producto, id]
+            );
+
+            return res.status(200).json({ message: 'Producto eliminado exitosamente' });
+        } catch (error) {
+            console.error('Error al eliminar el producto:', error.stack || error.message || error);
+            return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+        }
+    } else {
+        return res.status(405).json({ message: 'Método no permitido' });
+    }
+*/
+}
