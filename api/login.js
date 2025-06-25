@@ -40,7 +40,6 @@ module.exports = async (req, res) => {
             }
 
             const user = result.rows[0];
-            console.log(user);
             // Verificar la contraseña
             const isPasswordValid = await bcrypt.compare(password, user.password_hash);
             if (!isPasswordValid) {

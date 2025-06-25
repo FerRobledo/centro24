@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
         return res.status(200).end();
     }
 
-    
+
     // GET
     if (req.method === 'GET') {
         const { id } = req.query;
@@ -42,11 +42,6 @@ module.exports = async (req, res) => {
             const { id } = req.query; // Extraer id de los parámetros de la URL
             if (!id) {
                 return res.status(400).json({ error: 'ID es requerido' });
-            }
-
-            // Verificar y parsear el cuerpo de la solicitud
-            if (!req.body || typeof req.body !== 'object') {
-                return res.status(400).json({ error: 'Cuerpo de la solicitud inválido o ausente' });
             }
 
             // Crear instancia de ProductoDTO con los datos del cuerpo
@@ -106,10 +101,6 @@ module.exports = async (req, res) => {
         try {
             console.log('Datos recibidos en req.body:', req.body); // Depuración
             const productoDTO = new ProductoDTO(req.body);
-            const error = productoDTO.validateRequired();
-            if (error) {
-                return res.status(400).json({ error });
-            }
 
             // Verificar si el producto ya existe
             const { id, id_admin } = productoDTO;

@@ -55,7 +55,7 @@ export class AuthService {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       let idAdmin = payload.idAdmin;
-      if(!idAdmin){
+      if (!idAdmin) {
         return this.getUserId();
       } else {
         return payload.idAdmin;

@@ -39,7 +39,7 @@ export class SideMenuComponent implements OnInit {
     {
       nombre: 'Usuarios',
       icono: 'fa-solid fa-user',
-    }
+    },
   ];
   seccionesDisponibles: { nombre: string, icono: string }[] = []
 
