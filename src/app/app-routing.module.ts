@@ -9,6 +9,7 @@ import { authGuard } from './auth-guard.guard';
 import { CobranzaComponent } from './componentes/cobranza/cobranza.component';
 import { UsuarioModalComponent } from './componentes/usuarios/usuarioModal/UsuarioModal.component';
 import { UsuariosComponent } from './componentes/usuarios/usuarios/usuarios.component';
+import { ClientesComponent } from './componentes/clientes/clientes.component';
 import { CargaProductosComponent } from './componentes/cargaProductos/cargaProductos.component';
 
 const routes: Routes = [
@@ -40,6 +41,10 @@ const routes: Routes = [
         path: 'usuarios',
         component: UsuariosComponent,
       },
+      {
+        path: 'clientes',
+        component: ClientesComponent
+      }
       {
         path: 'carga',
         component: CargaProductosComponent,

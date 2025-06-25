@@ -80,6 +80,24 @@ export class AuthService {
       console.error('Error al decodificar el token', error);
       return null;
     }
+  }
 
+  esAdmin() {
+    const token = this.getToken();
+
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      let idAdmin = payload.idAdmin;
+      if(!idAdmin){
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error('Error al decodificar el token', error);
+      return false;
+    }
   }
 }
