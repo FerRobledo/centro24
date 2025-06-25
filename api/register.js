@@ -56,7 +56,6 @@ module.exports = async (req, res) => {
 
 async function insertRoles(id, rolesUsuario) {
     for (const rol of rolesUsuario) {
-        console.log(rol);
         try {
             await pool.query(`
                 INSERT INTO user_rol (id_user, id_rol)

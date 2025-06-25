@@ -27,6 +27,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ClientesComponent } from './componentes/clientes/clientes.component';
 import { InsertarClienteComponent } from './componentes/clientes/insertarCliente/insertarCliente.component';
+import { CargaProductosComponent } from './componentes/cargaProductos/cargaProductos.component';
 
 
 @NgModule({
@@ -48,7 +49,8 @@ import { InsertarClienteComponent } from './componentes/clientes/insertarCliente
     RegisterClienteComponent,
     ConfirmDialogComponent,
     ClientesComponent,
-    InsertarClienteComponent
+    InsertarClienteComponent,
+    CargaProductosComponent,
   ],
   imports: [
     BrowserModule,
