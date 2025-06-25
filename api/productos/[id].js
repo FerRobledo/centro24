@@ -39,9 +39,18 @@ module.exports = async (req, res) => {
     // PUT para actualizar cualquier campo del producto
     if (req.method === 'PUT') {
         try {
-            const { id } = req.query; // Extraer id de los parámetros de la URL
-            if (!id) {
-                return res.status(400).json({ error: 'ID es requerido' });
+            const idProducto = req.query.id; // ID del producto desde la URL
+            const { idAdmin } = req.body; // ID del admin desde el body
+            const payload = req.body; // Datos completos desde el body
+            
+            console.log("El payload del update es: ", payload);
+
+            if (!idProducto) {
+                return res.status(400).json({ error: 'ID del producto es requerido' });
+            }
+
+            if (!idAdmin) {
+                return res.status(400).json({ error: 'ID del administrador es requerido' });
             }
 
             // Crear instancia de ProductoDTO con los datos del cuerpo
@@ -53,11 +62,11 @@ module.exports = async (req, res) => {
                 return res.status(400).json({ error: 'Datos inválidos', details: error.message });
             }
 
-            // Obtener el producto actual para cálculos o validaciones
-            const selectQuery = 'SELECT precio_costo, ganancia, id_admin FROM productos WHERE id = $1';
-            const { rows: currentRows } = await pool.query(selectQuery, [id]);
+            // Obtener el producto actual para cálculos o validaciones y verificar que pertenece al admin
+            const selectQuery = 'SELECT precio_costo, ganancia, id_admin FROM productos WHERE id = $1 AND id_admin = $2';
+            const { rows: currentRows } = await pool.query(selectQuery, [idProducto, idAdmin]);
             if (currentRows.length === 0) {
-                return res.status(404).json({ error: 'Producto no encontrado' });
+                return res.status(404).json({ error: 'Producto no encontrado o no pertenece al administrador' });
             }
             const currentProducto = currentRows[0];
 
@@ -71,8 +80,10 @@ module.exports = async (req, res) => {
                 productoDTO.precio_venta = nuevoPrecioVenta;
             }
 
-            // Obtener solo los campos a actualizar
+            // Obtener solo los campos a actualizar (excluyendo idAdmin)
             const updates = productoDTO.getUpdates();
+            delete updates.idAdmin; // Remover idAdmin de los updates
+            
             if (Object.keys(updates).length === 0) {
                 return res.status(400).json({ error: 'No se proporcionaron campos para actualizar' });
             }
@@ -84,8 +95,9 @@ module.exports = async (req, res) => {
                 updateParams.push(`${key} = $${index + 1}`);
                 values.push(updates[key]);
             });
-            values.push(id); // Agregar id al final para la cláusula WHERE
-            const query = `UPDATE productos SET ${updateParams.join(', ')} WHERE id = $${values.length} RETURNING *`;
+            values.push(idProducto); // Agregar id del producto al final para la cláusula WHERE
+            values.push(idAdmin); // Agregar id del admin para la cláusula WHERE
+            const query = `UPDATE productos SET ${updateParams.join(', ')} WHERE id = $${values.length - 1} AND id_admin = $${values.length} RETURNING *`;
 
             // Ejecutar la consulta
             const { rows } = await pool.query(query, values);
@@ -124,11 +136,9 @@ module.exports = async (req, res) => {
             console.error('Error al crear el producto:', error);
             return res.status(500).json({ message: 'Error al crear el producto', details: error.message });
         }
-    } else {
-        res.status(405).json({ message: 'Método no permitido' });
     }
 
-/*
+    // DELETE
     if (req.method === 'DELETE') {
         try {
             // Extraer id_admin de la ruta y id_producto del query con validación
@@ -163,8 +173,8 @@ module.exports = async (req, res) => {
             console.error('Error al eliminar el producto:', error.stack || error.message || error);
             return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
         }
-    } else {
-        return res.status(405).json({ message: 'Método no permitido' });
     }
-*/
+    
+    // Si ningún método coincide
+    return res.status(405).json({ message: 'Método no permitido' });
 }
