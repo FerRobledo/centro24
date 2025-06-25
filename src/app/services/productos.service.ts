@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, from, mergeMap, Observable, of } from 'rxjs';
 import { AuthService } from './auth.service';
-import { Usuario } from 'src/assets/dto/usuario';
-import { ProductoDTO } from 'src/assets/dto/producto';
+import { Producto, ProductoDTO } from 'src/assets/dto/producto';
 
 @Injectable({
   providedIn: 'root'
@@ -21,27 +20,46 @@ export class ProductosService {
     return this.http.put(this.origin + '/api/productos', { id, stock });
   }
 
-  public addProducto(producto: ProductoDTO): Observable<any> {
+  public addProducto(producto: Producto): Observable<any> {
     const id_admin = this.authService.getIdAdmin();
     const nuevoProducto = new ProductoDTO({ ...producto, id_admin });
     return this.http.post(this.origin + '/api/productos/' + id_admin, nuevoProducto);
   }
 
-  public addAllProductos(productos: Producto[]) {
-    // Obtengo el id_admin desde auhtService
+  public addAllProductos(productos: ProductoDTO[]) {
     const id_admin = this.authService.getIdAdmin();
-
     const nuevosProductos = productos.map(producto => ({
       ...producto,
       id_admin
     }));
 
-    nuevosProductos.forEach(producto => {
-      this.actualizarProducto(producto);
+    const CONCURRENCY = 5; // cantidad máxima de peticiones simultáneas
+
+    from(nuevosProductos).pipe(
+      mergeMap(producto =>
+        this.actualizarProducto(producto).pipe(
+          catchError(err => {
+            if (err.status === 404) {
+              return this.agregarProducto(producto);
+            } else {
+              console.error(`Error con producto ${producto.id}`, err);
+              return of(null);
+            }
+          })
+        ),
+        CONCURRENCY
+      )
+    ).subscribe({
+      next: res => console.log('Producto procesado:', res),
+      complete: () => console.log('Todos los productos fueron procesados')
     });
   }
-
+  
   public actualizarProducto(producto: Producto): Observable<any> {
-    return this.http.put(this.origin + '/api/productos', producto);
+    return this.http.put(`${this.origin}/api/productos/${producto.id}`, producto);
+  }
+
+  private agregarProducto(producto: any): Observable<any> {
+    return this.http.post(`${this.origin}/api/productos/${producto.id_admin}`, producto);
   }
 }

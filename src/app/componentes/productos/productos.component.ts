@@ -35,7 +35,8 @@ export class ProductosComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.productosService.getProductos().subscribe({
+    const idAdmin = this.authService.getIdAdmin();
+    this.productosService.getProductos(idAdmin).subscribe({
       next: (data: Producto[]) => {
         this.productos = data.map((producto: Producto) => new ProductoDTO({ ...producto, cantidadModificar: null }));
         this.productosFiltrados = this.productos.map(p => new ProductoDTO(p));

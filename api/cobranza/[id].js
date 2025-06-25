@@ -52,8 +52,6 @@ module.exports = async (req, res) => {
         const {id} = req.query;
         const payload = req.body;
 
-        console.log(payload.detalle);
-
         if(!id){
             return res.status(500).json({ error: 'Error falta id para insertar usuario', details: 'No se recibió el ID en el cuerpo de la petición' });
                         
