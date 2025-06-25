@@ -19,8 +19,10 @@ export class ProductosService {
   }
 
   public actualizarProducto(producto: ProductoDTO): Observable<Producto> {
+    const idAdmin = this.authService.getIdAdmin();
     const updates = producto.getUpdates();
-    return this.http.put<Producto>(this.origin + '/api/productos/' + producto.id, updates);
+    const body = { ...updates, idAdmin };
+    return this.http.put<Producto>(this.origin + '/api/productos/' + producto.id, body);
   }
 
   public addProducto(producto: ProductoDTO): Observable<any> {
@@ -29,12 +31,10 @@ export class ProductosService {
     return this.http.post(this.origin + '/api/productos/' + id_admin, nuevoProducto);
   }
 
-/*
-  public eliminarProducto(producto: ProductoDTO): Observable<any> { // Cambié a any por simplicidad, ajusta si necesitas Producto
-    const id_admin = this.authService.getIdAdmin(); // Obtener id_admin del servicio de autenticación
+  public eliminarProducto(producto: ProductoDTO): Observable<any> {
+    const id_admin = this.authService.getIdAdmin();
     const id_producto = producto.id;
     const url = `${this.origin}/api/productos/${id_admin}`;
-    return this.http.delete<any>(url, { params: { id_producto } });
+    return this.http.delete<any>(url, { params: { id_producto: id_producto.toString() } });
   }
-*/
 }
