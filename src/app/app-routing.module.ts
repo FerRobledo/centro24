@@ -45,10 +45,6 @@ const routes: Routes = [
         path: 'clientes',
         component: ClientesComponent
       },
-      {
-        path: 'carga',
-        component: CargaProductosComponent,
-      },
     ],
     canActivate: [authGuard]
   },

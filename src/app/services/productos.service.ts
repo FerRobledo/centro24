@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, from, mergeMap, Observable, of } from 'rxjs';
+import { catchError, from, map, mergeMap, Observable, of, toArray } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Producto, ProductoDTO } from 'src/assets/dto/producto';
 
@@ -25,17 +25,17 @@ export class ProductosService {
     const nuevoProducto = new ProductoDTO({ ...producto, id_admin });
     return this.http.post(this.origin + '/api/productos/' + id_admin, nuevoProducto);
   }
-
-  public addAllProductos(productos: ProductoDTO[]) {
+  
+  public addAllProductos(productos: ProductoDTO[]): Observable<void> {
     const id_admin = this.authService.getIdAdmin();
     const nuevosProductos = productos.map(producto => ({
       ...producto,
       id_admin
     }));
 
-    const CONCURRENCY = 5; // cantidad máxima de peticiones simultáneas
+    const CONCURRENCY = 5;
 
-    from(nuevosProductos).pipe(
+    return from(nuevosProductos).pipe(
       mergeMap(producto =>
         this.actualizarProducto(producto).pipe(
           catchError(err => {
@@ -48,13 +48,13 @@ export class ProductosService {
           })
         ),
         CONCURRENCY
-      )
-    ).subscribe({
-      next: res => console.log('Producto procesado:', res),
-      complete: () => console.log('Todos los productos fueron procesados')
-    });
+      ),
+      toArray(), // espera a que se completen todos
+      map(() => void 0) // solo retorna void
+    );
   }
-  
+
+
   public actualizarProducto(producto: Producto): Observable<any> {
     return this.http.put(`${this.origin}/api/productos/${producto.id}`, producto);
   }

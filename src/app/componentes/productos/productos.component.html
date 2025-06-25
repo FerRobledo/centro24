@@ -2,9 +2,7 @@
 <div class="container mx-auto p-4 w-[75vw] h-[95vh] shadow-2xl rounded-2xl bg-white">
   <div class="mb-4">
     <label for="categoriaFiltro" class="block text-sm font-medium text-gray-700">Filtrar por Categoría:</label>
-    <select 
-      id="categoriaFiltro" 
-      (change)="filtrarCategoria($event)" 
+    <select id="categoriaFiltro" (change)="filtrarCategoria($event)"
       class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
       <option value="">Todas</option>
       <option *ngFor="let cat of categoriasUnicas" [value]="cat">{{ cat }}</option>
@@ -13,34 +11,28 @@
 
   <div class="mb-4 flex items-center space-x-4 mt-8">
     <!-- Boton Todos los Productos -->
-    <button
-      (click)="mostrarTodos()"
-      class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+    <button (click)="mostrarTodos()" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
       Todos los productos
     </button>
     <!-- Boton Mi Stock -->
-    <button
-      (click)="filtrarStockMayorCero()"
-      class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+    <button (click)="filtrarStockMayorCero()" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
       Mi Stock
     </button>
     <!-- Boton Agregar Producto -->
-    <button
-      (click)="mostrarFormulario = true"
-      class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+    <button (click)="mostrarFormulario = true" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
       Agregar productos
     </button>
+    <app-cargaProductos (cargaIniciada)="onCargaIniciada()" (cargaFinalizada)="onCargaCompleta()"></app-cargaProductos>
   </div>
 
 
-  <div *ngIf="productos.length > 0">
+  <div *ngIf="!cargando">
     <div class="h-[70vh] overflow-y-auto border border-gray-300 rounded-md">
       <table class="w-full border-collapse">
         <thead class="bg-gray-100 sticky top-0">
           <tr class="bg-gray-100">
-            <th class="p-3 border border-gray-300 text-center"></th>
             <th class="p-3 border border-gray-300 text-center">ID</th>
-            <th *ngIf="esAdmin()"  class="p-3 border border-gray-300 text-center">Costo</th>
+            <th *ngIf="esAdmin()" class="p-3 border border-gray-300 text-center">Costo</th>
             <th *ngIf="esAdmin()" class="p-3 border border-gray-300 text-center">Ganancia</th>
             <th class="p-3 border border-gray-300 text-center">Venta</th>
             <th class="p-3 border border-gray-300 text-center">Descripción</th>
@@ -63,59 +55,46 @@
             <td class="p-3 border border-gray-300">{{ producto.id }}</td>
             <td *ngIf="esAdmin()" class="p-3 border border-gray-300">${{ producto.precio_costo }}</td>
             <td *ngIf="esAdmin()" class="p-3 border border-gray-300 flex items-center justify-center flex-wrap">
-              <input
-                type="number"
-                class="w-16 mx-2 p-1 border border-gray-300 rounded-md text-center"
-                [(ngModel)]="producto.ganancia"
-                placeholder="{{ producto.ganancia }}"
-              >
+              <input type="number" class="w-16 mx-2 p-1 border border-gray-300 rounded-md text-center"
+                [(ngModel)]="producto.ganancia" placeholder="{{ producto.ganancia }}">
               <span class="pr-1 pl-0">%</span>
-              <button 
-                class="bg-blue-500 text-white px-2 py-1 rounded-md hover:bg-blue-600"
-                (click)="modificarGanancia(producto)"
-                [disabled]="!producto.ganancia || producto.ganancia < 0"
-              >
+              <button class="bg-blue-500 text-white px-2 py-1 rounded-md hover:bg-blue-600"
+                (click)="modificarGanancia(producto)" [disabled]="!producto.ganancia || producto.ganancia < 0">
                 Actualizar
               </button>
             </td>
             <td class="p-3 border border-gray-300">${{ producto.precio_venta }}</td>
-            <td class="p-3 border border-gray-300 max-w-[100px] truncate" matTooltip="{{ producto.descripcion }}">{{ producto.descripcion }}</td>
+            <td class="p-3 border border-gray-300 max-w-[100px] truncate" matTooltip="{{ producto.descripcion }}">{{
+              producto.descripcion }}</td>
             <td class="p-3 border border-gray-300 flex items-center justify-center flex-wrap">
               <div class=" bg-gray-200">
-                <button 
-                  (click)="decrementarStock(producto)" 
+                <button (click)="decrementarStock(producto)"
                   class="bg-red-500 text-white px-2 py-1 rounded-l-md hover:bg-red-600">-</button>
-                  <span class="px-4 bg-gray-200">{{ producto.stock }}</span>
-                <button 
-                  (click)="incrementarStock(producto)" 
+                <span class="px-4 bg-gray-200">{{ producto.stock }}</span>
+                <button (click)="incrementarStock(producto)"
                   class="bg-green-500 text-white px-2 py-1 rounded-r-md hover:bg-green-600">+
                 </button>
               </div>
-              <input 
-                type="number" 
-                [(ngModel)]="producto.cantidadModificar" 
-                class="w-16 mx-2 p-1 border border-gray-300 rounded-md text-center"  
-                placeholder="Cant."
-              >
-              <button 
-                (click)="modificarStock(producto)" 
+              <input type="number" [(ngModel)]="producto.cantidadModificar"
+                class="w-16 mx-2 p-1 border border-gray-300 rounded-md text-center" placeholder="Cant.">
+              <button (click)="modificarStock(producto)"
                 class="bg-blue-500 text-white px-2 py-1 rounded-md hover:bg-blue-600"
-                [disabled]="!producto.cantidadModificar || producto.cantidadModificar === 0"
-              >
+                [disabled]="!producto.cantidadModificar || producto.cantidadModificar === 0">
                 Actualizar
               </button>
             </td>
-            <td class="p-3 border border-gray-300 categoria max-w-[100px] truncate" matTooltip="{{ producto.categoria }}">{{ producto.categoria }}</td>
+            <td class="p-3 border border-gray-300 categoria max-w-[100px] truncate"
+              matTooltip="{{ producto.categoria }}">{{ producto.categoria }}</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
-  <div *ngIf="productos.length === 0" class="text-center py-10">
-    <p class="text-gray-500">Cargando productos...</p>
+  <div *ngIf="cargando" class="text-center py-10">
+    <p class="text-gray-500">{{mensaje}}</p>
   </div>
 
-  
+
 
 
   <!-- Form para agregar producto -->
@@ -125,95 +104,46 @@
       <form (ngSubmit)="addProducto()" class="space-y-4">
         <div>
           <label for="id" class="block text-sm font-medium text-gray-700">ID</label>
-          <input
-            type="text"
-            id="id"
-            [(ngModel)]="nuevoProducto.id"
-            name="id"
-            required
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100"
-          >
+          <input type="text" id="id" [(ngModel)]="nuevoProducto.id" name="id" required
+            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100">
         </div>
         <div>
           <label for="precio" class="block text-sm font-medium text-gray-700">Precio de costo</label>
-          <input
-            type="number"
-            id="precio"
-            [(ngModel)]="nuevoProducto.precio_costo"
-            name="precio_costo"
-            required
-            min="0"
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100"
-          >
+          <input type="number" id="precio" [(ngModel)]="nuevoProducto.precio_costo" name="precio_costo" required min="0"
+            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100">
         </div>
         <div>
           <label for="ganancia" class="block text-sm font-medium text-gray-700">Ganancia (%)</label>
-          <input
-            type="number"
-            id="ganancia"
-            [(ngModel)]="nuevoProducto.ganancia"
-            name="ganancia"
-            required
-            min="0"
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100"
-          >
+          <input type="number" id="ganancia" [(ngModel)]="nuevoProducto.ganancia" name="ganancia" required min="0"
+            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100">
         </div>
         <div>
           <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción</label>
-          <input
-            type="text"
-            id="descripcion"
-            [(ngModel)]="nuevoProducto.descripcion"
-            name="descripcion"
-            required
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100"
-          >
+          <input type="text" id="descripcion" [(ngModel)]="nuevoProducto.descripcion" name="descripcion" required
+            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100">
         </div>
         <div>
           <label for="imagen" class="block text-sm font-medium text-gray-700">Imagen (URL)</label>
-          <input
-            type="text"
-            id="imagen"
-            [(ngModel)]="nuevoProducto.imagen"
-            name="imagen"
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100"
-          >
+          <input type="text" id="imagen" [(ngModel)]="nuevoProducto.imagen" name="imagen"
+            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100">
         </div>
         <div>
           <label for="stock" class="block text-sm font-medium text-gray-700">Stock</label>
-          <input
-            type="number"
-            id="stock"
-            [(ngModel)]="nuevoProducto.stock"
-            name="stock"
-            required
-            min="0"
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100"
-          >
+          <input type="number" id="stock" [(ngModel)]="nuevoProducto.stock" name="stock" required min="0"
+            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100">
         </div>
         <div>
           <label for="categoria" class="block text-sm font-medium text-gray-700">Categoría</label>
-          <input
-            type="text"
-            id="categoria"
-            [(ngModel)]="nuevoProducto.categoria"
-            name="categoria"
-            required
-            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100"
-          >
+          <input type="text" id="categoria" [(ngModel)]="nuevoProducto.categoria" name="categoria" required
+            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-gray-100">
         </div>
         <p class="mt-2 text-sm text-red-600" *ngIf="mensaje">{{ mensaje }}</p>
         <div class="flex justify-end space-x-2">
-          <button
-            type="submit"
-            [disabled]="cargando"
+          <button type="submit" [disabled]="cargando"
             class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
             Guardar
           </button>
-          <button
-            type="button"
-            (click)="cancelar()"
-            [disabled]="cargando"
+          <button type="button" (click)="cancelar()" [disabled]="cargando"
             class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
             Cancelar
           </button>

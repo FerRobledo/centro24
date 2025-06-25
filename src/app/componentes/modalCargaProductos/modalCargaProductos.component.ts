@@ -52,12 +52,12 @@ export class ModalCargaProductosComponent implements OnInit {
     this.todasSeleccionadas = Object.values(this.estadoCheckboxes).every(v => v);
   }
 
-confirmar() {
-  const seleccionadas = Object.entries(this.estadoCheckboxes)
-    .filter(([_, v]) => v)
-    .map(([k, _]) => k); // solo devuelve el nombre de las hojas
-  this.dialogRef.close(seleccionadas);
-}
+  confirmar() {
+    const seleccionadas = Object.entries(this.estadoCheckboxes)
+      .filter(([_, v]) => v)
+      .map(([k, _]) => k); // solo devuelve el nombre de las hojas
+    this.dialogRef.close(seleccionadas);
+  }
 
   cancelar() {
     this.dialogRef.close();

@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { SheetsService } from 'src/app/services/sheets.service';
 import { ModalCargaProductosComponent } from '../modalCargaProductos/modalCargaProductos.component';
 import { ProductoDTO } from 'src/assets/dto/producto';
 import { ProductosService } from 'src/app/services/productos.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cargaProductos',
@@ -16,8 +17,11 @@ export class CargaProductosComponent implements OnInit {
     private sheetsService: SheetsService,
     private productosService: ProductosService,
     public dialog: MatDialog,
+    private router: Router
   ) { }
 
+  @Output() cargaFinalizada = new EventEmitter<void>();
+  @Output() cargaIniciada = new EventEmitter<void>();
   productos: ProductoDTO[] = [];
 
   ngOnInit() {
@@ -33,6 +37,9 @@ export class CargaProductosComponent implements OnInit {
     // y se procede a cargar los productos de cada hoja.
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        this.cargaIniciada.emit();
+        let hojasProcesadas = 0;
+        const totalHojas = result.length;
         result.forEach((hoja: string) => {
           this.productos = [];
           this.sheetsService.getData(hoja).subscribe({
@@ -64,7 +71,18 @@ export class CargaProductosComponent implements OnInit {
                   } as ProductoDTO;
                 });
               this.productos.push(...productosDeHoja);
-              this.productosService.addAllProductos(this.productos);
+              this.productosService.addAllProductos(this.productos).subscribe({
+                complete: () => {
+                  console.log('Todos los productos fueron procesados');
+                  this.verificarFinalizacion(++hojasProcesadas, totalHojas);
+                },
+                error: err => {
+                  console.error('Error durante la carga de productos', err);
+                  this.verificarFinalizacion(++hojasProcesadas, totalHojas);
+                }
+              });
+
+              this.router.navigate(['/productos']);
             },
             error: error => {
               console.error(`Error al obtener datos de la hoja ${hoja}:`, error);
@@ -74,6 +92,12 @@ export class CargaProductosComponent implements OnInit {
         });
       }
     });
+  }
+
+  private verificarFinalizacion(procesadas: number, total: number) {
+    if (procesadas === total) {
+      this.cargaFinalizada.emit();
+    }
   }
 
 

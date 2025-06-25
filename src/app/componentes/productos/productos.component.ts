@@ -15,7 +15,7 @@ interface AddProductoResponse {
 @Component({
   selector: 'app-productos',
   templateUrl: './productos.component.html',
-  styleUrls: ['./productos.component.css']
+  styleUrls: ['./productos.component.css'],
 })
 
 export class ProductosComponent implements OnInit {
@@ -27,7 +27,7 @@ export class ProductosComponent implements OnInit {
 
   mostrarFormulario: boolean = false;
   cargando: boolean = false;
-  mensaje: string = ''; 
+  mensaje: string = '';
   nuevoProducto: ProductoDTO = new ProductoDTO();
 
   constructor(private productosService: ProductosService, private authService: AuthService) {
@@ -36,6 +36,12 @@ export class ProductosComponent implements OnInit {
 
   ngOnInit() {
     const idAdmin = this.authService.getIdAdmin();
+    this.cargarProductos(idAdmin);
+  }
+
+  cargarProductos(idAdmin: number) {
+    this.mensaje = 'Cargando productos...';
+    this.cargando = true;
     this.productosService.getProductos(idAdmin).subscribe({
       next: (data: Producto[]) => {
         this.productos = data.map((producto: Producto) => new ProductoDTO({ ...producto, cantidadModificar: null }));
@@ -47,11 +53,11 @@ export class ProductosComponent implements OnInit {
         console.error('Error al obtener productos:', error);
       },
       complete: () => {
+        this.cargando = false;
         console.log('Solicitud completada');
       }
     });
   }
-
   filtrarCategoria(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
     this.categoriaSeleccionada = value; // Actualiza la categoría seleccionada
@@ -94,7 +100,7 @@ export class ProductosComponent implements OnInit {
         console.log('Respuesta del servidor:', updatedProducto);
         const index = this.productos.findIndex(p => p.id === producto.id);
         if (index !== -1) {
-          this.productos[index] = new ProductoDTO({...this.productos[index], ...updatedProducto });
+          this.productos[index] = new ProductoDTO({ ...this.productos[index], ...updatedProducto });
           this.aplicarFiltros();
         }
       },
@@ -248,8 +254,18 @@ export class ProductosComponent implements OnInit {
     this.cargando = false;
   }
 
+  onCargaCompleta() {
+    this.cargando = false;
+    const idAdmin = this.authService.getIdAdmin();
+    this.cargarProductos(idAdmin)
+  }
 
-  esAdmin(){
+  onCargaIniciada() {
+    this.cargando = true;
+    this.mensaje = 'Procesando productos esto puede tardar unos segundos...';
+  }
+
+  esAdmin() {
     return this.authService.esAdmin();
   }
 
