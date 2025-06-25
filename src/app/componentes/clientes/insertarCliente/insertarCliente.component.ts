@@ -1,8 +1,9 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input  } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
 import { ClientesComponent } from '../clientes.component';
+import { OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'app-insertarCliente',
@@ -11,8 +12,10 @@ import { ClientesComponent } from '../clientes.component';
 })
 export class InsertarClienteComponent implements OnInit {
   @Output() closeForm = new EventEmitter<void>();
+  @Input() clientEdit: any;
 
   form: FormGroup;
+  editMode = false;
 
   constructor(
     private fb: FormBuilder,
@@ -22,10 +25,10 @@ export class InsertarClienteComponent implements OnInit {
     this.form = this.fb.group({
       tipo: ['', Validators.required],
       cliente: ['', Validators.required],
-      mensual: [0],
-      bonificacion: [0],
-      semanal: [0],
-      monto_pagado: [0]
+      mensual: [],
+      bonificacion: [],
+      semanal: [],
+      monto_pagado: []
     });
   }
 
@@ -35,52 +38,67 @@ export class InsertarClienteComponent implements OnInit {
       return;
     }
 
-    const idAdmin = this.authService.getIdAdmin();
-    const payloadInsert = this.form.value;
+    const camposNumericos: string[] = [
+      'mensual', 'bonificacion', 'semanal', 'monto_pagado'
+    ];
+
     
-    this.clientstService.postClientMonthly(payloadInsert, idAdmin).subscribe({
-      next: (res) => {
-        console.log('Éxito:', res);
-        this.closeForm.emit();
-        this.clientComponent.ngOnInit();
-      },
-      error: (err) => {
-        console.error('Error al enviar:', err);
-        if (err.status === 404) {
-          console.log('La URL no se encontró');
-        } else {
-          console.log('Ocurrió un error al registrar el cliente');
-        }
-      },
-      complete: () => {
-        console.log("Registro en estado OK");
+    camposNumericos.forEach((campo: string) => {
+      const control = this.form.get(campo);
+      if (control?.value === null) { 
+        control?.setValue(0);
       }
-    })
-    /*
-        const camposInsertForm: string[] = [
-          'tipo',
-          'cliente',
-          'credito',
-          'transferencia',
-          'cheque',
-          'retiro',
-          'gasto'
-        ];
-    
-        camposInsertForm.forEach((campo: string) => {
-          const control = this.form.get(campo);
-          if (control?.value === null) { 
-            control?.setValue(0);
-          }
-        });
-      
-    */
+    });
+
+    const payload = this.form.value;
+    const idAdmin = this.authService.getIdAdmin();
+
+    if (this.editMode && this.clientEdit?.id_client) { //existe un cliente para editar y tiene un ID definido??
+
+      this.clientstService.updateClient(this.clientEdit.id_client, idAdmin, payload).subscribe({
+        next: (res) => {
+          console.log('Cliente actualizado:', res);
+          this.closeForm.emit();
+          this.form.reset();
+          console.log("el cliente que se edito fue: ", this.clientEdit);
+          this.clientComponent.ngOnInit();
+        },
+        error: (err) => {
+          console.error('Error al actualizar:', err);
+        }
+      });
+    } else {
+      this.clientstService.postClientDaily(payload, idAdmin).subscribe({
+        next: (res) => {
+          console.log('Cliente registrado:', res);
+          this.closeForm.emit();
+          this.clientComponent.ngOnInit();          
+        },
+        error: (err) => {
+          console.error('Error al registrar:', err);
+        }
+      });
+    }
   }
   ngOnInit() {
   }
 
   onCancel() {
     this.closeForm.emit();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['clientEdit'] && this.clientEdit) {
+      this.editMode = true;
+      this.form.patchValue({
+        tipo: this.clientEdit.tipo ?? '',
+        cliente: this.clientEdit.cliente,
+        mensual: this.clientEdit.mensual,
+        bonificaion: this.clientEdit.bonificaion,
+        semanal: this.clientEdit.semanal,
+        monto_pagado: this.clientEdit.monto_pagado,
+      });
+    }
   }
 
 }

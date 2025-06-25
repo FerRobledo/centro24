@@ -24,16 +24,7 @@ module.exports = async (req, res) => {
         if(!id){
             return res.status(400).json({ error: 'Error falta id para obtener los clientes del dia', details: error.message });
         }
-        try {/*
-            if(action === 'close'){
-                const result = await pool.query('SELECT SUM '
-                                            +'(efectivo + debito + transferencia + cheque + gasto + retiro) AS total'
-                                            +' FROM caja WHERE fecha = CURRENT_DATE AND user_admin = $1', [id]);
-
-                const total = result.rows[0].total ?? 0;
-
-                return res.status(200).json({ total });
-            }*/
+        try {
             const{ rows } = await pool.query('SELECT * FROM clientes_mensuales WHERE user_admin = $1', [id]);
 
             return res.status(200).json(rows);
@@ -61,6 +52,54 @@ module.exports = async (req, res) => {
         }catch(error) {
             console.log(error);
             return res.status(500).json({ error: 'Error no se pudo insertar el cliente', details: error.message });
+        }
+    }
+
+    //PUT
+    if (req.method === 'PUT') {
+        const idClient = req.query.id;
+        const { idAdmin } = req.body; //con { } extrae solo idAdmin del body recibido.
+        const payload = req.body; //sin { } guarda todo el body (con todas sus propiedades).
+
+        if (!idClient) {
+            return res.status(500).json({ error: 'Error falta id para actualizar usuario', details: 'No se recibió el ID en el cuerpo de la petición' });
+        } try {
+            const { rows } = await pool.query(
+                "UPDATE public.clientes_mensuales" +
+                " SET tipo=$1, cliente=$2, mensual=$3, bonificacion=$4, semanal=$5, user_admin=$6, monto_pagado=$7" +
+                " WHERE id_client=$8;", [payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.semanal, idAdmin, payload.monto_pagado, idClient]
+            );
+            return res.status(200).json(rows);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ error: 'Error no se pudo actualizar el cliente', details: error.message });
+        }
+    }
+
+    // DELETE 
+    if (req.method === 'DELETE') {
+        const idAdmin = req.query.id;
+        const { idClient } = req.body;
+        
+
+        if (!idAdmin || !idClient) {
+            return res.status(400).json({ error: 'Falta idAdmin o idAdmin' });
+        }
+
+        try {
+            const { rows } = await pool.query(
+                'DELETE FROM public.clientes_mensuales WHERE id_client=$1 and user_admin=$2 RETURNING id_client;',
+                [idClient, idAdmin]
+            );
+
+            if (rows.length > 0) {
+                return res.status(200).json({ success: true, deletedId: rows[0].id });
+            } else {
+                return res.status(404).json({ success: false, message: 'Cliente no encontrado o no autorizado' });
+            }
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Error en la eliminación', detail: error.message });
         }
     }
 }

@@ -52,7 +52,7 @@ export class RegisterClienteComponent implements OnInit {
         cheque: this.clientEdit.cheque,
         retiro: this.clientEdit.retiro,
         observacion: this.clientEdit.observacion ?? '',
-        gasto: this.clientEdit.gasto 
+        gasto: this.clientEdit.gasto
       });
     }
   }
@@ -73,6 +73,7 @@ export class RegisterClienteComponent implements OnInit {
 
     camposNumericos.forEach((campo: string) => {
       const control = this.form.get(campo);
+      //si control existe, devolveme su .value, si no existe (null o undefined), devolveme undefined y no rompas el programa
       if (control?.value === null) { //si mi campo coincide con el string, pregunto si es null y si lo es seteo (0)
         control?.setValue(0);
       }
@@ -81,12 +82,14 @@ export class RegisterClienteComponent implements OnInit {
     const payload = this.form.value;
     const idAdmin = this.authService.getIdAdmin();
 
-    if (this.editMode && this.clientEdit?.id) {
+    if (this.editMode && this.clientEdit?.id) {      
       this.cobranzaService.updateClient(this.clientEdit.id, idAdmin, payload).subscribe({
         next: (res) => {
           console.log('Cliente actualizado:', res);
           this.closeForm.emit();
           this.form.reset();
+          //this.clientEdit = null;
+          console.log("el cliente que se edito fue: ", this.clientEdit);
           this.cobranzaComponent.ngOnInit();
         },
         error: (err) => {
@@ -98,7 +101,7 @@ export class RegisterClienteComponent implements OnInit {
         next: (res) => {
           console.log('Cliente registrado:', res);
           this.closeForm.emit();
-          this.cobranzaComponent.ngOnInit();
+          this.cobranzaComponent.ngOnInit();          
         },
         error: (err) => {
           console.error('Error al registrar:', err);
@@ -106,7 +109,7 @@ export class RegisterClienteComponent implements OnInit {
       });
     }
   }
-  
+
   ngOnInit() {
   }
 }
