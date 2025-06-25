@@ -11,11 +11,11 @@ export class ClientesComponent implements OnInit {
   clientsOfMonth: any[] = [];
   months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   monthSelected: string = '';
-  //*ngIf="clicked" (closeForm)="clicked = false"
-  clicked = false;
+  isLoading: Boolean = true;
+  clicked: Boolean = false;
+  clientEdit: any = null;
 
   constructor(private clientesService: ClientesService, private authService: AuthService) {
-
   }
 
   handleClick() {
@@ -32,18 +32,47 @@ export class ClientesComponent implements OnInit {
 
   private loadClientsMonthly(){
     const idAdmin = this.authService.getIdAdmin(); 
+    this.isLoading = true;
     if(idAdmin){
       this.clientesService.getClientsOfMonth(idAdmin).subscribe({
         next: (data) => {
           //si hay data entonces hago un .add
           this.clientsOfMonth = data;
+          this.isLoading = false;
           console.log("Los clientes son: ", data);
         },
         error: (error) => {
+          this.isLoading = false;
           console.log("Error en el pedido de clientes del dia: ", error)
         },
         complete: () => {
+          this.isLoading = false;
           console.log("Pedido en estado OK");
+        }
+      })
+    }
+  }
+
+  public updateClient(client: any) {
+    this.clientEdit = client;
+    this.clicked = true;
+  }
+
+  public deleteClient(client: any){
+    const idClient = client.id_client;
+    const idAdmin = this.authService.getIdAdmin();
+    if(idAdmin){
+      this.clientesService.deleteClient(idAdmin, idClient).subscribe({
+        next: (data) => {
+          const resp = data as { success: boolean; deletedId: number }; //se hace en dos pasos pq typescript no confia como devuelvan el objeto data
+          console.log("El id del cliente eliminado es: ", resp.deletedId); //no permite data.atributo
+          this.loadClientsMonthly(); 
+        },
+        error: (error) => {
+          console.log("Error en la eliminacion del cliente: ", error)
+        },
+        complete: () => {
+          console.log("Pedido en estado OK"); 
         }
       })
     }

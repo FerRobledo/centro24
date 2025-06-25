@@ -70,17 +70,17 @@ module.exports = async (req, res) => {
 
     //PUT
     if (req.method === 'PUT') {
-        const idClient  = req.query.id;
+        const idClient = req.query.id;
         const { idAdmin } = req.body; //el {} quiere decir del objeto req.body, extraeme la propiedad llamada idAdmin
         const payload = req.body; //sin {} porque es un objeto, los objetos se toman completos
-        
+
         console.log("El payload del update es: ", payload);
 
         if (!idClient) {
             return res.status(500).json({ error: 'Error falta id para actualizar usuario', details: 'No se recibió el ID en el cuerpo de la petición' });
         } try {
             const { rows } = await pool.query(
-                "UPDATE public.caja"+
+                "UPDATE public.caja" +
                 " SET detalle=$1, efectivo=$2, debito=$3, credito=$4, transferencia=$5, cheque=$6, retiro=$7, observacion=$8, gasto=$9, user_admin=$10" +
                 " WHERE id=$11;", [payload.detalle, payload.efectivo, payload.debito, payload.credito, payload.transferencia, payload.cheque, payload.retiro, payload.observacion, payload.gasto, idAdmin, idClient]
             );
@@ -88,6 +88,32 @@ module.exports = async (req, res) => {
         } catch (error) {
             console.log(error);
             return res.status(500).json({ error: 'Error no se pudo actualizar el cliente', details: error.message });
+        }
+    }
+
+    // DELETE 
+    if (req.method === 'DELETE') {
+        const idAdmin = req.query.id;
+        const { idClient } = req.body;
+
+        if (!idAdmin || !idClient) {
+            return res.status(400).json({ error: 'Falta idAdmin o idAdmin' });
+        }
+
+        try {
+            const { rows } = await pool.query(
+                'DELETE FROM public.caja WHERE id=$1 and user_admin=$2 RETURNING id;',
+                [idClient, idAdmin]
+            );
+
+            if (rows.length > 0) {
+                return res.status(200).json({ success: true, deletedId: rows[0].id });
+            } else {
+                return res.status(404).json({ success: false, message: 'Cliente no encontrado o no autorizado' });
+            }
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Error en la eliminación', detail: error.message });
         }
     }
 }

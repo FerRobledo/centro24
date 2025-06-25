@@ -36,7 +36,7 @@
     </div>
 
   </div>
-  <div class="p-0 overflow-y-scroll " *ngIf="!clicked">
+  <div class="p-0 overflow-y-scroll " *ngIf="!clicked && !isLoading">
     <table class="w-full mt-4 text-left table-auto min-w-max">
       <thead>
         <tr>
@@ -186,11 +186,11 @@
             </div>
           </td>
           <td class="p-4 border-b border-slate-200">
-            <div class="flex gap-2">
+            <div class="flex gap-2"> <!--cliente viene del for-->
               <button (click)="updateClient(cliente)" class="text-slate-500 hover:text-blue-600" title="Editar">
                 <i class="fa-solid fa-pencil"></i>
               </button>
-              <button class="text-slate-500 hover:text-red-600" title="Eliminar">
+              <button (click)="deleteClient(cliente)" class="text-slate-500 hover:text-red-600" title="Eliminar">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </div>
@@ -198,6 +198,9 @@
         </tr>
       </tbody>
     </table>
+  </div>
+  <div *ngIf="isLoading" class="flex justify-center items-center h-96">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
   </div>
   <app-registerCliente class="justify-center" *ngIf="clicked" [clientEdit]="clientEdit" (closeForm)="clicked = false"></app-registerCliente>
 </div>

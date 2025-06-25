@@ -11,23 +11,22 @@ export class ClientesService {
 
   constructor(private http: HttpClient) { }
 
-  public getClientsOfMonth(idAdmin: number): Observable<any>{
+  public getClientsOfMonth(idAdmin: number): Observable<any> {
     return this.http.get(this.origin + '/api/clientes/' + idAdmin)
-  } 
-  
-  public postClientMonthly(payloadInsert: any, idAdmin: number): Observable<any>{
-    return this.http.post(this.origin + '/api/clientes/' + idAdmin, payloadInsert);
   }
-  /*
-    public getClientsOfDay(id: number): Observable<any>{
-      return this.http.get(this.origin + '/api/cobranza/' + id)
-    } 
-  
-    public postClientDaily(payload: any, idAdmin: number): Observable<any>{
-      return this.http.post(this.origin + '/api/cobranza/' + idAdmin, payload);
-    }
-  
-    public closeClientsOfDay(idAmin: number): Observable<any>{
-      return this.http.get(this.origin + '/api/cobranza/' + idAmin + '?action=close');
-    }*/
+
+  public postClientDaily(payload: any, idAdmin: number): Observable<any> {
+    return this.http.post(this.origin + '/api/clientes/' + idAdmin, payload);
   }
+
+  public deleteClient(idAdmin: number, idClient: number) {
+    const body = { idClient };
+    return this.http.delete(this.origin + '/api/clientes/' + idAdmin, { body });
+  }
+
+  public updateClient(idClient: number, idAdmin: number, payload: any) {
+    const body = { ...payload, idAdmin };
+  
+    return this.http.put(this.origin + '/api/clientes/' + idClient, body);
+  }
+}
