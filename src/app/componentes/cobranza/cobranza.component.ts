@@ -18,6 +18,7 @@ export class CobranzaComponent implements OnInit {
   collectionDay = 0;
   collectionClosed = false;
   today: Date = new Date();
+  isLoading: Boolean = true;
 
   constructor(private cobranzaService: CobranzaService, private authService: AuthService) {
     
@@ -54,17 +55,21 @@ export class CobranzaComponent implements OnInit {
 
   private loadClientsDaily() {
     const id = this.authService.getIdAdmin();
+    this.isLoading = true;
 
     if (id) {
       this.cobranzaService.getClientsOfDay(id).subscribe({
         next: (data) => {
           this.clientsOfDay = data;
+          this.isLoading = false;
           console.log("Los clientes son: ", data);
         },
         error: (error) => {
-          console.log("Error en el pedido de clientes del dia: ", error)
+          console.log("Error en el pedido de clientes del dia: ", error);
+          this.isLoading = false;
         },
         complete: () => {
+          this.isLoading = false;
           console.log("Pedido en estado OK");
         }
       })

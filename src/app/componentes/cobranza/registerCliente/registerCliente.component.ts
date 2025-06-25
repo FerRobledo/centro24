@@ -82,7 +82,7 @@ export class RegisterClienteComponent implements OnInit {
     const payload = this.form.value;
     const idAdmin = this.authService.getIdAdmin();
 
-    if (this.editMode && this.clientEdit?.id) {
+    if (this.editMode && this.clientEdit?.id) {      
       this.cobranzaService.updateClient(this.clientEdit.id, idAdmin, payload).subscribe({
         next: (res) => {
           console.log('Cliente actualizado:', res);
