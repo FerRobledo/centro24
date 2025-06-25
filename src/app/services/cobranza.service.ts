@@ -26,4 +26,9 @@ export class CobranzaService {
     const body = { ...payload, idAdmin };
     return this.http.put(this.origin + '/api/cobranza/' + idClient, body);
   }
+
+  public deleteClient(idAdmin: number, idClient: number){
+    const body = { idClient };
+    return this.http.delete(this.origin + '/api/cobranza/' + idAdmin, { body });
+  }
 }

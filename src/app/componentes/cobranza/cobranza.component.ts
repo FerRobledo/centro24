@@ -12,12 +12,13 @@ import { RegisterClienteComponent } from 'src/app/componentes/cobranza/registerC
 export class CobranzaComponent implements OnInit {
   @ViewChild(RegisterClienteComponent) registerClienteComp!: RegisterClienteComponent;
 
+  public clientEdit: any = null;
   clientsOfDay: any[] = [];
   clicked = false;
-  public clientEdit: any = null;
   collectionDay = 0;
   collectionClosed = false;
   today: Date = new Date();
+  isLoading: Boolean = true;
 
   constructor(private cobranzaService: CobranzaService, private authService: AuthService) {
     
@@ -35,7 +36,7 @@ export class CobranzaComponent implements OnInit {
 
   public closeDay(){
     this.collectionClosed = true;
-    console.log("me clickeaste");
+    
     const id = this.authService.getIdAdmin();
     if(id) {
       this.cobranzaService.closeClientsOfDay(id).subscribe({
@@ -54,19 +55,21 @@ export class CobranzaComponent implements OnInit {
 
   private loadClientsDaily() {
     const id = this.authService.getIdAdmin();
+    this.isLoading = true;
 
     if (id) {
       this.cobranzaService.getClientsOfDay(id).subscribe({
-
         next: (data) => {
-          //si hay data entonces hago un .add
           this.clientsOfDay = data;
+          this.isLoading = false;
           console.log("Los clientes son: ", data);
         },
         error: (error) => {
-          console.log("Error en el pedido de clientes del dia: ", error)
+          console.log("Error en el pedido de clientes del dia: ", error);
+          this.isLoading = false;
         },
         complete: () => {
+          this.isLoading = false;
           console.log("Pedido en estado OK");
         }
       })
@@ -76,6 +79,26 @@ export class CobranzaComponent implements OnInit {
   public updateClient(client: any) {
     this.clientEdit = client;
     this.clicked = true;
+  }
+
+  public deleteClient(client: any){
+    const idClient = client.id;
+    const idAdmin = this.authService.getIdAdmin();
+    if(idAdmin){
+      this.cobranzaService.deleteClient(idAdmin, idClient).subscribe({
+        next: (data) => {
+          const resp = data as { success: boolean; deletedId: number }; //se hace en dos pasos pq typescript no confia como devuelvan el objeto data
+          console.log("El id del cliente eliminado es: ", resp.deletedId); //no permite data.atributo
+          this.ngOnInit(); 
+        },
+        error: (error) => {
+          console.log("Error en la eliminacion del cliente: ", error)
+        },
+        complete: () => {
+          console.log("Pedido en estado OK"); 
+        }
+      })
+    }
   }
 }
 
