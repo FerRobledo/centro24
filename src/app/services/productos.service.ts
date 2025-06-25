@@ -21,6 +21,8 @@ export class ProductosService {
     const updates = producto.getUpdates();
     const body = { ...updates, idAdmin };
     return this.http.put<Producto>(this.origin + '/api/productos/' + producto.id, body);
+  }
+
   public actualizarStock(id: number, stock: number): Observable<any> {
     return this.http.put(this.origin + '/api/productos', { id, stock });
   }
@@ -36,7 +38,8 @@ export class ProductosService {
     const id_producto = producto.id;
     const url = `${this.origin}/api/productos/${id_admin}`;
     return this.http.delete<any>(url, { params: { id_producto: id_producto.toString() } });
-  
+  }
+
   public addAllProductos(productos: ProductoDTO[]): Observable<void> {
     const id_admin = this.authService.getIdAdmin();
     const nuevosProductos = productos.map(producto => ({
@@ -48,7 +51,7 @@ export class ProductosService {
 
     return from(nuevosProductos).pipe(
       mergeMap(producto =>
-        this.actualizarProducto(producto).pipe(
+        this.updateProducto(producto).pipe(
           catchError(err => {
             if (err.status === 404) {
               return this.agregarProducto(producto);
@@ -66,7 +69,7 @@ export class ProductosService {
   }
 
 
-  public actualizarProducto(producto: Producto): Observable<any> {
+  public updateProducto(producto: Producto): Observable<any> {
     return this.http.put(`${this.origin}/api/productos/${producto.id}`, producto);
   }
 
