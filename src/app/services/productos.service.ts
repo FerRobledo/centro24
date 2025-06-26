@@ -46,34 +46,7 @@ export class ProductosService {
       ...producto,
       id_admin
     }));
-
-    const CONCURRENCY = 5;
-
-    return from(nuevosProductos).pipe(
-      mergeMap(producto =>
-        this.updateProducto(producto).pipe(
-          catchError(err => {
-            if (err.status === 404) {
-              return this.agregarProducto(producto);
-            } else {
-              console.error(`Error con producto ${producto.id}`, err);
-              return of(null);
-            }
-          })
-        ),
-        CONCURRENCY
-      ),
-      toArray(), // espera a que se completen todos
-      map(() => void 0) // solo retorna void
-    );
-  }
-
-
-  public updateProducto(producto: Producto): Observable<any> {
-    return this.http.put(`${this.origin}/api/productos/${producto.id}`, producto);
-  }
-
-  private agregarProducto(producto: any): Observable<any> {
-    return this.http.post(`${this.origin}/api/productos/${producto.id_admin}`, producto);
+    console.log(nuevosProductos.length);
+    return this.http.post<any>(`${this.origin}/api/productos/${id_admin}`, {accion: 'addAll', productos: nuevosProductos})
   }
 }
