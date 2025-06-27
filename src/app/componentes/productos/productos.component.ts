@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ProductosService } from 'src/app/services/productos.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { Producto, ProductoDTO } from 'src/assets/dto/producto';
+import { MatTableDataSource } from '@angular/material/table';
 
 interface AddProductoResponse {
   message: string;
@@ -21,6 +22,7 @@ interface AddProductoResponse {
 export class ProductosComponent implements OnInit {
   productos: ProductoDTO[] = [];
   productosFiltrados: ProductoDTO[] = [];
+  productosAux: ProductoDTO[] = [];
   categoriasUnicas: string[] = [];
   cantidadModificar: number | null = null;
   categoriaSeleccionada: string = '';   // Filtro principal (categoría)
@@ -33,7 +35,8 @@ export class ProductosComponent implements OnInit {
   cargando: boolean = false;
   mensaje: string = '';
   nuevoProducto: ProductoDTO = new ProductoDTO();
-  
+  filtroTexto: string = '';
+
   // Variable para mantener el formato argentino en el input
   precioCostoInput: string = '';
 
@@ -52,7 +55,8 @@ export class ProductosComponent implements OnInit {
     this.productosService.getProductos(idAdmin).subscribe({
       next: (data: Producto[]) => {
         this.productos = data.map((producto: Producto) => new ProductoDTO({ ...producto, cantidadModificar: null }));
-        this.productosFiltrados = this.productos.map(p => new ProductoDTO(p));
+        this.productosFiltrados = this.productos;
+        this.productosAux = this.productos;
         this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
         console.log('Datos recibidos:', data);
       },
@@ -69,6 +73,29 @@ export class ProductosComponent implements OnInit {
     const value = (event.target as HTMLSelectElement).value;
     this.categoriaSeleccionada = value; // Actualiza la categoría seleccionada
     this.aplicarFiltros(); // Aplica todos los filtros
+  }
+
+  // Filtro por texto
+  applyFilter() {
+    let encontro: boolean = false;
+    const filtroLower = this.filtroTexto.toLowerCase();
+
+    // Si el filtro es numérico (sin letras), intentamos buscar por ID
+    const esNumerico = /^[0-9]+$/.test(filtroLower);
+    if (esNumerico) {
+      const porId = this.productosAux.filter(p => p.id.toString() === filtroLower);
+      if (porId.length > 0) {
+        this.productosFiltrados = porId;
+        encontro = true;
+      }
+    }
+    if (!encontro) {
+      // Si no hay coincidencia por ID, filtrar por nombre o dirección
+      this.productosFiltrados = this.productosAux.filter(p =>
+        p.id.toLowerCase().includes(filtroLower) ||
+        p.categoria.toLowerCase().includes(filtroLower)
+      );
+    }
   }
 
   filtrarStockMayorCero() {
@@ -97,17 +124,17 @@ export class ProductosComponent implements OnInit {
 
   incrementarStock(producto: ProductoDTO) {
     // Crear una copia del producto con el stock incrementado
-    const productoActualizado = new ProductoDTO({ 
-      ...producto, 
-      stock: (producto.stock || 0) + 1 
+    const productoActualizado = new ProductoDTO({
+      ...producto,
+      stock: (producto.stock || 0) + 1
     });
-    
+
     const error = productoActualizado.validateRequired();
     if (error) {
       alert(error);
       return;
     }
-    
+
     this.productosService.actualizarProducto(productoActualizado).subscribe({
       next: (updatedProducto: Producto) => {
         console.log('Respuesta del servidor:', updatedProducto);
@@ -116,8 +143,8 @@ export class ProductosComponent implements OnInit {
           this.productos[index] = new ProductoDTO({ ...this.productos[index], ...updatedProducto });
           // Actualizar el producto en el array principal
           this.productos[index] = new ProductoDTO({
-            ...this.productos[index], 
-            ...updatedProducto 
+            ...this.productos[index],
+            ...updatedProducto
           });
           this.aplicarFiltros();
         }
@@ -132,26 +159,26 @@ export class ProductosComponent implements OnInit {
 
   decrementarStock(producto: ProductoDTO) {
     if (producto.stock > 0) {
-      const productoActualizado = new ProductoDTO({ 
-        ...producto, 
-        stock: (producto.stock || 0) - 1 
+      const productoActualizado = new ProductoDTO({
+        ...producto,
+        stock: (producto.stock || 0) - 1
       });
-      
+
       const error = productoActualizado.validateRequired();
       if (error) {
         alert(error);
         return;
       }
-      
+
       console.log('Intentando decrementar stock. Producto:', productoActualizado);
       this.productosService.actualizarProducto(productoActualizado).subscribe({
         next: (updatedProducto: Producto) => {
           console.log('Respuesta del servidor:', updatedProducto);
           const index = this.productos.findIndex(p => p.id === producto.id);
           if (index !== -1) {
-            this.productos[index] = new ProductoDTO({ 
-              ...this.productos[index], 
-              ...updatedProducto 
+            this.productos[index] = new ProductoDTO({
+              ...this.productos[index],
+              ...updatedProducto
             });
             this.aplicarFiltros();
           }
@@ -176,26 +203,26 @@ export class ProductosComponent implements OnInit {
     const cambio = producto.cantidadModificar;
     const nuevoStock = (producto.stock || 0) + cambio;
     if (nuevoStock >= 0) {
-      const productoActualizado = new ProductoDTO({ 
-        ...producto, 
-        stock: nuevoStock 
+      const productoActualizado = new ProductoDTO({
+        ...producto,
+        stock: nuevoStock
       });
-      
+
       const error = productoActualizado.validateRequired();
       if (error) {
         alert(error);
         return;
       }
-      
+
       console.log('Intentando modificar stock. Producto:', productoActualizado);
       this.productosService.actualizarProducto(productoActualizado).subscribe({
         next: (updatedProducto: Producto) => {
           console.log('Respuesta del servidor:', updatedProducto);
           const index = this.productos.findIndex(p => p.id === producto.id);
           if (index !== -1) {
-            this.productos[index] = new ProductoDTO({ 
-              ...this.productos[index], 
-              ...updatedProducto 
+            this.productos[index] = new ProductoDTO({
+              ...this.productos[index],
+              ...updatedProducto
             });
             producto.cantidadModificar = null;
             this.aplicarFiltros();
@@ -215,27 +242,27 @@ export class ProductosComponent implements OnInit {
 
   modificarGanancia(producto: ProductoDTO) {
     const nuevoPrecioVenta = producto.precio_costo * (1 + (producto.ganancia || 0) / 100);
-    const productoActualizado = new ProductoDTO({ 
-      ...producto, 
-      ganancia: producto.ganancia, 
-      precio_venta: nuevoPrecioVenta 
+    const productoActualizado = new ProductoDTO({
+      ...producto,
+      ganancia: producto.ganancia,
+      precio_venta: nuevoPrecioVenta
     });
-    
+
     const error = productoActualizado.validateRequired();
     if (error) {
       alert(error);
       return;
     }
-    
+
     console.log('Intentando modificar ganancia. Producto:', productoActualizado);
     this.productosService.actualizarProducto(productoActualizado).subscribe({
       next: (updatedProducto: Producto) => {
         console.log('Respuesta del servidor:', updatedProducto);
         const index = this.productos.findIndex(p => p.id === producto.id);
         if (index !== -1) {
-          this.productos[index] = new ProductoDTO({ 
-            ...this.productos[index], 
-            ...updatedProducto 
+          this.productos[index] = new ProductoDTO({
+            ...this.productos[index],
+            ...updatedProducto
           });
           this.aplicarFiltros();
         }
@@ -303,7 +330,7 @@ export class ProductosComponent implements OnInit {
     this.nuevoProducto = new ProductoDTO();
     this.mensaje = '';
     this.cargando = false;
-    
+
     // Limpiar el input del precio de costo
     this.precioCostoInput = '';
   }
@@ -329,7 +356,7 @@ export class ProductosComponent implements OnInit {
     this.nuevoProducto = new ProductoDTO(producto);
     this.mostrarFormulario = true;
     this.mensaje = '';
-    
+
     // Inicializar el input con formato argentino
     this.precioCostoInput = this.convertirAFormatoArgentino(this.nuevoProducto.precio_costo);
   }
@@ -355,7 +382,7 @@ export class ProductosComponent implements OnInit {
 
     // Si el usuario no es admin, preservar los valores originales de precio_costo y ganancia
     let productoParaActualizar = { ...this.nuevoProducto };
-    
+
     if (!this.esAdmin() && this.productoEditando) {
       // Mantener los valores originales que el usuario no admin no puede modificar
       productoParaActualizar.precio_costo = this.productoEditando.precio_costo;
@@ -364,9 +391,9 @@ export class ProductosComponent implements OnInit {
 
     // Calcular el precio de venta
     const precio_venta = productoParaActualizar.precio_costo + (productoParaActualizar.precio_costo * (productoParaActualizar.ganancia || 0) / 100);
-    const productoActualizado = new ProductoDTO({ 
-      ...productoParaActualizar, 
-      precio_venta 
+    const productoActualizado = new ProductoDTO({
+      ...productoParaActualizar,
+      precio_venta
     });
 
     const error = productoActualizado.validateRequired();
@@ -381,17 +408,17 @@ export class ProductosComponent implements OnInit {
         console.log('Producto actualizado:', updatedProducto);
         this.mensaje = 'Producto actualizado con éxito.';
         this.cargando = false;
-        
+
         // Actualizar el producto en el array
         const index = this.productos.findIndex(p => p.id === updatedProducto.id);
         if (index !== -1) {
           this.productos[index] = new ProductoDTO(updatedProducto);
           this.aplicarFiltros();
-          
+
           // Actualizar categorías únicas si es necesario
           this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
         }
-        
+
         this.cancelar();
       },
       error: (error: any) => {
@@ -408,7 +435,7 @@ export class ProductosComponent implements OnInit {
     this.nuevoProducto = new ProductoDTO();
     this.mostrarFormulario = true;
     this.mensaje = '';
-    
+
     // Limpiar el input del precio de costo
     this.precioCostoInput = '';
   }
@@ -449,17 +476,17 @@ export class ProductosComponent implements OnInit {
   // Función para formatear el número según el formato argentino (convierte de argentino a número)
   formatearNumeroArgentino(valor: string): number {
     if (!valor) return 0;
-    
+
     // Convertir a string si viene como número
     const valorStr = valor.toString();
-    
+
     // Si contiene coma, es decimal (formato argentino)
     if (valorStr.includes(',')) {
       // Separar parte entera y decimal
       const partes = valorStr.split(',');
       const parteEntera = partes[0].replace(/\./g, ''); // Quitar puntos de miles
       const parteDecimal = partes[1] || '0';
-      
+
       // Formar el número en formato estándar (punto como decimal)
       const numeroFormateado = `${parteEntera}.${parteDecimal}`;
       return parseFloat(numeroFormateado);
@@ -473,18 +500,18 @@ export class ProductosComponent implements OnInit {
   // Función para convertir número a formato argentino (para mostrar en el input)
   convertirAFormatoArgentino(numero: number): string {
     if (!numero && numero !== 0) return '';
-    
+
     const numeroStr = numero.toString();
-    
+
     // Si tiene decimales
     if (numeroStr.includes('.')) {
       const partes = numeroStr.split('.');
       const parteEntera = partes[0];
       const parteDecimal = partes[1];
-      
+
       // Formatear parte entera con puntos cada 3 dígitos
       const enteraFormateada = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-      
+
       return `${enteraFormateada},${parteDecimal}`;
     } else {
       // Solo parte entera, formatear con puntos
@@ -497,7 +524,7 @@ export class ProductosComponent implements OnInit {
     const valorIngresado = event.target.value;
     const numeroFormateado = this.formatearNumeroArgentino(valorIngresado);
     this.nuevoProducto.precio_costo = numeroFormateado;
-    
+
     // Actualizar el input con el formato argentino correcto
     this.precioCostoInput = this.convertirAFormatoArgentino(numeroFormateado);
     event.target.value = this.precioCostoInput;

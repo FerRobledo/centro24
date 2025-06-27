@@ -28,6 +28,13 @@
         <app-cargaProductos (cargaIniciada)="onCargaIniciada()"
           (cargaFinalizada)="onCargaCompleta()"></app-cargaProductos>
       </div>
+
+      <!-- Filtro general -->
+      <div class="p-4 md:p-0">
+        <input [(ngModel)]="filtroTexto" matInput name="filtro" class="rounded border p-2 w-56" (keyup)="applyFilter()"
+          placeholder="Buscar ID, descripcion o categoría"/>
+      </div>
+
       <!-- Filtro categorias -->
       <div class="mb-4">
         <label for="categoriaFiltro" class="block text-sm font-medium text-gray-700">Filtrar por Categoría:</label>
