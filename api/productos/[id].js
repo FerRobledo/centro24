@@ -180,9 +180,8 @@ module.exports = async (req, res) => {
                 imagen = EXCLUDED.imagen,
                 stock = EXCLUDED.stock,
                 categoria = EXCLUDED.categoria,
-                ganancia = EXCLUDED.ganancia,
                 precio_venta = EXCLUDED.precio_venta
-                RETURNING *
+                RETURNING *;
             `;
 
             try {
@@ -237,16 +236,16 @@ module.exports = async (req, res) => {
 }
 
 function filtrarProductosUnicos(productos) {
-  const vistos = new Set();
-  const unicos = [];
+    const vistos = new Set();
+    const unicos = [];
 
-  for (const producto of productos) {
-    const clave = `${producto.id}-${producto.id_admin}`;
-    if (!vistos.has(clave)) {
-      vistos.add(clave);
-      unicos.push(producto);
+    for (const producto of productos) {
+        const clave = `${producto.id}-${producto.id_admin}`;
+        if (!vistos.has(clave)) {
+            vistos.add(clave);
+            unicos.push(producto);
+        }
     }
-  }
 
-  return unicos;
+    return unicos;
 }
