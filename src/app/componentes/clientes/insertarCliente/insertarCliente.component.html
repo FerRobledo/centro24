@@ -42,6 +42,20 @@
           class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
         </div>
 
+        <div class="col-span-full">
+          <label class="text-sm font-medium text-gray-900 block mb-2">Meses pagados</label>
+          <div class="grid grid-cols-4 gap-2">
+            <div *ngFor="let mes of meses">
+              <ng-container *ngIf="formMeses.get(mes) as rawControl">
+                <label class="inline-flex items-center">
+                  <input type="checkbox" [formControl]="asFormControl(rawControl)" class="mr-2">
+                  {{ mes }}
+                </label>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        
         <div class="col-span-full flex gap-4 mt-4">
           <button type="submit"
             class="w-28 rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">

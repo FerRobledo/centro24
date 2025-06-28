@@ -1,8 +1,8 @@
-const {Pool} = require('pg');
+const { Pool } = require('pg');
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: {rejectUnauthorized: false},
+    ssl: { rejectUnauthorized: false },
 });
 
 module.exports = async (req, res) => {
@@ -13,30 +13,30 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    if(req.method === 'OPTIONS'){
+    if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
 
     //GET
-    if(req.method === 'GET'){
-        const {id, action} = req.query;
-        
-        if(!id){
+    if (req.method === 'GET') {
+        const { id } = req.query;
+
+        if (!id) {
             return res.status(400).json({ error: 'Error falta id para obtener los clientes del dia', details: error.message });
         }
         try {
-            const{ rows } = await pool.query('SELECT * FROM clientes_mensuales WHERE user_admin = $1', [id]);
+            const { rows } = await pool.query('SELECT * FROM clientes_mensuales WHERE user_admin = $1', [id]);
 
             return res.status(200).json(rows);
-        } catch(error) {
+        } catch (error) {
             console.log(error);
             return res.status(500).json({ error: 'Error no se pudo obtener los clientes del dia', details: error.message });
         }
     }
 
     //POST
-    if(req.method === 'POST'){
-        const {id} = req.query;
+    if (req.method === 'POST') {
+        const { id } = req.query;
         const payload = req.body;
 
         if(!id){
@@ -54,6 +54,7 @@ module.exports = async (req, res) => {
             return res.status(500).json({ error: 'Error no se pudo insertar el cliente', details: error.message });
         }
     }
+
 
     //PUT
     if (req.method === 'PUT') {
@@ -80,7 +81,7 @@ module.exports = async (req, res) => {
     if (req.method === 'DELETE') {
         const idAdmin = req.query.id;
         const { idClient } = req.body;
-        
+
 
         if (!idAdmin || !idClient) {
             return res.status(400).json({ error: 'Falta idAdmin o idAdmin' });
@@ -102,4 +103,37 @@ module.exports = async (req, res) => {
             return res.status(500).json({ error: 'Error en la eliminación', detail: error.message });
         }
     }
+
+// GET MES CLIENT
+if (req.method === 'GET') {
+    const month = req.query.monthSelected;
+  
+    if (!month) {
+      return res.status(400).json({
+        error: 'Error falta mes',
+        details: 'No se recibió el mes necesario',
+      });
+    }
+  
+    try {
+      const { rows } = await pool.query(
+        `
+        SELECT * 
+        FROM public.clientes_mensuales cm
+        JOIN public.pagos_mensuales pm 
+          ON cm.id_client = pm.id_client
+        WHERE pm.mes = $1
+        `,
+        [month]
+      );
+  
+      res.json(rows);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        error: 'Error no se pudo obtener los clientes del mes',
+        details: error.message,
+      });
+    }
+  }
 }
