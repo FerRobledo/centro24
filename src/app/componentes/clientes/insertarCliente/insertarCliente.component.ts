@@ -4,6 +4,8 @@ import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
 import { ClientesComponent } from '../clientes.component';
 import { OnChanges, SimpleChanges } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 
 @Component({
   selector: 'app-insertarCliente',
@@ -13,9 +15,11 @@ import { OnChanges, SimpleChanges } from '@angular/core';
 export class InsertarClienteComponent implements OnInit {
   @Output() closeForm = new EventEmitter<void>();
   @Input() clientEdit: any;
-
+  
   form: FormGroup;
   editMode = false;
+  meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio','Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  formMeses = new FormGroup({});
 
   constructor(
     private fb: FormBuilder,
@@ -28,7 +32,8 @@ export class InsertarClienteComponent implements OnInit {
       mensual: [],
       bonificacion: [],
       semanal: [],
-      monto_pagado: []
+      monto_pagado: [],
+      mesesPagados: this.formMeses 
     });
   }
 
@@ -38,11 +43,17 @@ export class InsertarClienteComponent implements OnInit {
       return;
     }
 
+    //fltra y mapea los meses seleccionados (checked) del formulario formMeses
+    const mesesPagados = Object.entries(this.formMeses.value)
+    .filter(([mes, checked]) => checked)
+    .map(([mes]) => mes); 
+    console.log('Meses pagados:', mesesPagados);
+    //cuando hago sumbit lleno el meses pagados con los true
+
     const camposNumericos: string[] = [
       'mensual', 'bonificacion', 'semanal', 'monto_pagado'
     ];
 
-    
     camposNumericos.forEach((campo: string) => {
       const control = this.form.get(campo);
       if (control?.value === null) { 
@@ -50,7 +61,10 @@ export class InsertarClienteComponent implements OnInit {
       }
     });
 
-    const payload = this.form.value;
+    const payload = {
+      ...this.form.value,
+      mesesPagados  //aplano el form y agrego el meses pagados todo el payload
+    };
     const idAdmin = this.authService.getIdAdmin();
 
     if (this.editMode && this.clientEdit?.id_client) { //existe un cliente para editar y tiene un ID definido??
@@ -80,7 +94,11 @@ export class InsertarClienteComponent implements OnInit {
       });
     }
   }
-  ngOnInit() {
+  ngOnInit() { //setea todos los meses en false
+    this.meses.forEach(mes => {
+      this.formMeses.addControl(mes, new FormControl(false)); /*const nombre = new FormControl('Matías');
+                                                              console.log(nombre.value); // → 'Matías' */
+    });
   }
 
   onCancel() {
@@ -94,11 +112,14 @@ export class InsertarClienteComponent implements OnInit {
         tipo: this.clientEdit.tipo ?? '',
         cliente: this.clientEdit.cliente,
         mensual: this.clientEdit.mensual,
-        bonificaion: this.clientEdit.bonificaion,
+        bonificacion: this.clientEdit.bonificacion,
         semanal: this.clientEdit.semanal,
         monto_pagado: this.clientEdit.monto_pagado,
       });
     }
   }
 
+  asFormControl(control: AbstractControl | null): FormControl {
+    return control as FormControl;
+  }
 }

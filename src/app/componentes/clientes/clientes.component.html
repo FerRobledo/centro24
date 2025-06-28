@@ -20,56 +20,70 @@
       <table class="w-full mt-4 text-left table-auto min-w-max">
         <thead>
           <tr>
-            <th class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+            <th
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                 Tipo
               </p>
             </th>
-            <th class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+            <th
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                 Num de cliente
               </p>
             </th>
-            <th class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+            <th
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                 Cliente
               </p>
             </th>
-            <th class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+            <th
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                 Mensual
               </p>
             </th>
-            <th class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+            <th
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                 Bonificacion
               </p>
             </th>
-            <th class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+            <th
+              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                 Semanal
               </p>
             </th>
-            <th class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+            <th
+              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                 Monto pagado
               </p>
             </th>
             <th class="p-1 w-4 transition-colors border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
               <div class="flex flex-col items-center justify-center mt-2">
-                <select
-                  class="text-sm text-slate-500 border rounded px-2 py-1"
-                  [(ngModel)]="monthSelected">
+                <select class="text-sm text-slate-500 border rounded px-2 py-1" [(ngModel)]="monthSelected" (change)="getMonthsClients()">
                   <option *ngFor="let month of months" [value]="month" class="text-sm">
-                    {{ month }}
+                    {{ month }} 
                   </option>
                 </select>
                 <p class="text-xs mt-1 text-slate-600">selec: <strong>{{ monthSelected }}</strong></p>
               </div>
             </th>
-            
-            <th class="p-2 w-5 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p class="flex justify-center items-center gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+
+            <th
+              class="p-2 w-5 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex justify-center items-center gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                 Modificar
               </p>
             </th>
@@ -99,7 +113,8 @@
               <p class="text-sm text-slate-500">{{ client.monto_pagado }}</p>
             </td>
             <td class="p-4 w-4 border-b border-slate-200">
-              <p class="text-sm text-slate-500">Aca va la fecha</p>
+              <!--<p *ngIf="payThisMonth[client.id_client] === true">Pagó</p>-->
+              <button><!--{{ getMonth(client) ? 'Pagó' : 'No pagó' }}--></button>
             </td>
             <td class="p-2 border-b border-slate-200">
               <div class="flex gap-2 justify-center">
@@ -118,6 +133,7 @@
     <div *ngIf="isLoading" class="flex justify-center items-center h-96">
       <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
     </div>
-    <app-insertarCliente class="justify-center" *ngIf="clicked && !isLoading" [clientEdit]="clientEdit" (closeForm)="clicked = false"></app-insertarCliente>
+    <app-insertarCliente class="justify-center" *ngIf="clicked && !isLoading" [clientEdit]="clientEdit"
+      (closeForm)="clicked = false"></app-insertarCliente>
   </div>
 </div>
