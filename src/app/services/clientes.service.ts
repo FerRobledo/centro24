@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -26,7 +27,11 @@ export class ClientesService {
 
   public updateClient(idClient: number, idAdmin: number, payload: any) {
     const body = { ...payload, idAdmin };
-  
     return this.http.put(this.origin + '/api/clientes/' + idClient, body);
+  }
+
+  public getMontOfCurrentClient(monthSelected: string) {
+    const params = new HttpParams().set('monthSelected', monthSelected);
+    return this.http.get<any[]>(this.origin + '/api/clientes', { params });
   }
 }
