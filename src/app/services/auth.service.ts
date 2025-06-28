@@ -100,4 +100,23 @@ export class AuthService {
       return false;
     }
   }
+
+  getUserName(){
+    const token = this.getToken();
+
+    if(!token) return null;
+
+    try{
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const username = payload.username;
+      //console.log("el objeto es", payload);
+      //console.log("el nombre del cliente es: " + username);
+      
+      return username || null;
+    } catch (error) {
+      console.error('Error al decodificar el token', error);
+      return null;
+    }
+
+  }
 }
