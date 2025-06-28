@@ -27,8 +27,7 @@ export class InsertarClienteComponent implements OnInit {
       cliente: ['', Validators.required],
       mensual: [],
       bonificacion: [],
-      semanal: [],
-      monto_pagado: []
+      monto: []
     });
   }
 
@@ -39,7 +38,7 @@ export class InsertarClienteComponent implements OnInit {
     }
 
     const camposNumericos: string[] = [
-      'mensual', 'bonificacion', 'semanal', 'monto_pagado'
+      'mensual', 'bonificacion', 'monto'
     ];
 
     
@@ -95,8 +94,7 @@ export class InsertarClienteComponent implements OnInit {
         cliente: this.clientEdit.cliente,
         mensual: this.clientEdit.mensual,
         bonificaion: this.clientEdit.bonificaion,
-        semanal: this.clientEdit.semanal,
-        monto_pagado: this.clientEdit.monto_pagado,
+        monto: this.clientEdit.monto,
       });
     }
   }

@@ -45,8 +45,8 @@ module.exports = async (req, res) => {
         } try {
             const { rows } = await pool.query(
                 "INSERT INTO public.clientes_mensuales" +
-                " (tipo, cliente, mensual, bonificacion, semanal, user_admin, monto_pagado)" +
-                " VALUES ($2, $3, $4, $5, $6, $1, $7)", [id, payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.semanal, payload.monto_pagado]
+                " (tipo, cliente, mensual, bonificacion, user_admin, monto)" +
+                " VALUES ($2, $3, $4, $5, $6, $1, $7)", [id, payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.monto]
               );
               return res.status(200).json(rows);
         }catch(error) {
@@ -66,8 +66,8 @@ module.exports = async (req, res) => {
         } try {
             const { rows } = await pool.query(
                 "UPDATE public.clientes_mensuales" +
-                " SET tipo=$1, cliente=$2, mensual=$3, bonificacion=$4, semanal=$5, user_admin=$6, monto_pagado=$7" +
-                " WHERE id_client=$8;", [payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.semanal, idAdmin, payload.monto_pagado, idClient]
+                " SET tipo=$1, cliente=$2, mensual=$3, bonificacion=$4, user_admin=$6, monto=$7" +
+                " WHERE id_client=$8;", [payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, idAdmin, payload.monto, idClient]
             );
             return res.status(200).json(rows);
         } catch (error) {
