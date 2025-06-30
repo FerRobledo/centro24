@@ -1,6 +1,6 @@
 <div class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl bg-clip-border">
-  <div class="relative mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border">
-    <div class="flex justify-between items-start w-full" *ngIf="!clicked">
+  <div class="relative mt-4 overflow-hidden h-full text-slate-700 bg-white rounded-none bg-clip-border">
+    <div class="flex justify-between items-start w-full">
       <div class="flex items-start gap-8 ml-4">
         <div class="space-y-1">
           <h3 class="text-lg font-semibold text-slate-800">
@@ -9,118 +9,38 @@
           <p class="text-slate-500">Listar clientes mensuales</p>
         </div>
       </div>
-      <button (click)="handleClick()"
+      <button (click)="agregarCliente()"
         class="flex select-none items-center gap-2 rounded bg-green-600 py-2 mr-8 mt-2 px-4 text-xs font-semibold text-white"
         type="button">
         <i class="fa-solid fa-user-plus"></i>
         Agregar cliente
       </button>
+      <button (click)="agregarPago()"
+        class="flex select-none items-center gap-2 rounded bg-green-600 py-2 mr-8 mt-2 px-4 text-xs font-semibold text-white"
+        type="button">
+        <i class="fa-solid fa-user-plus"></i>
+        Agregar pago
+      </button>
     </div>
-    <div class="p-0 overflow-y-scroll" *ngIf="!clicked && !isLoading">
-      <table class="w-full mt-4 text-left table-auto min-w-max">
-        <thead>
-          <tr>
-            <th
-              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Tipo
-              </p>
-            </th>
-            <th
-              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Num de cliente
-              </p>
-            </th>
-            <th
-              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Cliente
-              </p>
-            </th>
-            <th
-              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Mensual
-              </p>
-            </th>
-            <th
-              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Bonificacion
-              </p>
-            </th>
-            <th class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Monto pagado
-              </p>
-            </th>
-            <th class="p-1 w-4 transition-colors border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <div class="flex flex-col items-center justify-center mt-2">
-                <select class="text-sm text-slate-500 border rounded px-2 py-1" [(ngModel)]="monthSelected" (change)="getMonthsClients()">
-                  <option *ngFor="let month of months" [value]="month" class="text-sm">
-                    {{ month }} 
-                  </option>
-                </select>
-                <p class="text-xs mt-1 text-slate-600">selec: <strong>{{ monthSelected }}</strong></p>
-              </div>
-            </th>
 
-            <th
-              class="p-2 w-5 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex justify-center items-center gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Modificar
-              </p>
-            </th>
-          </tr>
-        </thead>
-        <tbody *ngIf="clientsOfMonth.length > 0">
-          <tr *ngFor="let client of clientsOfMonth">
-            <td class="p-4 w-4 border-b border-slate-200">
-              <p class="text-sm text-slate-500">{{ client.tipo }}</p>
-            </td>
-            <td class="p-4 w-6 border-b border-slate-200">
-              <p class="text-sm text-slate-500">{{ client.id_client }}</p>
-            </td>
-            <td class="p-4 w-6 border-b border-slate-200">
-              <p class="text-sm text-slate-500">{{ client.cliente }}</p>
-            </td>
-            <td class="p-4 w-4 border-b border-slate-200">
-              <p class="text-sm text-slate-500">{{ client.mensual }}</p>
-            </td>
-            <td class="p-4 w-4 border-b border-slate-200">
-              <p class="text-sm text-slate-500">{{ client.bonificacion }}</p>
-            </td>
-            <td class="p-4 w-4 border-b border-slate-200">
-              <p class="text-sm text-slate-500">{{ client.monto }}</p>
-            </td>
-            <td class="p-4 w-4 border-b border-slate-200">
-              <p class="text-sm text-slate-500">Aca va la fecha</p>
-            </td>
-            <td class="p-2 border-b border-slate-200">
-              <div class="flex gap-2 justify-center">
-                <button (click)="updateClient(client)" class="text-slate-500 hover:text-blue-600" title="Editar">
-                  <i class="fa-solid fa-pencil"></i>
-                </button>
-                <button (click)="deleteClient(client)" class="text-slate-500 hover:text-red-600" title="Eliminar">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div *ngIf="isLoading" class="flex justify-center items-center h-96">
-      <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
-    </div>
-    <app-insertarCliente class="justify-center" *ngIf="clicked && !isLoading" [clientEdit]="clientEdit"
-      (closeForm)="clicked = false"></app-insertarCliente>
+    <!-- SI ESTA CARGANDO MUESTRA EL ESTADO DE CARGA -->
+    <ng-container *ngIf="isLoading else matTab">
+      <div class="flex justify-center items-center h-96">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
+      </div>
+    </ng-container>
+
+    <!-- SINO MUESTRA LAS LISTAS CLIENTES/PAGOS -->
+    <ng-template #matTab>
+
+      <mat-tab-group class="h-full">
+        <mat-tab label="Clientes">
+          <app-listaClientes [clientsOfMonth]="clientsOfMonth"
+            (loadClientsMonthly)="loadClientsMonthly()"></app-listaClientes>
+        </mat-tab>
+        <mat-tab label="Pagos"> Content 2 </mat-tab>
+      </mat-tab-group>
+
+    </ng-template>
   </div>
 </div>

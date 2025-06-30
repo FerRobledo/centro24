@@ -34,4 +34,11 @@ export class ClientesService {
     const params = new HttpParams().set('monthSelected', monthSelected);
     return this.http.get<any[]>(this.origin + '/api/clientes', { params });
   }
+
+  public asignarPago(idAdmin: number, infoPago: any): any{
+    console.log(infoPago);
+    return;
+    const data = {infoPago, accion:'addPago'}
+    return this.http.post(this.origin + '/api/clientes/' + idAdmin, data)
+  }
 }

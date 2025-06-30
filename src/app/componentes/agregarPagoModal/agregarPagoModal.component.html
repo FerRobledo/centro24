@@ -1,0 +1,88 @@
+<div class="min-w-[350px] w-[40rem] flex flex-col p-4">
+  <div class="w-11/12 py-3 m-auto">
+
+    <div class="py-2">
+      <p class="text-lg font-bold" style="margin: 0;">Agregar un nuevo pago</p>
+      <p class="text-zinc-700 text-base">Selecciona el cliente y configura el período de pago</p>
+    </div>
+
+    <form class="space-y-2 justify-center flex flex-col" [formGroup]="pagoForm" (ngSubmit)="crearPago()">
+      <mat-form-field appearance="fill">
+        <mat-label>Cliente</mat-label>
+        <mat-select formControlName="client">
+          <mat-option *ngFor="let cliente of clientes" [value]="cliente">{{cliente.cliente}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="flex w-full justify-between">
+        <mat-form-field appearance="fill">
+          <mat-label>Desde</mat-label>
+          <input matInput [matDatepicker]="pickerDesde" formControlName="fechaDesde" placeholder="MM/YYYY"
+            (dateChange)="chosenYearHandler($event, 'fechaDesde')">
+          <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
+          <mat-datepicker #pickerDesde startView="multi-year"
+            (monthSelected)="chosenMonthHandler($event, 'fechaDesde', pickerDesde)"
+            panelClass="month-picker"></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Hasta</mat-label>
+          <input matInput [matDatepicker]="pickerHasta" formControlName="fechaHasta" placeholder="MM/YYYY"
+            (dateChange)="chosenYearHandler($event, 'fechaHasta')">
+          <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
+          <mat-datepicker #pickerHasta startView="multi-year"
+            (monthSelected)="chosenMonthHandler($event, 'fechaHasta', pickerHasta)"
+            panelClass="month-picker"></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+
+      <div class="rounded flex gap-2 items-center w-full text-blue-700 bg-blue-50">
+        <i class="fa-solid fa-circle-info p-4"></i>
+        <p>Selecciona una fecha final solo si el pago cubre más de un mes </p>
+      </div>
+
+      <mat-divider style="margin-top: 10px; margin-bottom: 10px;"></mat-divider>
+
+      <div class="space-y-4">
+
+        <div class="flex gap-2 items-center">
+          <i class="fa-solid fa-dollar-sign text-xl text-green-600"></i>
+          <h2 class="text-xl font-bold">Resumen de pago</h2>
+        </div>
+
+
+        <div class="grid gap-3 rounded-lg bg-slate-50 p-4">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Costo mensual del cliente:</span>
+            <p class="p-2 rounded-sm bg-zinc-50">{{valorMensual | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-600">Cantidad de meses:</span>
+            <p class="p-2 rounded-sm bg-white">{{cantidadMeses}}</p>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="flex items-center justify-between">
+            <span class="font-medium text-slate-900">Monto de pago:</span>
+            <p class="bg-green-600 text-lg font-bold hover:bg-green-700 p-2 text-white rounded-full">{{monto | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="error !== ''" class="text-red-500 text-sm mt-1">
+        {{ error }}
+      </div>
+
+      <div class="relative">
+        <button type="submit"
+          class="w-full rounded-md bg-zinc-700 px-3 py-1.5 my-2 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed">
+          Agregar pago
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

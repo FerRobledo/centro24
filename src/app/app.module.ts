@@ -28,6 +28,28 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ClientesComponent } from './componentes/clientes/clientes.component';
 import { InsertarClienteComponent } from './componentes/clientes/insertarCliente/insertarCliente.component';
 import { CargaProductosComponent } from './componentes/cargaProductos/cargaProductos.component';
+import { AgregarPagoModalComponent } from './componentes/agregarPagoModal/agregarPagoModal.component';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatMomentDateModule, MomentDateAdapter } from '@angular/material-moment-adapter';
+import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
+import { MatDividerModule } from '@angular/material/divider';
+import {MatTabsModule} from '@angular/material/tabs';
+import { ListaClientesComponent } from './componentes/clientes/listaClientes/listaClientes.component';
+
+
+export const MONTH_YEAR_FORMATS = {
+  parse: {
+    dateInput: 'MM/YYYY',
+  },
+  display: {
+    dateInput: 'MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 
 @NgModule({
@@ -51,6 +73,8 @@ import { CargaProductosComponent } from './componentes/cargaProductos/cargaProdu
     ClientesComponent,
     InsertarClienteComponent,
     CargaProductosComponent,
+    AgregarPagoModalComponent,
+    ListaClientesComponent,
   ],
   imports: [
     BrowserModule,
@@ -66,9 +90,18 @@ import { CargaProductosComponent } from './componentes/cargaProductos/cargaProdu
     MatInputModule,
     MatIconModule,
     MatTooltipModule,
+    MatOptionModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatMomentDateModule,
+    MatDividerModule,
+    MatTabsModule,
   ],
   providers: [
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
+    { provide: DateAdapter, useClass: MomentDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: MONTH_YEAR_FORMATS }
   ],
   bootstrap: [AppComponent]
 })
