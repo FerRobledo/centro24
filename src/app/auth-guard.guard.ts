@@ -18,31 +18,32 @@ const isTokenExpired = (token: string | null): boolean => {
 };
 
 // Usamos `inject` para obtener las dependencias de AuthService y Router
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
   const token = authService.getToken();
 
+  // Validación local: si no hay token o expiró
   if (isTokenExpired(token)) {
     router.navigate(['/login']);
     return false;
   }
 
-  const userRoles = authService.getUserRoles().map((r: string) => r.toLowerCase()); // roles del usuario en minúsculas
-  const rolRequerido = state.url.slice(1).toLowerCase(); // ruta sin "/" y en minúsculas
+  // Validación remota contra el backend
+  // const isValid = await authService.validateToken();
+  // if (!isValid) {
+  //   router.navigate(['/login']);
+  //   return false;
+  // }
 
-  // Permitimos siempre acceso a Home o ruta raíz
-  if (rolRequerido === '' || rolRequerido === 'home') {
-    return true;
-  }
+  const userRoles = authService.getUserRoles().map((r: string) => r.toLowerCase());
+  const rolRequerido = state.url.slice(1).toLowerCase();
 
-  // Si el usuario tiene rol 'admin', permitimos todo
-  if (userRoles.includes('admin')) {
-    return true;
-  }
+  if (rolRequerido === '' || rolRequerido === 'home') return true;
+  if (userRoles.includes('admin')) return true;
 
   if (!userRoles.includes(rolRequerido)) {
-    router.navigate(['/']); // o donde quieras redirigir si no tiene permiso
+    router.navigate(['/']);
     return false;
   }
 

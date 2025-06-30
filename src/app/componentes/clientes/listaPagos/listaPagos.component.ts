@@ -12,6 +12,7 @@ export class ListaPagosComponent implements OnInit {
   listaPagos: any[] = [];
 
   ngOnInit() {
+    console.log(this.listaPagos);
     this.generarListaPagos();
   }
 

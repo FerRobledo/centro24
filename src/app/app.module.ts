@@ -7,13 +7,8 @@ import { RegisterComponent } from './componentes/auth/register/register.componen
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './componentes/auth/login/login.component';
 import { SideMenuComponent } from './componentes/sideMenu/sideMenu.component';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatInputModule } from '@angular/material/input';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { AppRoutingModule } from './app-routing.module';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { LOCALE_ID } from '@angular/core';

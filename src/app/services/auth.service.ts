@@ -32,6 +32,19 @@ export class AuthService {
     localStorage.removeItem('jwtToken');
   }
 
+  validateToken(): Promise<boolean> {
+    const token = this.getToken();
+    if (!token) return Promise.resolve(false);
+
+    return this.http
+      .get('/api/auth/validate-token', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .toPromise()
+      .then(() => true)
+      .catch(() => false);
+  }
+
   getUserId() {
     const token = this.getToken();
 
