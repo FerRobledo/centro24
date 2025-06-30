@@ -21,6 +21,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { CardComponent } from '../componentes/card/card.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { DashboardRoutes } from './dashboard.routing';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   ],
   imports: [
     CommonModule,
+    DashboardRoutes,
     ReactiveFormsModule,
     MatDialogModule,
     MatSlideToggleModule,
