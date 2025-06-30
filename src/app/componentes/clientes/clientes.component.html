@@ -38,7 +38,9 @@
           <app-listaClientes [clientsOfMonth]="clientsOfMonth"
             (loadClientsMonthly)="loadClientsMonthly()"></app-listaClientes>
         </mat-tab>
-        <mat-tab label="Pagos"> Content 2 </mat-tab>
+        <mat-tab label="Pagos"> 
+          <app-listaPagos [clientes]="clientsOfMonth"></app-listaPagos>
+        </mat-tab>
       </mat-tab-group>
 
     </ng-template>

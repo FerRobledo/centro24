@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
             const { rows } = await pool.query('SELECT * FROM clientes_mensuales WHERE user_admin = $1', [id]);
 
             for (let row of rows) {
-                const pagos = await getPagos(row.id_client);
+                const pagos = await getPagos(row.id_client, id);
                 row.pagos = pagos;
             }
 
@@ -41,15 +41,17 @@ module.exports = async (req, res) => {
     //POST
     if (req.method === 'POST') {
         const { accion } = req.body;
+        const { id } = req.query;
         if (accion === 'addPago') {
             const { infoPago } = req.body;
+            console.log(infoPago);
             try {
                 await pool.query(
                     `
                     INSERT INTO pagos_mensuales
-                    (id_client, fecha_pago, monto, periodo_desde, periodo_hasta)
-                    VALUES ($1, now(), $2, $3, $4)
-                    `, [infoPago.idClient, infoPago.monto, infoPago.fechaDesde, infoPago.fechaHasta]
+                    (id_client, fecha_pago, monto, periodo_desde, periodo_hasta, id_admin)
+                    VALUES ($1, now(), $2, $3, $4, $5)
+                    `, [infoPago.client.id_client, infoPago.monto, infoPago.fechaDesde, infoPago.fechaHasta, id]
                 )
             } catch (error) {
                 console.log(error);
@@ -160,13 +162,13 @@ module.exports = async (req, res) => {
     }
 }
 
-async function getPagos(id_cliente) {
+async function getPagos(id_cliente, id_admin) {
     const query = `
         SELECT *  
         FROM pagos_mensuales
-        WHERE id_client = $1
+        WHERE id_client = $1 and id_admin = $2
         ORDER BY fecha_pago DESC
     `;
-    const { rows } = await pool.query(query, [id_cliente]);
+    const { rows } = await pool.query(query, [id_cliente, id_admin]);
     return rows;
 }

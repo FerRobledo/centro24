@@ -36,8 +36,6 @@ export class ClientesService {
   }
 
   public asignarPago(idAdmin: number, infoPago: any): any{
-    console.log(infoPago);
-    return;
     const data = {infoPago, accion:'addPago'}
     return this.http.post(this.origin + '/api/clientes/' + idAdmin, data)
   }

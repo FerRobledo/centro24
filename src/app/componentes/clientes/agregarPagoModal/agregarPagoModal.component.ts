@@ -58,7 +58,7 @@ export class AgregarPagoModalComponent implements OnInit {
   formatearMesAnio(fecha: Date) {
     const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
     const anio = fecha.getFullYear();
-    return `${mes}-${anio}`;
+    return `${anio}-${mes}-1`;
   }
 
   crearPago() {
@@ -73,7 +73,10 @@ export class AgregarPagoModalComponent implements OnInit {
 
     // Formatear fechas
     const fechaDesdeStr = this.formatearMesAnio(fechaDesdeDate);
-    const fechaHastaStr = this.formatearMesAnio(fechaHastaDate);
+    let fechaHastaStr = fechaDesdeStr;
+    if(fechaHastaDate){
+      fechaHastaStr = this.formatearMesAnio(fechaHastaDate);
+    }
 
     // Armá el objeto a enviar con fechas formateadas
     const pagoData = {
@@ -83,8 +86,6 @@ export class AgregarPagoModalComponent implements OnInit {
       monto: this.monto,
     };
 
-    console.log('Pago a enviar:', pagoData);
-    return;
     const adminId = this.authService.getIdAdmin();
 
     this.clientesService.asignarPago(adminId, pagoData).subscribe({

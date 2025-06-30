@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
-import { AgregarPagoModalComponent } from '../agregarPagoModal/agregarPagoModal.component';
+import { AgregarPagoModalComponent } from './agregarPagoModal/agregarPagoModal.component';
 
 @Component({
   selector: 'app-clientes',

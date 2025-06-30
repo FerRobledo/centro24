@@ -28,15 +28,17 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ClientesComponent } from './componentes/clientes/clientes.component';
 import { InsertarClienteComponent } from './componentes/clientes/insertarCliente/insertarCliente.component';
 import { CargaProductosComponent } from './componentes/cargaProductos/cargaProductos.component';
-import { AgregarPagoModalComponent } from './componentes/agregarPagoModal/agregarPagoModal.component';
+import { AgregarPagoModalComponent } from './componentes/clientes/agregarPagoModal/agregarPagoModal.component';
 import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatMomentDateModule, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
-import {MatTabsModule} from '@angular/material/tabs';
+import { MatTabsModule } from '@angular/material/tabs';
 import { ListaClientesComponent } from './componentes/clientes/listaClientes/listaClientes.component';
+import { ListaPagosComponent } from './componentes/clientes/listaPagos/listaPagos.component';
+import { LOCALE_ID } from '@angular/core';
 
 
 export const MONTH_YEAR_FORMATS = {
@@ -75,6 +77,7 @@ export const MONTH_YEAR_FORMATS = {
     CargaProductosComponent,
     AgregarPagoModalComponent,
     ListaClientesComponent,
+    ListaPagosComponent,
   ],
   imports: [
     BrowserModule,
@@ -101,6 +104,7 @@ export const MONTH_YEAR_FORMATS = {
   providers: [
     provideAnimationsAsync(),
     { provide: DateAdapter, useClass: MomentDateAdapter },
+    { provide: LOCALE_ID, useValue: 'es-AR' },
     { provide: MAT_DATE_FORMATS, useValue: MONTH_YEAR_FORMATS }
   ],
   bootstrap: [AppComponent]
