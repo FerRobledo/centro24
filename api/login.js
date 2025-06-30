@@ -19,11 +19,22 @@ module.exports = async (req, res) => {
         return res.status(200).end();
     }
 
+    if (req.method == 'GET') {
+        const action = req.query.action;
+        if (action == 'validarToken') {
+            const token = req.headers.authorization?.split(' ')[1];
+            try {
+                const payload = jwt.verify(token, process.env.JWT_SECRET);
+                return res.status(200).json({ valid: true });
+            } catch (err) {
+                return res.status(401).json({ valid: false });
+            }
+        }
+    }
+
     if (req.method === 'POST') {
         const { username, password } = req.body;
-
         try {
-
             // Verificar si el usuario existe en la base de datos
             const result = await pool.query(`
                     SELECT 
@@ -34,7 +45,7 @@ module.exports = async (req, res) => {
                     INNER JOIN rol r ON r.id = ur.id_rol
                     WHERE u.nombre = $1
                     GROUP BY u.id , u.nombre, u.password_hash, u.user_padre_id;
-                `, [username]);
+                    `, [username]);
             if (result.rows.length === 0) {
                 return res.status(401).json({ message: 'Usuario no encontrado' });
             }
@@ -48,11 +59,11 @@ module.exports = async (req, res) => {
 
             // Generar el JWT
             const token = jwt.sign(
-                { userId: user.id, username: user.nombre, idAdmin: user.user_padre_id, roles:user.roles },
+                { userId: user.id, username: user.nombre, idAdmin: user.user_padre_id, roles: user.roles },
                 process.env.JWT_SECRET,
                 { expiresIn: '12h' } // El token expira en 6 horas
             );
-            
+
             return res.status(200).json({ token });
         } catch (error) {
             console.log(error);

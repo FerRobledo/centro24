@@ -30,11 +30,11 @@ export const authGuard: CanActivateFn = async (route, state) => {
   }
 
   // Validación remota contra el backend
-  // const isValid = await authService.validateToken();
-  // if (!isValid) {
-  //   router.navigate(['/login']);
-  //   return false;
-  // }
+  const isValid = await authService.validateToken();
+  if (!isValid) {
+    router.navigate(['/login']);
+    return false;
+  }
 
   const userRoles = authService.getUserRoles().map((r: string) => r.toLowerCase());
   const rolRequerido = state.url.slice(1).toLowerCase();

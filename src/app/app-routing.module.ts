@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { RegisterComponent } from './componentes/auth/register/register.component';
 import { LoginComponent } from './componentes/auth/login/login.component';
 import { authGuard } from './auth-guard.guard';
+import { NotFoundComponent } from './componentes/notFound/notFound.component';
 
 const routes: Routes = [
   {
@@ -18,6 +19,10 @@ const routes: Routes = [
     loadChildren: () => import('./module/dashboard.module').then(m => m.DashboardModule),
     canActivate: [authGuard]
   },
+  {
+    path: '**',
+    component: NotFoundComponent,
+  }
 ];
 
 @NgModule({

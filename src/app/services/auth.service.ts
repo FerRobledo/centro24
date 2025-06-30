@@ -37,8 +37,9 @@ export class AuthService {
     if (!token) return Promise.resolve(false);
 
     return this.http
-      .get('/api/auth/validate-token', {
+      .get('/api/login', {
         headers: { Authorization: `Bearer ${token}` },
+        params: { action: 'validarToken' }
       })
       .toPromise()
       .then(() => true)
@@ -103,7 +104,7 @@ export class AuthService {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       let idAdmin = payload.idAdmin;
-      if(!idAdmin){
+      if (!idAdmin) {
         return true;
       } else {
         return false;
@@ -114,17 +115,17 @@ export class AuthService {
     }
   }
 
-  getUserName(){
+  getUserName() {
     const token = this.getToken();
 
-    if(!token) return null;
+    if (!token) return null;
 
-    try{
+    try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const username = payload.username;
       //console.log("el objeto es", payload);
       //console.log("el nombre del cliente es: " + username);
-      
+
       return username || null;
     } catch (error) {
       console.error('Error al decodificar el token', error);

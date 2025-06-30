@@ -31,6 +31,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { DashboardRoutes } from './dashboard.routing';
+import { SideMenuComponent } from '../componentes/sideMenu/sideMenu.component';
+import { HomeComponent } from '../componentes/home/home.component';
 
 @NgModule({
   declarations: [
@@ -51,6 +53,8 @@ import { DashboardRoutes } from './dashboard.routing';
     AgregarPagoModalComponent,
     ListaClientesComponent,
     ListaPagosComponent,
+    SideMenuComponent,
+    HomeComponent,
   ],
   imports: [
     CommonModule,
