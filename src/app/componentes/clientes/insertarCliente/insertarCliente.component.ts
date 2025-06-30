@@ -31,9 +31,7 @@ export class InsertarClienteComponent implements OnInit {
       cliente: ['', Validators.required],
       mensual: [],
       bonificacion: [],
-      semanal: [],
-      monto_pagado: [],
-      mesesPagados: this.formMeses 
+      monto: []
     });
   }
 
@@ -51,7 +49,7 @@ export class InsertarClienteComponent implements OnInit {
     //cuando hago sumbit lleno el meses pagados con los true
 
     const camposNumericos: string[] = [
-      'mensual', 'bonificacion', 'semanal', 'monto_pagado'
+      'mensual', 'bonificacion', 'monto'
     ];
 
     camposNumericos.forEach((campo: string) => {
@@ -112,9 +110,8 @@ export class InsertarClienteComponent implements OnInit {
         tipo: this.clientEdit.tipo ?? '',
         cliente: this.clientEdit.cliente,
         mensual: this.clientEdit.mensual,
-        bonificacion: this.clientEdit.bonificacion,
-        semanal: this.clientEdit.semanal,
-        monto_pagado: this.clientEdit.monto_pagado,
+        bonificaion: this.clientEdit.bonificaion,
+        monto: this.clientEdit.monto,
       });
     }
   }

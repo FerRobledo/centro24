@@ -16,7 +16,6 @@ module.exports = async (req, res) => {
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
-
     //GET
     if (req.method === 'GET') {
         const { id } = req.query;
@@ -27,6 +26,11 @@ module.exports = async (req, res) => {
         try {
             const { rows } = await pool.query('SELECT * FROM clientes_mensuales WHERE user_admin = $1', [id]);
 
+            for (let row of rows) {
+                const pagos = await getPagos(row.id_client, id);
+                row.pagos = pagos;
+            }
+
             return res.status(200).json(rows);
         } catch (error) {
             console.log(error);
@@ -36,45 +40,42 @@ module.exports = async (req, res) => {
 
     //POST
     if (req.method === 'POST') {
+        const { accion } = req.body;
         const { id } = req.query;
-        const payload = req.body;
-
-        if (!id) {
-            return res.status(500).json({
-                error: 'Error falta id para insertar usuario',
-                details: 'No se recibió el ID en el cuerpo de la petición',
-            });
-        }
-
-        try {
-            const insertClienteQuery = `
-            INSERT INTO public.clientes_mensuales 
-            (tipo, cliente, mensual, bonificacion, semanal, user_admin, monto_pagado)
-            VALUES ($2, $3, $4, $5, $6, $1, $7)
-            RETURNING id_client
-          `;
-            const result = await pool.query(insertClienteQuery, [id, payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.semanal, payload.monto_pagado]);
-
-            const newClientId = result.rows[0].id_client;
-
-            // Luego inserto los meses pagados
-            if (Array.isArray(payload.mesesPagados)) {
-                for (const mes of payload.mesesPagados) {
-                    await pool.query(`
-                INSERT INTO pagos_mensuales (id_cliente, anio, mes, pagado, monto_pagado, fecha_pago)
-                VALUES ($1, $2, $3, $4, $5, CURRENT_DATE)
-              `, [newClientId, new Date().getFullYear(), mes, true, 0]);
-                }
+        if (accion === 'addPago') {
+            const { infoPago } = req.body;
+            console.log(infoPago);
+            try {
+                await pool.query(
+                    `
+                    INSERT INTO pagos_mensuales
+                    (id_client, fecha_pago, monto, periodo_desde, periodo_hasta, id_admin)
+                    VALUES ($1, now(), $2, $3, $4, $5)
+                    `, [infoPago.client.id_client, infoPago.monto, infoPago.fechaDesde, infoPago.fechaHasta, id]
+                )
+            } catch (error) {
+                console.log(error);
+                return res.status(500).json({ error: 'Error no se pudo insertar el pago', details: error.message });
             }
+        } else {
 
-            return res.status(200).json({ success: true, id_client: newClientId });
+            const { id } = req.query;
+            const payload = req.body;
 
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({
-                error: 'Error al insertar cliente y meses pagados',
-                details: error.message
-            });
+            if (!id) {
+                return res.status(500).json({ error: 'Error falta id para insertar usuario', details: 'No se recibió el ID en el cuerpo de la petición' });
+
+            } try {
+                const { rows } = await pool.query(
+                    "INSERT INTO public.clientes_mensuales" +
+                    " (tipo, cliente, mensual, bonificacion, user_admin, monto)" +
+                    " VALUES ($2, $3, $4, $5, $6, $1, $7)", [id, payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.monto]
+                );
+                return res.status(200).json(rows);
+            } catch (error) {
+                console.log(error);
+                return res.status(500).json({ error: 'Error no se pudo insertar el cliente', details: error.message });
+            }
         }
     }
 
@@ -90,8 +91,8 @@ module.exports = async (req, res) => {
         } try {
             const { rows } = await pool.query(
                 "UPDATE public.clientes_mensuales" +
-                " SET tipo=$1, cliente=$2, mensual=$3, bonificacion=$4, semanal=$5, user_admin=$6, monto_pagado=$7" +
-                " WHERE id_client=$8;", [payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.semanal, idAdmin, payload.monto_pagado, idClient]
+                " SET tipo=$1, cliente=$2, mensual=$3, bonificacion=$4, user_admin=$6, monto=$7" +
+                " WHERE id_client=$8;", [payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, idAdmin, payload.monto, idClient]
             );
             return res.status(200).json(rows);
         } catch (error) {
@@ -127,36 +128,47 @@ module.exports = async (req, res) => {
         }
     }
 
-// GET MES CLIENT
-if (req.method === 'GET') {
-    const month = req.query.monthSelected;
-  
-    if (!month) {
-      return res.status(400).json({
-        error: 'Error falta mes',
-        details: 'No se recibió el mes necesario',
-      });
-    }
-  
-    try {
-      const { rows } = await pool.query(
-        `
+    // GET MES CLIENT
+    if (req.method === 'GET') {
+        const month = req.query.monthSelected;
+
+        if (!month) {
+            return res.status(400).json({
+                error: 'Error falta mes',
+                details: 'No se recibió el mes necesario',
+            });
+        }
+
+        try {
+            const { rows } = await pool.query(
+                `
         SELECT * 
         FROM public.clientes_mensuales cm
         JOIN public.pagos_mensuales pm 
           ON cm.id_client = pm.id_client
         WHERE pm.mes = $1
         `,
-        [month]
-      );
-  
-      res.json(rows);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        error: 'Error no se pudo obtener los clientes del mes',
-        details: error.message,
-      });
+                [month]
+            );
+
+            res.json(rows);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({
+                error: 'Error no se pudo obtener los clientes del mes',
+                details: error.message,
+            });
+        }
     }
-  }
+}
+
+async function getPagos(id_cliente, id_admin) {
+    const query = `
+        SELECT *  
+        FROM pagos_mensuales
+        WHERE id_client = $1 and id_admin = $2
+        ORDER BY fecha_pago DESC
+    `;
+    const { rows } = await pool.query(query, [id_cliente, id_admin]);
+    return rows;
 }

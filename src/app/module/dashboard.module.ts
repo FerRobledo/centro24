@@ -21,6 +21,15 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { CardComponent } from '../componentes/card/card.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AgregarPagoModalComponent } from '../componentes/clientes/agregarPagoModal/agregarPagoModal.component';
+import { ListaClientesComponent } from '../componentes/clientes/listaClientes/listaClientes.component';
+import { ListaPagosComponent } from '../componentes/clientes/listaPagos/listaPagos.component';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { MatOptionModule, MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
 import { DashboardRoutes } from './dashboard.routing';
 
 @NgModule({
@@ -39,6 +48,9 @@ import { DashboardRoutes } from './dashboard.routing';
     ClientesComponent,
     InsertarClienteComponent,
     CargaProductosComponent,
+    AgregarPagoModalComponent,
+    ListaClientesComponent,
+    ListaPagosComponent,
   ],
   imports: [
     CommonModule,
@@ -50,6 +62,13 @@ import { DashboardRoutes } from './dashboard.routing';
     MatIconModule,
     MatTooltipModule,
     FormsModule,
+    MatOptionModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatMomentDateModule,
+    MatDividerModule,
+    MatTabsModule,
   ],
   providers: [
     provideAnimationsAsync()
