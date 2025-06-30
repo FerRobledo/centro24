@@ -18,6 +18,7 @@ export class SideMenuComponent implements OnInit {
   ) { }
 
   roles: string[] = []
+  nameUserCurrent: String = '';
 
   secciones: { nombre: string, icono: string }[] = [
     {
@@ -46,6 +47,7 @@ export class SideMenuComponent implements OnInit {
   ngOnInit() {
     this.roles = this.authService.getUserRoles();
     this.filtrarSecciones();
+    this.nameUserCurrent = this.authService.getUserName();
   }
 
   filtrarSecciones() {
@@ -71,4 +73,6 @@ export class SideMenuComponent implements OnInit {
       }
     });
   }
+
+
 }

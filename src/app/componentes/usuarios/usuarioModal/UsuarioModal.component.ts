@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { RolService } from 'src/app/services/rol.service';
 import { Rol } from 'src/assets/dto/rol';
-import { Usuario, newUsuario } from 'src/assets/dto/usuario';
 
 @Component({
   selector: 'app-UsuarioModal',
