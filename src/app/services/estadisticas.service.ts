@@ -27,4 +27,13 @@ export class EstadisticasService {
     public getNewClients(id: number): Observable<any> {
         return this.http.get(this.origin + '/api/estadisticas/' + id + '?action=newClients');
     }
+
+    public getUsersByAdmin(id: number): Observable<any> {
+        return this.http.get(this.origin + '/api/estadisticas/' + id + '?action=users');
+    }
+
+    public getCollectionYesterday(id: number): Observable<any> {
+        return this.http.get(this.origin + '/api/estadisticas/' + id + '?action=yesterday');
+    }
+
 }

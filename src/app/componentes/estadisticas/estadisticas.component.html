@@ -1,10 +1,14 @@
-<div class="mt-10 w-full">
+<div class="mt-10 w-full" *ngIf="!isLoading">
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center">
-    <app-card class="w-60 h-48" [titulo]="'Recaudación mes anterior'" [valor]="'$' + (collectionPreviousMonth | number:'1.0-0')" icon="fa-solid fa-money-bills"></app-card>
-    <app-card class="w-60 h-48" [titulo]="'Recaudación mes actual'" [valor]="'$' + (collectionCurrentMonth | number:'1.0-0')" icon="fa-solid fa-money-bills"></app-card>
+    <app-card class="w-60 h-48" [titulo]="'Recaudación del mes anterior'" [valor]="'$' + (collectionPreviousMonth | number:'1.0-0')" icon="fa-solid fa-money-bills"></app-card>
+    <app-card class="w-60 h-48" [titulo]="'Recaudación del mes actual'" [valor]="'$' + (collectionCurrentMonth | number:'1.0-0')" icon="fa-solid fa-money-bills"></app-card>
     <app-card class="w-60 h-48" [titulo]="'Clientes mensuales'" [valor]="(cantClients)" icon="fa-solid fa-users-rectangle"></app-card>
-    <app-card class="w-60 h-48" [titulo]="'Nuevos clientes'" [valor]="(newClients)" icon="fa-solid fa-user-plus"></app-card>
-    <app-card class="w-60 h-48" [titulo]="'Cantidad de usuarios'" [valor]="'11'" icon="fa-solid fa-circle-user"></app-card>
-    <app-card class="w-60 h-48" [titulo]="'Recaudación del dia de ayer'" [valor]="'$150.000'" icon="fa-solid fa-money-bill"></app-card>
+    <app-card class="w-60 h-48" [titulo]="'Clientes incorporados este mes'" [valor]="(newClients)" icon="fa-solid fa-user-plus"></app-card>
+    <app-card class="w-60 h-48" [titulo]="'Cantidad de usuarios'" [valor]="(cantUsersByAdmin)" icon="fa-solid fa-circle-user"></app-card>
+    <app-card class="w-60 h-48" [titulo]="'Recaudación del día anterior'" [valor]="'$' + (collectionYesterday | number:'1.0-0')" icon="fa-solid fa-money-bill"></app-card>
   </div>
+</div>
+
+<div *ngIf="isLoading" class="flex justify-center items-center h-96">
+  <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
 </div>
