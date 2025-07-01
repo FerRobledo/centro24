@@ -6,14 +6,15 @@
           <i class="fa-solid fa-user-plus text-2xl text-white"></i>
         </div>
         <h6 class="text-lg font-bold text-gray-900">
-          {{ editMode ? 'Edite cliente mensual' : 'Registre un nuevo cliente mensual' }}
+          {{ accion=='editar' ? 'Edite cliente mensual' : 'Registre un nuevo cliente mensual' }}
         </h6>
       </div>
 
       <div class="grid grid-cols-6 gap-4 col-span-full lg:col-span-3">
         <div class="col-span-full sm:col-span-3">
           <label for="tipo" class="text-sm font-medium text-gray-900">Tipo</label>
-          <input type="text" name="tipo" id="tipo" formControlName="tipo" autocomplete="tipo" required placeholder="Tipo de cliente"
+          <input type="text" name="tipo" id="tipo" formControlName="tipo" autocomplete="tipo" required
+            placeholder="Tipo de cliente"
             class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
         </div>
 
@@ -26,45 +27,29 @@
         <div class="col-span-full sm:col-span-3">
           <label for="mensual" class="text-sm font-medium text-gray-900">Mensual</label>
           <input type="number" name="mensual" id="mensual" formControlName="mensual" placeholder="$0.00"
-          class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
-        </div>
-
-        <div class="col-span-full sm:col-span-3">
-          <label for="bonificacion" class="text-sm font-medium text-gray-900">Bonificación</label>
-          <input type="number" name="bonificacion" id="bonificacion" formControlName="bonificacion"
-            placeholder="$0.00"
             class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
         </div>
 
         <div class="col-span-full sm:col-span-3">
-          <label for="monto" class="text-sm font-medium text-gray-900">Monto pagado</label>
+          <label for="bonificacion" class="text-sm font-medium text-gray-900">Bonificación</label>
+          <input type="number" name="bonificacion" id="bonificacion" formControlName="bonificacion" placeholder="$0.00"
+            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
+        </div>
+
+        <div class="col-span-full sm:col-span-3">
+          <label for="monto" class="text-sm font-medium text-gray-900">Monto</label>
           <input type="number" name="monto" id="monto" formControlName="monto" placeholder="$0.00"
-          class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
+            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
         </div>
 
-        <div class="col-span-full">
-          <label class="text-sm font-medium text-gray-900 block mb-2">Meses pagados</label>
-          <div class="grid grid-cols-4 gap-2">
-            <div *ngFor="let mes of meses">
-              <ng-container *ngIf="formMeses.get(mes) as rawControl">
-                <label class="inline-flex items-center">
-                  <input type="checkbox" [formControl]="asFormControl(rawControl)" class="mr-2">
-                  {{ mes }}
-                </label>
-              </ng-container>
-            </div>
-          </div>
-        </div>
-        
         <div class="col-span-full flex gap-4 mt-4">
-          <button type="submit"
-            class="w-28 rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">
-            {{ editMode ? 'Guardar cambios' : 'Crear usuario' }}
-          </button>
-
           <button type="button" (click)="onCancel()"
             class="w-20 rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">
             Cancelar
+          </button>
+          <button type="submit"
+            class="w-28 rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">
+            {{ accion=='editar' ? 'Guardar cambios' : 'Crear usuario' }}
           </button>
         </div>
       </div>
