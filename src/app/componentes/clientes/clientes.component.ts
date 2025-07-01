@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
 import { AgregarPagoModalComponent } from './agregarPagoModal/agregarPagoModal.component';
+import { InsertarClienteComponent } from './insertarCliente/insertarCliente.component';
 
 @Component({
   selector: 'app-clientes',
@@ -48,8 +49,17 @@ export class ClientesComponent implements OnInit {
     }
   }
 
-  agregarCliente(){
+  agregarCliente() {
+    const dialogRef = this.dialog.open(InsertarClienteComponent, {
+      maxWidth: '100%',
+      data: {accion:"agregar"},
+    });
 
+    dialogRef.afterClosed().subscribe(result => {
+      if (result == 'submit'){
+        this.loadClientsMonthly();
+      }
+    });
   }
 
   agregarPago() {

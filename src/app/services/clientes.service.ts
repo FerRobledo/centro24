@@ -16,7 +16,7 @@ export class ClientesService {
     return this.http.get(this.origin + '/api/clientes/' + idAdmin)
   }
 
-  public postClientDaily(payload: any, idAdmin: number): Observable<any> {
+  public postClientDaily(payload: any, idAdmin: number): Observable<any> {    
     return this.http.post(this.origin + '/api/clientes/' + idAdmin, payload);
   }
 

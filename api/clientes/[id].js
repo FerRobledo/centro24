@@ -61,7 +61,6 @@ module.exports = async (req, res) => {
 
             const { id } = req.query;
             const payload = req.body;
-
             if (!id) {
                 return res.status(500).json({ error: 'Error falta id para insertar usuario', details: 'No se recibió el ID en el cuerpo de la petición' });
 
@@ -69,8 +68,9 @@ module.exports = async (req, res) => {
                 const { rows } = await pool.query(
                     "INSERT INTO public.clientes_mensuales" +
                     " (tipo, cliente, mensual, bonificacion, user_admin, monto)" +
-                    " VALUES ($2, $3, $4, $5, $6, $1, $7)", [id, payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.monto]
+                    " VALUES ($2, $3, $4, $5, $1, $6)", [id, payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.monto]
                 );
+                console.log(rows);
                 return res.status(200).json(rows);
             } catch (error) {
                 console.log(error);

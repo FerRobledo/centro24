@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
+import { InsertarClienteComponent } from '../insertarCliente/insertarCliente.component';
 
 @Component({
   selector: 'app-listaClientes',
@@ -12,6 +14,7 @@ export class ListaClientesComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private clientesService: ClientesService,
+    public dialog: MatDialog,
   ) { }
 
   ngOnInit() {
@@ -23,8 +26,16 @@ export class ListaClientesComponent implements OnInit {
   clientEdit: any = null;
 
   public updateClient(client: any) {
-    this.clientEdit = client;
-    this.clicked = true;
+    const dialogRef = this.dialog.open(InsertarClienteComponent, {
+      maxWidth: '100%',
+      data: {client,accion:"editar"},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result == 'submit'){
+        this.loadClientsMonthly;
+      }
+    });
   }
 
   public deleteClient(client: any) {
@@ -46,5 +57,4 @@ export class ListaClientesComponent implements OnInit {
       })
     }
   }
-
 }
