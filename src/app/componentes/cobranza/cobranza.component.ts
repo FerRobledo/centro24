@@ -24,8 +24,6 @@ export class CobranzaComponent implements OnInit {
     
   }
 
-  //desglose ngOnInit asi poder agregar mas de un metodo con la accion de ejecutar cuando carga el DOM por primera vez
-  //como lo hace el ngOnInit
   ngOnInit() {
     this.loadClientsDaily();
   }
