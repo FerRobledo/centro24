@@ -1,0 +1,20 @@
+<mat-form-field class="w-full" appearance="fill">
+
+  <mat-label>Buscar cliente</mat-label>
+  <input type="text" placeholder="Escribí un nombre..." aria-label="Cliente" matInput [formControl]="clienteControl"
+    [matAutocomplete]="auto">
+
+  <mat-autocomplete #auto="matAutocomplete" [displayWith]="mostrarCliente" (optionSelected)="seleccionarCliente($event)">
+    <mat-option *ngFor="let cliente of clientesFiltrados" [value]="cliente">
+      <div class="flex flex-col">
+        <div class="font-semibold text-sm text-black">
+          #{{ cliente.id_client }} - {{ cliente.cliente }}
+        </div>
+        <div class="text-xs text-gray-500">
+          {{ cliente.mensual }} - ${{ cliente.monto }}/mes
+        </div>
+      </div>
+    </mat-option>
+  </mat-autocomplete>
+
+</mat-form-field>

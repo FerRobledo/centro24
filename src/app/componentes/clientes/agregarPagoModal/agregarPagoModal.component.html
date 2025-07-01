@@ -7,12 +7,8 @@
     </div>
 
     <form class="space-y-2 justify-center flex flex-col" [formGroup]="pagoForm" (ngSubmit)="crearPago()">
-      <mat-form-field appearance="fill">
-        <mat-label>Cliente</mat-label>
-        <mat-select formControlName="client" (ngModelChange)="actualizarMonto()">
-          <mat-option *ngFor="let cliente of clientes" [value]="cliente">{{cliente.cliente}}</mat-option>
-        </mat-select>
-      </mat-form-field>
+
+      <app-selectorClientes [clientes]="clientes" (clienteSeleccionadoChange)="onClienteSeleccionado($event)"></app-selectorClientes>
 
       <div class="flex w-full justify-between">
         <mat-form-field appearance="fill">

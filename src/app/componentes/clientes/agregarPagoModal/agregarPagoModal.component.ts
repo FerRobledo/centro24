@@ -33,7 +33,7 @@ export class AgregarPagoModalComponent implements OnInit {
   ngOnInit() {
     this.pagoForm = this.fb.group(
       {
-        client: [null ,[Validators.required]],
+        client: [null, [Validators.required]],
         fechaDesde: ['', [Validators.required]],
         fechaHasta: [''],
       },
@@ -74,7 +74,7 @@ export class AgregarPagoModalComponent implements OnInit {
     // Formatear fechas
     const fechaDesdeStr = this.formatearMesAnio(fechaDesdeDate);
     let fechaHastaStr = fechaDesdeStr;
-    if(fechaHastaDate){
+    if (fechaHastaDate) {
       fechaHastaStr = this.formatearMesAnio(fechaHastaDate);
     }
 
@@ -88,6 +88,8 @@ export class AgregarPagoModalComponent implements OnInit {
 
     const adminId = this.authService.getIdAdmin();
 
+    console.log(pagoData);
+    
     this.clientesService.asignarPago(adminId, pagoData).subscribe({
       error: (error: any) => console.log(error),
     });
@@ -123,7 +125,7 @@ export class AgregarPagoModalComponent implements OnInit {
 
       const diferenciaMeses = fechaHasta.diff(fechaDesde, 'months', true); // incluye decimales
       this.cantidadMeses = Math.floor(diferenciaMeses) + 1; // +1 para incluir ambos meses
-    } else if(desde && !hasta){
+    } else if (desde && !hasta) {
       this.cantidadMeses = 1;
     } else {
       this.cantidadMeses = 0;
@@ -134,17 +136,21 @@ export class AgregarPagoModalComponent implements OnInit {
 
   actualizarMonto() {
     const client = this.pagoForm.value.client;
-    if(client){
+    if (client) {
       this.monto = client.monto * this.cantidadMeses;
     }
   }
-  
-  get valorMensual(){
+
+  get valorMensual() {
     const client = this.pagoForm.value.client;
-    if(client){
+    if (client) {
       return this.pagoForm.value.client.monto;
     }
 
     else return 0;
+  }
+
+  onClienteSeleccionado(cliente: any) {
+    this.pagoForm.get('client')?.setValue(cliente);
   }
 }

@@ -33,6 +33,9 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { DashboardRoutes } from './dashboard.routing';
 import { SideMenuComponent } from '../componentes/sideMenu/sideMenu.component';
 import { HomeComponent } from '../componentes/home/home.component';
+import { SelectorClientesComponent } from '../componentes/clientes/selectorClientes/selectorClientes.component';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+
 
 @NgModule({
   declarations: [
@@ -55,6 +58,7 @@ import { HomeComponent } from '../componentes/home/home.component';
     ListaPagosComponent,
     SideMenuComponent,
     HomeComponent,
+    SelectorClientesComponent,
   ],
   imports: [
     CommonModule,
@@ -73,6 +77,7 @@ import { HomeComponent } from '../componentes/home/home.component';
     MatMomentDateModule,
     MatDividerModule,
     MatTabsModule,
+    MatAutocompleteModule,
   ],
   providers: [
     provideAnimationsAsync()
