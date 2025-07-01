@@ -79,20 +79,23 @@ module.exports = async (req, res) => {
         }
     }
 
-
     //PUT
     if (req.method === 'PUT') {
         const idClient = req.query.id;
-        const { idAdmin } = req.body; //con { } extrae solo idAdmin del body recibido.
-        const payload = req.body; //sin { } guarda todo el body (con todas sus propiedades).
-
+        const { idAdmin } = req.body;
+        const payload = req.body; 
+        //console.log("tiene que ser 1" + idAdmin);
         if (!idClient) {
             return res.status(500).json({ error: 'Error falta id para actualizar usuario', details: 'No se recibió el ID en el cuerpo de la petición' });
         } try {
-            const { rows } = await pool.query(
-                "UPDATE public.clientes_mensuales" +
-                " SET tipo=$1, cliente=$2, mensual=$3, bonificacion=$4, user_admin=$6, monto=$7" +
-                " WHERE id_client=$8;", [payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, idAdmin, payload.monto, idClient]
+            const { rows } = await pool.query(`
+            UPDATE public.clientes_mensuales
+            SET tipo = $1,
+                cliente = $2,
+                mensual = $3,
+                bonificacion = $4,
+                monto = $5
+            WHERE id_client = $6 AND user_admin = $7;`, [payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.monto, idClient, idAdmin]
             );
             return res.status(200).json(rows);
         } catch (error) {

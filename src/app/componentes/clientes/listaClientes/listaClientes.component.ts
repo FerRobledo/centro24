@@ -28,7 +28,7 @@ export class ListaClientesComponent implements OnInit {
   public updateClient(client: any) {
     const dialogRef = this.dialog.open(InsertarClienteComponent, {
       maxWidth: '100%',
-      data: {client,accion:"editar"},
+      data: {client, accion:"editar"},
     });
 
     dialogRef.afterClosed().subscribe(result => {
