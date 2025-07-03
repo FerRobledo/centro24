@@ -33,6 +33,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { DashboardRoutes } from './dashboard.routing';
 import { SideMenuComponent } from '../componentes/sideMenu/sideMenu.component';
 import { HomeComponent } from '../componentes/home/home.component';
+import { LogsComponent } from '../componentes/logs/logs.component';
 
 @NgModule({
   declarations: [
@@ -55,6 +56,7 @@ import { HomeComponent } from '../componentes/home/home.component';
     ListaPagosComponent,
     SideMenuComponent,
     HomeComponent,
+    LogsComponent,
   ],
   imports: [
     CommonModule,
