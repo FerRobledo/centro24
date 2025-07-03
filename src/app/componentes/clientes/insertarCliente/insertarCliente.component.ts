@@ -1,11 +1,13 @@
-import { Component, OnInit, EventEmitter, Output, Input  } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input, Inject  } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
 import { ClientesComponent } from '../clientes.component';
 import { OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
 import { AbstractControl } from '@angular/forms';
+import { DIALOG_DATA } from '@angular/cdk/dialog';
 
 @Component({
   selector: 'app-insertarCliente',
@@ -15,24 +17,20 @@ import { AbstractControl } from '@angular/forms';
 export class InsertarClienteComponent implements OnInit {
   @Output() closeForm = new EventEmitter<void>();
   @Input() clientEdit: any;
-  
-  form: FormGroup;
-  editMode = false;
+  accion:string='';
+  form!: FormGroup;
+  client: any = {tipo: '', cliente: '', mensual: '', bonificacion: '', monto: ''};
   meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio','Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   formMeses = new FormGroup({});
 
   constructor(
+    public dialogRef: MatDialogRef<InsertarClienteComponent>,
     private fb: FormBuilder,
     private authService: AuthService,
     private clientstService: ClientesService,
-    private clientComponent: ClientesComponent) {
-    this.form = this.fb.group({
-      tipo: ['', Validators.required],
-      cliente: ['', Validators.required],
-      mensual: [],
-      bonificacion: [],
-      monto: []
-    });
+    @Inject(DIALOG_DATA) public data: any,
+    ) {
+
   }
 
   onSubmit() {
@@ -65,55 +63,58 @@ export class InsertarClienteComponent implements OnInit {
     };
     const idAdmin = this.authService.getIdAdmin();
 
-    if (this.editMode && this.clientEdit?.id_client) { //existe un cliente para editar y tiene un ID definido??
+    if (this.accion=='editar' && this.clientEdit?.id_client) { //existe un cliente para editar y tiene un ID definido??
 
       this.clientstService.updateClient(this.clientEdit.id_client, idAdmin, payload).subscribe({
         next: (res) => {
           console.log('Cliente actualizado:', res);
-          this.closeForm.emit();
-          this.form.reset();
           console.log("el cliente que se edito fue: ", this.clientEdit);
-          this.clientComponent.ngOnInit();
         },
         error: (err) => {
           console.error('Error al actualizar:', err);
         }
       });
-    } else {
+      this.dialogRef.close("submit");
+    } else {      
       this.clientstService.postClientDaily(payload, idAdmin).subscribe({
         next: (res) => {
-          console.log('Cliente registrado:', res);
-          this.closeForm.emit();
-          this.clientComponent.ngOnInit();          
+          console.log(res);
         },
         error: (err) => {
           console.error('Error al registrar:', err);
         }
       });
+      this.dialogRef.close("submit");
     }
   }
+  
   ngOnInit() { //setea todos los meses en false
+    this.form = this.fb.group({
+      tipo: ['', Validators.required],
+      cliente: ['', Validators.required],
+      mensual: [],
+      bonificacion: [],
+      monto: []
+    });
     this.meses.forEach(mes => {
       this.formMeses.addControl(mes, new FormControl(false)); /*const nombre = new FormControl('Matías');
                                                               console.log(nombre.value); // → 'Matías' */
+                  
     });
+    this.accion=this.data.accion;
+    if(this.data.client) {
+      this.form.setValue({
+        tipo: this.data.client.tipo,
+        cliente: this.data.client.cliente,
+        mensual: this.data.client.mensual,
+        bonificacion: this.data.client.bonificacion,
+        monto: this.data.client.monto
+      })
+    }
   }
 
   onCancel() {
-    this.closeForm.emit();
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['clientEdit'] && this.clientEdit) {
-      this.editMode = true;
-      this.form.patchValue({
-        tipo: this.clientEdit.tipo ?? '',
-        cliente: this.clientEdit.cliente,
-        mensual: this.clientEdit.mensual,
-        bonificaion: this.clientEdit.bonificaion,
-        monto: this.clientEdit.monto,
-      });
-    }
+    this.dialogRef.close("cerrado");
   }
 
   asFormControl(control: AbstractControl | null): FormControl {
