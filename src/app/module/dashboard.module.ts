@@ -35,6 +35,7 @@ import { SideMenuComponent } from '../componentes/sideMenu/sideMenu.component';
 import { HomeComponent } from '../componentes/home/home.component';
 import { SelectorClientesComponent } from '../componentes/clientes/selectorClientes/selectorClientes.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { LogsComponent } from '../componentes/logs/logs.component';
 
 
 @NgModule({
@@ -59,6 +60,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     SideMenuComponent,
     HomeComponent,
     SelectorClientesComponent,
+    LogsComponent,
+
   ],
   imports: [
     CommonModule,
