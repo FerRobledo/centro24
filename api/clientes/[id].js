@@ -109,7 +109,6 @@ module.exports = async (req, res) => {
         const idAdmin = req.query.id;
         const { idClient } = req.body;
 
-
         if (!idAdmin || !idClient) {
             return res.status(400).json({ error: 'Falta idAdmin o idAdmin' });
         }
@@ -121,14 +120,26 @@ module.exports = async (req, res) => {
             );
 
             if (rows.length > 0) {
-                return res.status(200).json({ success: true, deletedId: rows[0].id });
+                return res.status(200).json({ success: true, deletedId: rows[0].id_client});
             } else {
                 return res.status(404).json({ success: false, message: 'Cliente no encontrado o no autorizado' });
             }
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ error: 'Error en la eliminación', detail: error.message });
-        }
+          
+            if (error.code === '23503') {
+              return res.status(409).json({
+                error: 'No se puede eliminar el cliente porque tiene pagos registrados.',
+                detail: error.detail
+              });
+            }
+          
+            return res.status(500).json({
+              error: 'Error en la eliminación',
+              detail: error.message
+            });
+          }
+          
     }
 
     // GET MES CLIENT

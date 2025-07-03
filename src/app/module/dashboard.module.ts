@@ -35,7 +35,7 @@ import { SideMenuComponent } from '../componentes/sideMenu/sideMenu.component';
 import { HomeComponent } from '../componentes/home/home.component';
 import { SelectorClientesComponent } from '../componentes/clientes/selectorClientes/selectorClientes.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-
+import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
 
 @NgModule({
   declarations: [
@@ -55,10 +55,11 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     CargaProductosComponent,
     AgregarPagoModalComponent,
     ListaClientesComponent,
+    FiltroClientesPipe,
     ListaPagosComponent,
     SideMenuComponent,
     HomeComponent,
-    SelectorClientesComponent,
+    SelectorClientesComponent,  
   ],
   imports: [
     CommonModule,

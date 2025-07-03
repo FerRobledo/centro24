@@ -13,7 +13,7 @@ export class ListaClientesComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private clientesService: ClientesService,
+    public clientesService: ClientesService,
     public dialog: MatDialog,
   ) { }
 
@@ -33,7 +33,7 @@ export class ListaClientesComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result == 'submit'){
-        this.loadClientsMonthly;
+        this.loadClientsMonthly.emit();
       }
     });
   }
@@ -46,7 +46,7 @@ export class ListaClientesComponent implements OnInit {
         next: (data) => {
           const resp = data as { success: boolean; deletedId: number }; //se hace en dos pasos pq typescript no confia como devuelvan el objeto data
           console.log("El id del cliente eliminado es: ", resp.deletedId); //no permite data.atributo
-          this.loadClientsMonthly;
+          this.loadClientsMonthly.emit();
         },
         error: (error) => {
           console.log("Error en la eliminacion del cliente: ", error)

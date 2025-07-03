@@ -15,7 +15,7 @@ export class CobranzaComponent implements OnInit {
   public clientEdit: any = null;
   clientsOfDay: any[] = [];
   clicked = false;
-  collectionDay = 0;
+  collectionDay = -1;
   collectionClosed = false;
   today: Date = new Date();
   isLoading: Boolean = true;

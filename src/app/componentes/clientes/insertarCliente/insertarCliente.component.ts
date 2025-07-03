@@ -117,4 +117,13 @@ export class InsertarClienteComponent implements OnInit {
   asFormControl(control: AbstractControl | null): FormControl {
     return control as FormControl;
   }
+
+  soloLetras(event: KeyboardEvent): void { //cuando escucha el teclado, solo te deja escribir letras
+    const pattern = /[a-zA-Z\s]/; 
+    const inputChar = String.fromCharCode(event.keyCode || event.which);
+
+    if (!pattern.test(inputChar)) {
+      event.preventDefault(); 
+    }
+  }
 }

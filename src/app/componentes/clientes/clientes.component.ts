@@ -15,9 +15,9 @@ export class ClientesComponent implements OnInit {
   months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   payThisMonth: { [id: number]: any } = {};
   isLoading: Boolean = true;
-
+ 
   constructor(
-    private clientesService: ClientesService,
+    public clientesService: ClientesService,
     private authService: AuthService,
     public dialog: MatDialog,
   ) { };
@@ -57,6 +57,8 @@ export class ClientesComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result == 'submit'){
+        console.log("llega a entrar aca cuando agrego un cliente?");
+        
         this.loadClientsMonthly();
       }
     });
@@ -73,5 +75,14 @@ export class ClientesComponent implements OnInit {
         this.loadClientsMonthly();
       }
     });
+  }
+
+  soloLetras(event: KeyboardEvent): void { //cuando escucha el teclado, solo te deja escribir letras
+    const pattern = /[a-zA-Z\s]/; 
+    const inputChar = String.fromCharCode(event.keyCode || event.which);
+
+    if (!pattern.test(inputChar)) {
+      event.preventDefault(); 
+    }
   }
 }

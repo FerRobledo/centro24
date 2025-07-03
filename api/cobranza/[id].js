@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
         try {
             if (action === 'close') {
                 const result = await pool.query('SELECT SUM '
-                    + '(efectivo + debito + transferencia + cheque + gasto + retiro) AS total'
+                    + '(efectivo + debito + credito + transferencia + cheque + gasto + retiro) AS total'
                     + ' FROM caja WHERE fecha = CURRENT_DATE AND user_admin = $1', [id]);
 
                 const total = result.rows[0].total ?? 0;
