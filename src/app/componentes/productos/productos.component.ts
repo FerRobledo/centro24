@@ -5,6 +5,8 @@ import { ProductosService } from 'src/app/services/productos.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { Producto, ProductoDTO } from 'src/assets/dto/producto';
 import { MatTableDataSource } from '@angular/material/table';
+import { LogsService } from 'src/app/services/logs.service';
+import { Log } from 'src/assets/dto/log';
 
 interface AddProductoResponse {
   message: string;
@@ -40,7 +42,11 @@ export class ProductosComponent implements OnInit {
   // Variable para mantener el formato argentino en el input
   precioCostoInput: string = '';
 
-  constructor(private productosService: ProductosService, private authService: AuthService) {
+  constructor(
+    private productosService: ProductosService, 
+    private authService: AuthService,
+    private logsService: LogsService
+    ) {
     console.log('Componente AppComponent inicializado');
   }
 
@@ -419,6 +425,25 @@ export class ProductosComponent implements OnInit {
           this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
         }
 
+        // Crear el log 
+        const nuevoLog: Log = {
+          id_producto: this.productoEditando!.id,
+          id_user: this.authService.getUserId(),
+          accion: 'actualizacion',
+          date: new Date(),
+          user_admin: this.authService.getIdAdmin()
+        };
+
+        // Agregar log a la base de datos
+        this.logsService.crearLog(nuevoLog).subscribe({
+          next: (logCreado) => {
+            console.log('Log de eliminación creado:', logCreado);
+          },
+          error: (errorLog) => {
+            console.error('Error al crear log de eliminación:', errorLog);
+          }
+        });
+
         this.cancelar();
       },
       error: (error: any) => {
@@ -454,9 +479,34 @@ export class ProductosComponent implements OnInit {
         console.log('Producto eliminado:', response);
         // Remover el producto del array local
         this.productos = this.productos.filter(p => p.id !== this.productoAEliminar!.id);
+
+        // Volver a cargar los productos
+        const idAdmin = this.authService.getIdAdmin();
+        this.cargarProductos(idAdmin);
+
+        // Aplicar todos los filtros
         this.aplicarFiltros();
+
         // Actualizar categorías únicas
         this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
+        // Crear el log usando la interfaz Log
+        const nuevoLog: Log = {
+          id_producto: this.productoAEliminar!.id,
+          id_user: this.authService.getUserId(),
+          accion: 'eliminacion',
+          date: new Date(),
+          user_admin: this.authService.getIdAdmin()
+        };
+        // Agregar log a la base de datos
+        this.logsService.crearLog(nuevoLog).subscribe({
+          next: (logCreado) => {
+            console.log('Log de eliminación creado:', logCreado);
+          },
+          error: (errorLog) => {
+            console.error('Error al crear log de eliminación:', errorLog);
+          }
+        });
+        
         this.cancelarEliminar();
       },
       error: (error: any) => {

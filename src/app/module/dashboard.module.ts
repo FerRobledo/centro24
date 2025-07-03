@@ -36,6 +36,7 @@ import { HomeComponent } from '../componentes/home/home.component';
 import { SelectorClientesComponent } from '../componentes/clientes/selectorClientes/selectorClientes.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
+import { LogsComponent } from '../componentes/logs/logs.component';
 
 @NgModule({
   declarations: [
@@ -59,7 +60,8 @@ import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
     ListaPagosComponent,
     SideMenuComponent,
     HomeComponent,
-    SelectorClientesComponent,  
+    SelectorClientesComponent,
+    LogsComponent,
   ],
   imports: [
     CommonModule,
