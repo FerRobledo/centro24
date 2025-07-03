@@ -1,40 +1,49 @@
 <div class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl bg-clip-border">
   <div class="relative mx-4 mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border" *ngIf="!clicked">
-    <div class="flex justify-between items-start w-full">
-
-      <div class="flex items-start gap-16">
-        <div class="space-y-1">
-          <h3 class="text-lg font-semibold text-slate-800"><i class="fa-solid fa-cash-register"></i> Caja de cobranza</h3>
+   
+    <div class="grid grid-cols-3 gap-5 items-start w-full">
+      <div class="flex justify-start space-y-1">
+        <div>
+          <h3 class="text-lg font-semibold text-slate-800">
+            <i class="fa-solid fa-cash-register"></i> Caja de cobranza
+          </h3>
           <p class="text-slate-500">Listar clientes diarios</p>
         </div>
-
-        <div class="flex items-center justify-between w-[255px]">
-          <button (click)="closeDay()"
-            class="flex select-none items-center gap-2 rounded bg-green-600 py-2 px-2 text-xs font-semibold text-white"
-            type="button">
-            <i class="fa-solid fa-lock"></i>
-            Cerrar caja
-          </button>
-          <div class="flex flex-col items-start">
-            <p class="text-slate-800 font-medium text-sm">
-              Recaudación del día:
-              <br>
-              {{ today | date:'dd/MM/yyyy' }}
-            </p>
-            <input type="text" placeholder="$0.00" [value]="'$' + (collectionDay | number:'1.0-0')"
-              class="text-right border rounded-md px-2 py-1 w-28 text-sm">
-          </div>
+      </div>
+    
+      <div class="flex justify-center items-center gap-5 w-full">
+        <button (click)="closeDay()"
+          class="flex select-none items-center w-28 gap-2 rounded bg-green-600 py-2 px-2 text-xs font-semibold text-white"
+          type="button">
+          <i class="fa-solid fa-lock"></i>
+          Cerrar caja
+        </button>
+        <div class="flex items-center gap-2">
+          <p class="text-slate-500 font-medium text-sm">
+            Recaudación:
+            <br>
+            {{ today | date:'dd/MM/yyyy' }}
+          </p>
+          <input
+            type="text"
+            [value]="(collectionDay > 0) ? ('$' + (collectionDay | number:'1.0-0')) : ''"
+            placeholder="Total diario"
+            class="text-center justify-center border rounded-md px-2 py-1 w-28 text-sm h-[35px]"
+          >
         </div>
       </div>
-
-      <button (click)="handleClick()"
-        class="flex select-none items-center gap-2 rounded bg-green-600 py-2 mr-4 mt-2 px-4 text-xs font-semibold text-white"
-        type="button">
-        <i class="fa-solid fa-user-plus"></i>
-        Agregar cliente
-      </button>
+    
+      <div class="flex justify-end mr-4 mt-2">
+        <button (click)="handleClick()"
+          class="flex select-none items-center gap-2 rounded bg-green-600 py-2 px-4 text-xs font-semibold text-white"
+          type="button">
+          <i class="fa-solid fa-user-plus"></i>
+          Agregar cliente
+        </button>
+      </div>
     </div>
-
+    
+    
   </div>
   <div class="p-0 overflow-y-scroll " *ngIf="!clicked && !isLoading">
     <table class="w-full mt-4 text-left table-auto min-w-max">

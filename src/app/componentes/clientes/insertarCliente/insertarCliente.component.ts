@@ -29,9 +29,7 @@ export class InsertarClienteComponent implements OnInit {
     private authService: AuthService,
     private clientstService: ClientesService,
     @Inject(DIALOG_DATA) public data: any,
-    ) {
-
-  }
+    ) {}
 
   onSubmit() {
     if (this.form.invalid) {
@@ -62,19 +60,17 @@ export class InsertarClienteComponent implements OnInit {
       mesesPagados  //aplano el form y agrego el meses pagados todo el payload
     };
     const idAdmin = this.authService.getIdAdmin();
-
-    if (this.accion=='editar' && this.clientEdit?.id_client) { //existe un cliente para editar y tiene un ID definido??
-
-      this.clientstService.updateClient(this.clientEdit.id_client, idAdmin, payload).subscribe({
+    
+    if (this.accion=='editar' && this.data.client?.id_client) { 
+      this.clientstService.updateClient(this.data.client.id_client, idAdmin, payload).subscribe({
         next: (res) => {
           console.log('Cliente actualizado:', res);
-          console.log("el cliente que se edito fue: ", this.clientEdit);
         },
         error: (err) => {
           console.error('Error al actualizar:', err);
         }
       });
-      this.dialogRef.close("submit");
+      this.dialogRef.close("submit"); //cierro modal
     } else {      
       this.clientstService.postClientDaily(payload, idAdmin).subscribe({
         next: (res) => {
@@ -84,7 +80,7 @@ export class InsertarClienteComponent implements OnInit {
           console.error('Error al registrar:', err);
         }
       });
-      this.dialogRef.close("submit");
+      this.dialogRef.close("submit"); //cierro modal
     }
   }
   
@@ -102,6 +98,7 @@ export class InsertarClienteComponent implements OnInit {
                   
     });
     this.accion=this.data.accion;
+
     if(this.data.client) {
       this.form.setValue({
         tipo: this.data.client.tipo,
@@ -119,5 +116,14 @@ export class InsertarClienteComponent implements OnInit {
 
   asFormControl(control: AbstractControl | null): FormControl {
     return control as FormControl;
+  }
+
+  soloLetras(event: KeyboardEvent): void { //cuando escucha el teclado, solo te deja escribir letras
+    const pattern = /[a-zA-Z\s]/; 
+    const inputChar = String.fromCharCode(event.keyCode || event.which);
+
+    if (!pattern.test(inputChar)) {
+      event.preventDefault(); 
+    }
   }
 }

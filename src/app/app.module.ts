@@ -11,7 +11,6 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { LOCALE_ID } from '@angular/core';
 
-
 export const MONTH_YEAR_FORMATS = {
   parse: {
     dateInput: 'MM/YYYY',
@@ -24,12 +23,11 @@ export const MONTH_YEAR_FORMATS = {
   },
 };
 
-
 @NgModule({
   declarations: [
     AppComponent,
     RegisterComponent,
-    LoginComponent,
+    LoginComponent,  
   ],
   imports: [
     BrowserModule,

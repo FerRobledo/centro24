@@ -13,14 +13,14 @@
       <div class="grid grid-cols-6 gap-4 col-span-full lg:col-span-3">
         <div class="col-span-full sm:col-span-3">
           <label for="tipo" class="text-sm font-medium text-gray-900">Tipo</label>
-          <input type="text" name="tipo" id="tipo" formControlName="tipo" autocomplete="tipo" required
+          <input type="text" name="tipo" id="tipo" formControlName="tipo" autocomplete="tipo" required 
             placeholder="Tipo de cliente"
             class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
         </div>
 
         <div class="col-span-full sm:col-span-3">
           <label for="cliente" class="text-sm font-medium text-gray-900">Cliente</label>
-          <input type="text" name="cliente" id="cliente" formControlName="cliente" placeholder="Nombre del cliente"
+          <input type="text" name="cliente" id="cliente" formControlName="cliente" placeholder="Nombre del cliente" (keypress)="soloLetras($event)"
             class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
         </div>
 
