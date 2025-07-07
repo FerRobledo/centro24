@@ -51,9 +51,15 @@
     </div>
   </div>
 
+  <!-- SI ESTA CARGANDO MUESTRA EL ESTADO DE CARGA -->
+  <ng-container *ngIf="cargando">
+    <div class="flex justify-center items-center h-96">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
+    </div>
+  </ng-container>
     
   <!-- TABLA -->  
-  <div class="w-full flex-1 border border-slate-200 rounded-lg mt-4">
+  <div *ngIf="!cargando" class="w-full flex-1 border border-slate-200 rounded-lg mt-4">
     <div class="overflow-y-auto" style="height: calc(95vh - 115px);">
       <table class="w-full text-center table-fixed min-w-max">
         <!-- Header -->
