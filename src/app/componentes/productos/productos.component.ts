@@ -69,13 +69,15 @@ export class ProductosComponent implements OnInit, OnDestroy {
         this.productosAux = this.productos;
         this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
         console.log('Datos recibidos:', data);
+        this.cargando = false;
       },
       error: (error) => {
         console.error('Error al obtener productos:', error);
+        this.cargando = false;
       },
       complete: () => {
-        this.cargando = false;
         console.log('Solicitud completada');
+        console.log('En complete, cargando =', this.cargando); 
       }
     });
   }
