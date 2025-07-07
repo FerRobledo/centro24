@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { MatTableDataSource } from '@angular/material/table';
@@ -11,13 +11,15 @@ import { UsuarioModalComponent } from '../usuarioModal/UsuarioModal.component';
   templateUrl: './usuarios.component.html',
   styleUrls: ['./usuarios.component.css']
 })
-export class UsuariosComponent implements OnInit {
+export class UsuariosComponent implements OnInit, OnDestroy {
 
   constructor(
     private usuarioService: UsuarioService,
     private authService: AuthService,
     public dialog: MatDialog,
-  ) { }
+  ) { 
+    console.log("usuarios component");
+  }
 
   filtroUsuarios = new MatTableDataSource();
   usuarios: Usuario[] = []
@@ -25,6 +27,9 @@ export class UsuariosComponent implements OnInit {
 
   ngOnInit() {
     this.cargarUsuarios();
+  }
+  ngOnDestroy(): void {
+    this.dialog.closeAll();
   }
 
   cargarUsuarios() {

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { SheetsService } from 'src/app/services/sheets.service';
 import { ModalCargaProductosComponent } from '../modalCargaProductos/modalCargaProductos.component';
@@ -13,7 +13,7 @@ import { map } from 'rxjs/operators';
   templateUrl: './cargaProductos.component.html',
   styleUrls: ['./cargaProductos.component.css']
 })
-export class CargaProductosComponent implements OnInit {
+export class CargaProductosComponent implements OnInit, OnDestroy {
 
   constructor(
     private sheetsService: SheetsService,
@@ -30,6 +30,9 @@ export class CargaProductosComponent implements OnInit {
     this.sheetsService.cargarHojas();
   }
 
+  ngOnDestroy() {
+    this.dialog.closeAll();
+  }
 
   hojasForm() {
     const dialogRef = this.dialog.open(ModalCargaProductosComponent, {
@@ -80,7 +83,6 @@ export class CargaProductosComponent implements OnInit {
 
             this.productosService.addAllProductos(this.productos).subscribe({
               complete: () => {
-                console.log('Todos los productos fueron procesados');
                 this.cargaFinalizada.emit();
               },
               error: err => {

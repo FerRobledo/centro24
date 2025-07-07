@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { CobranzaService } from 'src/app/services/cobranza.service';
-import { ViewChild } from '@angular/core';
 import { RegisterClienteComponent } from 'src/app/componentes/cobranza/registerCliente/registerCliente.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-cobranza',
@@ -10,93 +10,89 @@ import { RegisterClienteComponent } from 'src/app/componentes/cobranza/registerC
   styleUrls: ['./cobranza.component.css']
 })
 export class CobranzaComponent implements OnInit {
-  @ViewChild(RegisterClienteComponent) registerClienteComp!: RegisterClienteComponent;
-
   public clientEdit: any = null;
   clientsOfDay: any[] = [];
-  clicked = false;
   collectionDay = -1;
-  collectionClosed = false;
   today: Date = new Date();
-  isLoading: Boolean = true;
+  isLoadingCobranza!: Boolean;
 
-  constructor(private cobranzaService: CobranzaService, private authService: AuthService) {
-    
+  constructor(
+    private cobranzaService: CobranzaService,
+    private authService: AuthService,
+    public dialog: MatDialog,
+
+  ) {
+    console.log("cobranza component");
   }
 
   ngOnInit() {
+    this.isLoadingCobranza = true;
+    this.clientsOfDay = [];
     this.loadClientsDaily();
   }
 
-  handleClick() {
-    this.clicked = true;
-  }
-
-  public closeDay(){
-    this.collectionClosed = true;
-    
+  public closeDay() {
     const id = this.authService.getIdAdmin();
-    if(id) {
+    if (id) {
       this.cobranzaService.closeClientsOfDay(id).subscribe({
         next: (data) => {
           this.collectionDay = data.total;
-          console.log("La recaudacion del dia fue: ", this.collectionDay);
         },
         error: (error) => {
           console.log("Error en el calculo de recaudacion: ", error)
         },
-        complete: () => 
-          console.log("El calculo fue exitoso")
       })
     }
   }
 
-  private loadClientsDaily() {
+  public loadClientsDaily() {
     const id = this.authService.getIdAdmin();
-    this.isLoading = true;
+    this.isLoadingCobranza = true;
 
     if (id) {
       this.cobranzaService.getClientsOfDay(id).subscribe({
         next: (data) => {
           this.clientsOfDay = data;
-          this.isLoading = false;
-          console.log("Los clientes son: ", data);
+          this.isLoadingCobranza = false;
         },
         error: (error) => {
           console.log("Error en el pedido de clientes del dia: ", error);
-          this.isLoading = false;
+          this.isLoadingCobranza = false;
         },
-        complete: () => {
-          this.isLoading = false;
-          console.log("Pedido en estado OK");
-        }
       })
     }
   }
 
   public updateClient(client: any) {
     this.clientEdit = client;
-    this.clicked = true;
   }
 
-  public deleteClient(client: any){
+  public deleteClient(client: any) {
     const idClient = client.id;
     const idAdmin = this.authService.getIdAdmin();
-    if(idAdmin){
+    if (idAdmin) {
       this.cobranzaService.deleteClient(idAdmin, idClient).subscribe({
-        next: (data) => {
-          const resp = data as { success: boolean; deletedId: number }; //se hace en dos pasos pq typescript no confia como devuelvan el objeto data
-          console.log("El id del cliente eliminado es: ", resp.deletedId); //no permite data.atributo
-          this.ngOnInit(); 
+        next: () => {
+          this.loadClientsDaily();
         },
         error: (error) => {
           console.log("Error en la eliminacion del cliente: ", error)
         },
-        complete: () => {
-          console.log("Pedido en estado OK"); 
-        }
       })
     }
   }
+
+  nuevaCobranza() {
+    const dialogRef = this.dialog.open(RegisterClienteComponent, {
+      maxWidth: '100%',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'submit') {
+        this.loadClientsDaily();
+      }
+    });
+  }
+
 }
 

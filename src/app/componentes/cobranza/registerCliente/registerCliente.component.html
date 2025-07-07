@@ -1,4 +1,4 @@
-<div class="flex w-[75vw] h-[90vh] mt-6 mb-7 overflow-y-auto overflow-x-hidden">
+<div class="flex w-[75vw] h-[90vh] mt-6 mb-7 overflow-y-auto">
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="container flex flex-col mx-auto space-y-12">
     <fieldset class="grid grid-cols-4 gap-6 p-6 rounded-md shadow-sm bg-white">
       <div class="space-y-2 col-span-full lg:col-span-1 justify-center ">
@@ -69,7 +69,7 @@
             {{ editMode ? 'Guardar cambios' : 'Crear cliente' }}
           </button>
 
-          <button type="button" (click)="onCancel()"
+          <button type="button"
             class="w-20 rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">
             Cancelar
           </button>

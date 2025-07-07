@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { CobranzaService } from '../../../services/cobranza.service';
 import { CobranzaComponent } from '../cobranza.component';
 import { OnChanges, SimpleChanges } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 
 
 @Component({
@@ -13,29 +14,17 @@ import { OnChanges, SimpleChanges } from '@angular/core';
 })
 export class RegisterClienteComponent implements OnInit {
   //emite eventos
-  @Output() closeForm = new EventEmitter<void>();
+  @Output() loadClientes = new EventEmitter<void>();
   @Input() clientEdit: any;
   editMode = false;
-  form: FormGroup;
+  form!: FormGroup;
 
   constructor(
+    public dialogRef: MatDialogRef<RegisterClienteComponent>,
     private fb: FormBuilder,
     private cobranzaService: CobranzaService,
     private authService: AuthService,
-    private cobranzaComponent: CobranzaComponent
   ) {
-    this.form = this.fb.group({
-      detalle: ['', Validators.required],
-      efectivo: [],
-      debito: [],
-      credito: [],
-      transferencia: [],
-      cheque: [],
-      retiro: [],
-      observacion: [''],
-      gasto: [],
-    });
-
   }
 
   //se dispara automáticamente cuando cambia un @Input() en algun hijo.
@@ -55,10 +44,6 @@ export class RegisterClienteComponent implements OnInit {
         gasto: this.clientEdit.gasto
       });
     }
-  }
-
-  onCancel() {
-    this.closeForm.emit();
   }
 
   onSubmit() {
@@ -82,15 +67,11 @@ export class RegisterClienteComponent implements OnInit {
     const payload = this.form.value;
     const idAdmin = this.authService.getIdAdmin();
 
-    if (this.editMode && this.clientEdit?.id) {      
+    if (this.editMode && this.clientEdit?.id) {
       this.cobranzaService.updateClient(this.clientEdit.id, idAdmin, payload).subscribe({
-        next: (res) => {
-          console.log('Cliente actualizado:', res);
-          this.closeForm.emit();
+        next: () => {
           this.form.reset();
-          //this.clientEdit = null;
-          console.log("el cliente que se edito fue: ", this.clientEdit);
-          this.cobranzaComponent.ngOnInit();
+          this.loadClientes.emit();
         },
         error: (err) => {
           console.error('Error al actualizar:', err);
@@ -99,9 +80,7 @@ export class RegisterClienteComponent implements OnInit {
     } else {
       this.cobranzaService.postClientDaily(payload, idAdmin).subscribe({
         next: (res) => {
-          console.log('Cliente registrado:', res);
-          this.closeForm.emit();
-          this.cobranzaComponent.ngOnInit();          
+          this.loadClientes.emit();
         },
         error: (err) => {
           console.error('Error al registrar:', err);
@@ -111,5 +90,17 @@ export class RegisterClienteComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.form = this.fb.group({
+      detalle: ['', Validators.required],
+      efectivo: [],
+      debito: [],
+      credito: [],
+      transferencia: [],
+      cheque: [],
+      retiro: [],
+      observacion: [''],
+      gasto: [],
+    });
+
   }
 }
