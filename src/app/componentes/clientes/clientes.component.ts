@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
@@ -10,20 +10,26 @@ import { InsertarClienteComponent } from './insertarCliente/insertarCliente.comp
   templateUrl: './clientes.component.html',
   styleUrls: ['./clientes.component.css']
 })
-export class ClientesComponent implements OnInit {
+export class ClientesComponent implements OnInit, OnDestroy {
   clientsOfMonth: any[] = [];
   months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   payThisMonth: { [id: number]: any } = {};
   isLoading: Boolean = true;
- 
+
   constructor(
     public clientesService: ClientesService,
     private authService: AuthService,
     public dialog: MatDialog,
-  ) { };
+  ) {
+    console.log("clientes component")
+  };
 
   ngOnInit() {
     this.loadClientsMonthly();
+  }
+
+  ngOnDestroy(): void {
+    this.dialog.closeAll();
   }
 
   loadClientsMonthly() {
@@ -34,8 +40,6 @@ export class ClientesComponent implements OnInit {
         next: (data) => {
           //si hay data entonces hago un .add
           this.clientsOfMonth = data;
-          this.isLoading = false;
-          console.log("Los clientes son: ", data);
         },
         error: (error) => {
           this.isLoading = false;
@@ -43,7 +47,6 @@ export class ClientesComponent implements OnInit {
         },
         complete: () => {
           this.isLoading = false;
-          console.log("Pedido en estado OK");
         }
       })
     }
@@ -52,13 +55,11 @@ export class ClientesComponent implements OnInit {
   agregarCliente() {
     const dialogRef = this.dialog.open(InsertarClienteComponent, {
       maxWidth: '100%',
-      data: {accion:"agregar"},
+      data: { accion: "agregar" },
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result == 'submit'){
-        console.log("llega a entrar aca cuando agrego un cliente?");
-        
+      if (result == 'submit') {
         this.loadClientsMonthly();
       }
     });
@@ -78,11 +79,11 @@ export class ClientesComponent implements OnInit {
   }
 
   soloLetras(event: KeyboardEvent): void { //cuando escucha el teclado, solo te deja escribir letras
-    const pattern = /[a-zA-Z\s]/; 
+    const pattern = /[a-zA-Z\s]/;
     const inputChar = String.fromCharCode(event.keyCode || event.which);
 
     if (!pattern.test(inputChar)) {
-      event.preventDefault(); 
+      event.preventDefault();
     }
   }
 }

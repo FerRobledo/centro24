@@ -39,7 +39,6 @@ const routes: Routes = [
         component: NotFoundComponent,
       }
     ],
-    canActivate: [authGuard]
   },
 ];
 

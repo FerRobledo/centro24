@@ -126,7 +126,6 @@ export class EstadisticasComponent implements OnInit {
       this.estadisticasService.getCollectionYesterday(id).subscribe({
         next: (data) => {
           this.collectionYesterday = data;
-          this.isLoading = false;
           console.log("El total de usuarios de este admin es de: ", data);
         },
         error: (error) => {
@@ -135,7 +134,6 @@ export class EstadisticasComponent implements OnInit {
         },
         complete: () => {
           this.isLoading = false;
-          console.log("Pedido en estado OK");
         }
       })
     }

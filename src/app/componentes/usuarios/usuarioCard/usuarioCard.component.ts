@@ -17,14 +17,14 @@ export class UsuarioCardComponent implements OnInit {
   ) { }
   @Input() usuario: Usuario = newUsuario();
   roles: Rol[] = [];
-  cargando: boolean = false;
+  cargandoCardUsuario: boolean = false;
 
   ngOnInit() {
     this.roles = this.rolService.getRoles();
   }
 
   onTogglePermiso(rol: Rol, event: boolean) {
-    this.cargando = true;
+    this.cargandoCardUsuario = true;
 
     if (event) {
       const yaTieneRol = this.usuario.roles.some(r => r.id === rol.id);
@@ -37,7 +37,7 @@ export class UsuarioCardComponent implements OnInit {
 
     this.userService.editUsuario(this.usuario).subscribe({
       error: error => console.log(error),
-      complete: () => this.cargando = false,
+      complete: () => this.cargandoCardUsuario = false,
     });
   }
 
@@ -46,7 +46,7 @@ export class UsuarioCardComponent implements OnInit {
   }
 
   eliminarUsuario(){
-    this.cargando = true;
+    this.cargandoCardUsuario = true;
     this.userService.eliminarUsuario(this.usuario).subscribe({
       next: () => location.reload(),
       error: error => console.log(error),

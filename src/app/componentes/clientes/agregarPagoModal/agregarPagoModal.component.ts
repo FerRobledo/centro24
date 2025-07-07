@@ -87,8 +87,6 @@ export class AgregarPagoModalComponent implements OnInit {
     };
 
     const adminId = this.authService.getIdAdmin();
-
-    console.log(pagoData);
     
     this.clientesService.asignarPago(adminId, pagoData).subscribe({
       error: (error: any) => console.log(error),

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ConfirmDialogComponent } from '../confirmDialog/confirmDialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from 'src/app/services/auth.service';
@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   templateUrl: './sideMenu.component.html',
   styleUrls: ['./sideMenu.component.css']
 })
-export class SideMenuComponent implements OnInit {
+export class SideMenuComponent implements OnInit, OnDestroy {
 
   constructor(
     private dialog: MatDialog,
@@ -50,8 +50,12 @@ export class SideMenuComponent implements OnInit {
     this.nameUserCurrent = this.authService.getUserName();
   }
 
+  ngOnDestroy(): void {
+    this.dialog.closeAll();
+  }
+
   filtrarSecciones() {
-    if(this.roles.includes('Admin')){
+    if (this.roles.includes('Admin')) {
       this.seccionesDisponibles = this.secciones;
     } else {
       this.seccionesDisponibles = this.secciones.filter(seccion =>

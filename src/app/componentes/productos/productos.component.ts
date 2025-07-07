@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ProductosService } from 'src/app/services/productos.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -21,7 +21,7 @@ interface AddProductoResponse {
   styleUrls: ['./productos.component.css'],
 })
 
-export class ProductosComponent implements OnInit {
+export class ProductosComponent implements OnInit, OnDestroy {
   productos: ProductoDTO[] = [];
   productosFiltrados: ProductoDTO[] = [];
   productosAux: ProductoDTO[] = [];
@@ -53,6 +53,10 @@ export class ProductosComponent implements OnInit {
   ngOnInit() {
     const idAdmin = this.authService.getIdAdmin();
     this.cargarProductos(idAdmin);
+  }
+
+  ngOnDestroy(): void {
+    console.log("destroy productos")
   }
 
   cargarProductos(idAdmin: number) {
