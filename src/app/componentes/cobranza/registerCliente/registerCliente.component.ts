@@ -1,10 +1,11 @@
-import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, EventEmitter, Output, Input, Inject } from '@angular/core';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { CobranzaService } from '../../../services/cobranza.service';
 import { CobranzaComponent } from '../cobranza.component';
 import { OnChanges, SimpleChanges } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
+import { DIALOG_DATA } from '@angular/cdk/dialog';
 
 
 @Component({
@@ -16,7 +17,8 @@ export class RegisterClienteComponent implements OnInit {
   //emite eventos
   @Output() loadClientes = new EventEmitter<void>();
   @Input() clientEdit: any;
-  editMode = false;
+  accion: string = '';
+  //editMode = false;
   form!: FormGroup;
 
   constructor(
@@ -24,26 +26,8 @@ export class RegisterClienteComponent implements OnInit {
     private fb: FormBuilder,
     private cobranzaService: CobranzaService,
     private authService: AuthService,
+    @Inject(DIALOG_DATA) public data: any,
   ) {
-  }
-
-  //se dispara automáticamente cuando cambia un @Input() en algun hijo.
-  //si se cambio la variable hago update de lo nuevo que se cambio en el form
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['clientEdit'] && this.clientEdit) {
-      this.editMode = true;
-      this.form.patchValue({
-        detalle: this.clientEdit.detalle ?? '',
-        efectivo: this.clientEdit.efectivo,
-        debito: this.clientEdit.debito,
-        credito: this.clientEdit.credito,
-        transferencia: this.clientEdit.transferencia,
-        cheque: this.clientEdit.cheque,
-        retiro: this.clientEdit.retiro,
-        observacion: this.clientEdit.observacion ?? '',
-        gasto: this.clientEdit.gasto
-      });
-    }
   }
 
   onSubmit() {
@@ -58,7 +42,6 @@ export class RegisterClienteComponent implements OnInit {
 
     camposNumericos.forEach((campo: string) => {
       const control = this.form.get(campo);
-      //si control existe, devolveme su .value, si no existe (null o undefined), devolveme undefined y no rompas el programa
       if (control?.value === null) { //si mi campo coincide con el string, pregunto si es null y si lo es seteo (0)
         control?.setValue(0);
       }
@@ -67,25 +50,20 @@ export class RegisterClienteComponent implements OnInit {
     const payload = this.form.value;
     const idAdmin = this.authService.getIdAdmin();
 
-    if (this.editMode && this.clientEdit?.id) {
-      this.cobranzaService.updateClient(this.clientEdit.id, idAdmin, payload).subscribe({
-        next: () => {
-          this.form.reset();
-          this.loadClientes.emit();
-        },
+    if (this.accion == 'editar' && this.data.client?.id_client) {
+      this.cobranzaService.updateClient(this.data.client.id_client, idAdmin, payload).subscribe({
         error: (err) => {
           console.error('Error al actualizar:', err);
         }
       });
+      this.dialogRef.close("submit"); //cierro modal
     } else {
       this.cobranzaService.postClientDaily(payload, idAdmin).subscribe({
-        next: (res) => {
-          this.loadClientes.emit();
-        },
         error: (err) => {
           console.error('Error al registrar:', err);
         }
       });
+      this.dialogRef.close("submit"); //cierro modal
     }
   }
 
@@ -101,6 +79,27 @@ export class RegisterClienteComponent implements OnInit {
       observacion: [''],
       gasto: [],
     });
+    this.accion = this.data.accion;
+    if (this.data.client) {
+      this.form.setValue({
+        detalle: this.data.client.detalle,
+        efectivo: this.data.client.efectivo,
+        debito: this.data.client.debito,
+        credito: this.data.client.credito,
+        transferencia: this.data.client.transferencia,
+        cheque: this.data.client.cheque,
+        retiro: this.data.client.retiro,
+        observacion: this.data.client.observacion,
+        gasto: this.data.client.gasto,
+      })
+    }
+  }
 
+  onCancel() {
+    this.dialogRef.close("cerrado");
+  }
+
+  asFormControl(control: AbstractControl | null): FormControl {
+    return control as FormControl;
   }
 }
