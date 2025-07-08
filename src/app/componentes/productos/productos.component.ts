@@ -594,5 +594,4 @@ export class ProductosComponent implements OnInit, OnDestroy {
       event.target.value = this.precioCostoInput;
     }
   }
-
 }

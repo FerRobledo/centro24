@@ -5,7 +5,8 @@
         <div class="w-16 h-16 rounded-2xl bg-green-600 flex items-center justify-center">
           <i class="fa-solid fa-user-plus text-2xl text-white"></i>
         </div>
-        <h6 class="text-lg font-bold text-gray-900">{{ editMode ? 'Edite al cliente:' : 'Registre un nuevo cliente:' }}</h6>
+        <h6 class="text-lg font-bold text-gray-900">{{ accion=='editar' ? 'Edite cliente mensual' : 'Registre un nuevo cliente mensual' }}
+        </h6>
       </div>
 
       <div class="grid grid-cols-6 gap-4 col-span-full lg:col-span-3">
@@ -64,14 +65,13 @@
         </div>
 
         <div class="col-span-full flex gap-4 mt-4">
-          <button type="submit"
-            class="w-28 rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">
-            {{ editMode ? 'Guardar cambios' : 'Crear cliente' }}
-          </button>
-
-          <button type="button"
+          <button type="button" (click)="onCancel()"
             class="w-20 rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">
             Cancelar
+          </button>
+          <button type="submit"
+            class="w-28 rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">
+            {{ accion=='editar' ? 'Guardar cambios' : 'Crear usuario' }}
           </button>
         </div>
       </div>
