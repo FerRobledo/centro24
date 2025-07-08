@@ -34,10 +34,6 @@ const routes: Routes = [
         path: 'clientes',
         component: ClientesComponent
       },
-      {
-        path: '**',
-        component: NotFoundComponent,
-      }
     ],
   },
 ];

@@ -2,7 +2,6 @@ import { DIALOG_DATA } from '@angular/cdk/dialog';
 import { Component, EventEmitter, Inject, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
 import * as _moment from 'moment';
@@ -20,7 +19,6 @@ export class AgregarPagoModalComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private clientesService: ClientesService,
-    private router: Router,
     @Inject(DIALOG_DATA) public clientes: any[] = []
   ) { }
 
