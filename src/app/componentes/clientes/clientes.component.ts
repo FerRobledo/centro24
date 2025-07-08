@@ -25,6 +25,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit() {
+    this.clientsOfMonth = [];
     this.loadClientsMonthly();
   }
 

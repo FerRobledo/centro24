@@ -15,6 +15,7 @@ export class CobranzaComponent implements OnInit {
   collectionDay = -1;
   today: Date = new Date();
   isLoadingCobranza!: Boolean;
+  
 
   constructor(
     private cobranzaService: CobranzaService,
