@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Observable, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { EstadisticasService } from 'src/app/services/estadisticas.service';
-
 
 @Component({
   selector: 'app-estadisticas',
@@ -15,127 +16,52 @@ export class EstadisticasComponent implements OnInit {
   newClients:number = 0;
   cantUsersByAdmin:number = 0;
   collectionYesterday:number = 0;
-  isLoading:Boolean = true;
+  isLoading: boolean = true; 
 
-  constructor(private estadisticasService: EstadisticasService, private authService: AuthService) { }
+  private dialogRef: MatDialogRef<any> | null = null; //aca 
+  private subscriptions: Subscription = new Subscription();
+
+  constructor(private estadisticasService: EstadisticasService, private authService: AuthService, public dialog: MatDialog, private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
-    this.loadPreviousMonth();
-    this.loadCurrentMonth();
-    this.loadClients();
-    this.loadNewClients();
-    this.loadCantUsersByAdmin();
-    this.collectionOfYesterday();
+    this.loadData(this.estadisticasService.getStatsPreviousMonth, 'collectionPreviousMonth');
+    this.loadData(this.estadisticasService.getStatsCurrenMonth, 'collectionCurrentMonth');
+    this.loadData(this.estadisticasService.getClients, 'cantClients');
+    this.loadData(this.estadisticasService.getNewClients, 'newClients');
+    this.loadData(this.estadisticasService.getUsersByAdmin, 'cantUsersByAdmin');
+    this.loadData(this.estadisticasService.getCollectionYesterday, 'collectionYesterday', true);
   }
 
-  loadPreviousMonth() {
-    const id = this.authService.getIdAdmin();
+  loadData(servicio: (id: number) => Observable<number>, propiedad: string, usarLoading: boolean = false) {
+  const id = this.authService.getIdAdmin();
     if (id) {
-      this.estadisticasService.getStatsPreviousMonth(id).subscribe({
+      if (usarLoading) this.isLoading = true;
+      this.cdr.detectChanges(); //revisá este componente ya mismo por si hay algo que cambió y actualizá el HTML.
+      servicio.call(this.estadisticasService, id).subscribe({ //llamo al servicio dependiendo el que me llegue
         next: (data) => {
-          this.collectionPreviousMonth = data;
-          console.log("El total recaudado del mes anterior es de: ", data);
+          (this as any)[propiedad] = data;
+          this.cdr.detectChanges();
         },
         error: (error) => {
-          console.log("Error en el pedido de la recaudacion del mes anterior: ", error);
+          console.log("Error en el pedido de", propiedad, ":", error);
+          if (usarLoading) this.isLoading = false;
+          this.cdr.detectChanges();
         },
         complete: () => {
           console.log("Pedido en estado OK");
+          if (usarLoading) this.isLoading = false;
+          this.cdr.detectChanges();
         }
-      })
+      });
     }
   }
 
-  loadCurrentMonth() {
-    const id = this.authService.getIdAdmin();
-    if(id) {
-      this.estadisticasService.getStatsCurrenMonth(id).subscribe({
-        next: (data) => {
-          this.collectionCurrentMonth = data;
-          console.log("El total recaudado del mes actual es de: ", data);
-        },
-        error: (error) => {
-          console.log("Error en el pedido de recaudacion del mes: ", error);
-          
-        },
-        complete: () => {
-          console.log("Pedido en estado OK");
-        }
-      })
+  ngOnDestroy() {
+    if (this.dialogRef) {
+      this.dialogRef.close();
+      this.dialogRef = null;
     }
-  }
-
-  loadClients() {
-    const id = this.authService.getIdAdmin();
-    if(id) {
-      this.estadisticasService.getClients(id).subscribe({
-        next: (data) => {
-          this.cantClients = data;
-          console.log("El total de clientes es: ", data);
-        },
-        error: (error) => {
-          console.log("Error en el pedido del total de clientes: ", error);
-        },
-        complete: () => {
-          console.log("Pedido en estado OK");
-        }
-      })
-    }
-  }
-
-  loadNewClients(){
-    const id = this.authService.getIdAdmin();
-    if(id) {
-      this.estadisticasService.getNewClients(id).subscribe({
-        next: (data) => {
-          this.newClients = data;
-          console.log("El total de nuevos clientes es: ", data);
-        },
-        error: (error) => {
-          console.log("Error en el pedido de nuevos clientes del mes: ", error);
-        },
-        complete: () => {
-          console.log("Pedido en estado OK");
-        }
-      })
-    }
-  }
-
-  loadCantUsersByAdmin(){
-    const id =this.authService.getIdAdmin();
-    if(id){
-      this.estadisticasService.getUsersByAdmin(id).subscribe({
-        next: (data) => {
-          this.cantUsersByAdmin = data;
-          console.log("El total de usuarios de este admin es de: ", data);
-        },
-        error: (error) => {
-          console.log("Error en el pedido de users: ", error);
-        },
-        complete: () => {
-          console.log("Pedido en estado OK");
-        }
-      })
-    }
-  }
-
-  collectionOfYesterday(){ //preloader en la ultima card asi epsero que carguen todos
-    const id= this.authService.getIdAdmin();
-    this.isLoading = true;
-    if(id) {
-      this.estadisticasService.getCollectionYesterday(id).subscribe({
-        next: (data) => {
-          this.collectionYesterday = data;
-          console.log("El total de usuarios de este admin es de: ", data);
-        },
-        error: (error) => {
-          this.isLoading = false;
-          console.log("Error en el pedido de users: ", error);
-        },
-        complete: () => {
-          this.isLoading = false;
-        }
-      })
-    }
+    this.dialog.closeAll(); //cierra todos los diálogos al destruir el componente
+    this.subscriptions.unsubscribe(); //limpia todas las suscripciones
   }
 }
