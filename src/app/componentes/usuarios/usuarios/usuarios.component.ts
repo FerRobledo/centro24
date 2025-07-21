@@ -20,7 +20,6 @@ export class UsuariosComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private cdr: ChangeDetectorRef,
   ) {
-    console.log("usuarios component");
   }
 
   private subscriptions: Subscription = new Subscription();
