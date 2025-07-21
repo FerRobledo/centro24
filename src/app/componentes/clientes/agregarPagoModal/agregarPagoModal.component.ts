@@ -54,9 +54,10 @@ export class AgregarPagoModalComponent implements OnInit {
     return fechaDesde <= fechaHasta ? null : { fechasInvalidas: true };
   }
 
-  formatearMesAnio(fecha: Date) {
-    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-    const anio = fecha.getFullYear();
+  formatearMesAnio(fecha: Date | string) {
+    const fechaObj = (fecha instanceof Date) ? fecha : new Date(fecha);
+    const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
+    const anio = fechaObj.getFullYear();
     return `${anio}-${mes}-1`;
   }
 

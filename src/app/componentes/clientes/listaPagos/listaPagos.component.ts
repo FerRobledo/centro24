@@ -1,4 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AuthService } from 'src/app/services/auth.service';
+import { ClientesService } from 'src/app/services/clientes.service';
 
 @Component({
   selector: 'app-listaPagos',
@@ -7,22 +9,41 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class ListaPagosComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private clienteService: ClientesService,
+    private authService: AuthService,
+  ) { }
+
   @Input() clientes: any = [];
   listaPagos: any[] = [];
+  @Output() loadClientsMonthly = new EventEmitter<void>();
+  eliminandoPagoId: number | null = null; // guarda el id del pago que está siendo eliminado
 
   ngOnInit() {
-    console.log(this.listaPagos);
     this.generarListaPagos();
   }
 
   generarListaPagos() {
     this.clientes.forEach((cliente: any) => {
       cliente.pagos.forEach((pago: any) => {
-        pago = {...pago, cliente: cliente.cliente}
+        pago = { ...pago, cliente: cliente.cliente }
         this.listaPagos.push(pago);
       });
     });
-    console.log(this.listaPagos);
+  }
+
+  deletePago(pago: any) {
+    this.eliminandoPagoId = pago.id;
+    const idAdmin = this.authService.getIdAdmin();
+    this.clienteService.deletePago(idAdmin, pago).subscribe({
+      next: () => {
+        this.eliminandoPagoId = null;
+        this.loadClientsMonthly.emit();
+      },
+      error: (error) => {
+        console.log(error);
+        this.eliminandoPagoId = null;
+      },
+    });
   }
 }
