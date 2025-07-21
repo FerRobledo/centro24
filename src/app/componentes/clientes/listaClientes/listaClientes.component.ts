@@ -27,6 +27,7 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
   @Input() clientsOfMonth: any[] = [];
   clicked: Boolean = false;
   clientEdit: any = null;
+  eliminandoClienteId: number | null = null;
 
   public updateClient(client: any) {
     const dialogRef = this.dialog.open(InsertarClienteComponent, {
@@ -42,14 +43,17 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
   }
 
   public deleteClient(client: any) {
+    this.eliminandoClienteId = client.id_client;
     const idClient = client.id_client;
     const idAdmin = this.authService.getIdAdmin();
     if (idAdmin) {
       this.clientesService.deleteClient(idAdmin, idClient).subscribe({
         next: () => {
+          this.eliminandoClienteId = null;
           this.loadClientsMonthly.emit();
         },
         error: (error) => {
+          this.eliminandoClienteId = null;
           console.log("Error en la eliminacion del cliente: ", error)
         },
       })

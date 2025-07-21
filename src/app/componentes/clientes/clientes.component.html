@@ -20,8 +20,8 @@
           <div class="form-group mt-[7px] mr-4">
             <div class="flex items-center border border-gray-300 rounded px-2 bg-white">
               <i class="fa fa-search text-gray-500 mr-2"></i>
-              <input type="text" class="flex-1 h-8 outline-none py-2 bg-transparent" placeholder="Filtrar" name="filtrar"
-                [(ngModel)]="clientesService.filtroCliente" (keypress)="soloLetras($event)" />
+              <input type="text" class="flex-1 h-8 outline-none py-2 bg-transparent" placeholder="Filtrar"
+                name="filtrar" [(ngModel)]="clientesService.filtroCliente" (keypress)="soloLetras($event)" />
             </div>
           </div>
         </form>
@@ -49,7 +49,8 @@
             class="flex-1 overflow-auto"></app-listaClientes>
         </mat-tab>
         <mat-tab label="Pagos" class="flex flex-col h-full">
-          <app-listaPagos [clientes]="clientsOfMonth" class="flex-1 overflow-auto"></app-listaPagos>
+          <app-listaPagos [clientes]="clientsOfMonth" (loadClientsMonthly)="loadClientsMonthly()" class="flex-1
+            overflow-auto"></app-listaPagos>
         </mat-tab>
       </mat-tab-group>
     </ng-template>

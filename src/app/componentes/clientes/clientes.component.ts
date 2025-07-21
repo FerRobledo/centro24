@@ -24,7 +24,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     public dialog: MatDialog,
     private cdr: ChangeDetectorRef // inyecto ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadClientsMonthly();
@@ -36,39 +36,36 @@ export class ClientesComponent implements OnInit, OnDestroy {
       this.dialogRef = null;
     }
     this.dialog.closeAll();
-    this.subscriptions.unsubscribe(); 
+    this.subscriptions.unsubscribe();
   }
 
   loadClientsMonthly() {
     const idAdmin = this.authService.getIdAdmin();
-    this.isLoading = true;
-    this.cdr.detectChanges(); // fuerza el preloader a mostrarse
-
-    if (idAdmin) {
-      this.subscriptions.add(
-        this.clientesService.getClientsOfMonth(idAdmin).subscribe({
-          next: (data) => {
-            console.log("Datos recargados en Clientes:", data);
-            this.clientsOfMonth = data;
-            this.isLoading = false;
-            this.cdr.detectChanges(); //forzamos la actualización tras recargar
-          },
-          error: (error) => {
-            console.log("Error en el pedido de clientes del dia: ", error);
-            this.isLoading = false;
-            this.cdr.detectChanges(); 
-          },
-          complete: () => {
-            this.isLoading = false;
-            this.cdr.detectChanges();
-          }
-        })
-      );
-    } else {
+    if (!idAdmin) {
       this.clientsOfMonth = [];
       this.isLoading = false;
-      this.cdr.detectChanges();
+      return;
     }
+
+    this.isLoading = true;
+    this.cdr.detectChanges(); // para mostrar loader inmediatamente
+
+    this.subscriptions.add(
+      this.clientesService.getClientsOfMonth(idAdmin).subscribe({
+        next: (data) => {
+          console.log("Datos recargados en Clientes:", data);
+          this.clientsOfMonth = data;
+        },
+        error: (error) => {
+          console.error("Error en el pedido de clientes del día: ", error);
+          this.clientsOfMonth = [];
+        },
+        complete: () => {
+          this.isLoading = false;
+          this.cdr.detectChanges(); // actualiza UI al terminar o error
+        }
+      })
+    );
   }
 
   agregarCliente() {
@@ -80,7 +77,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
     });
 
     this.dialogRef.afterClosed().subscribe(result => {
-      if(result == 'submit'){
+      if (result == 'submit') {
         this.resetComponent();
       }
       this.dialogRef = null;
@@ -97,7 +94,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
     this.dialogRef.afterClosed().subscribe(result => {
       this.dialogRef = null;
-      if(result?.evento == 'pagoCreado'){
+      if (result?.evento == 'pagoCreado') {
         this.resetComponent();
       }
     });
@@ -118,7 +115,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.loadClientsMonthly();
   }
 
-  detectChanges(){
+  detectChanges() {
     this.cdr.detectChanges();
   }
 }
