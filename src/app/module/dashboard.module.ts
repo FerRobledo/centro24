@@ -24,8 +24,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AgregarPagoModalComponent } from '../componentes/clientes/agregarPagoModal/agregarPagoModal.component';
 import { ListaClientesComponent } from '../componentes/clientes/listaClientes/listaClientes.component';
 import { ListaPagosComponent } from '../componentes/clientes/listaPagos/listaPagos.component';
-import { MatMomentDateModule } from '@angular/material-moment-adapter';
-import { MatOptionModule, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
@@ -39,6 +37,19 @@ import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
 import { LogsComponent } from '../componentes/logs/logs.component';
 import { ConfirmarDeleteComponent } from '../componentes/productos/confirmar-delete/confirmar-delete.component';
 import { ProductFormComponent } from '../componentes/productos/product-form/product-form.component';
+import { MatOptionModule, MatNativeDateModule, NativeDateAdapter, DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
+
+export const MONTH_YEAR_FORMATS = {
+  parse: {
+    dateInput: 'MM/YYYY',
+  },
+  display: {
+    dateInput: 'MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 @NgModule({
   declarations: [
@@ -66,7 +77,6 @@ import { ProductFormComponent } from '../componentes/productos/product-form/prod
     LogsComponent,
     ConfirmarDeleteComponent,
     ProductFormComponent,
-
   ],
   imports: [
     CommonModule,
@@ -81,14 +91,15 @@ import { ProductFormComponent } from '../componentes/productos/product-form/prod
     MatOptionModule,
     MatSelectModule,
     MatDatepickerModule,
-    MatNativeDateModule,
-    MatMomentDateModule,
     MatDividerModule,
     MatTabsModule,
     MatAutocompleteModule,
-],
+    MatNativeDateModule,
+  ],
   providers: [
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
+    { provide: DateAdapter, useClass: NativeDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: MONTH_YEAR_FORMATS },
   ],
 })
 export class DashboardModule { }

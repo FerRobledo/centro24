@@ -1,12 +1,12 @@
 import { DIALOG_DATA } from '@angular/cdk/dialog';
-import { Component, EventEmitter, Inject, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
-import * as _moment from 'moment';
-const moment = _moment;
+import { setMonth, setYear, parseISO, format, differenceInMonths, startOfMonth } from 'date-fns';
+
+const fechaFormateada = format(new Date(), 'MM/yyyy');
 
 @Component({
   selector: 'app-agregarPagoModal',
@@ -20,7 +20,6 @@ export class AgregarPagoModalComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private clientesService: ClientesService,
-    private router: Router,
     @Inject(DIALOG_DATA) public clientes: any[] = []
   ) { }
 
@@ -87,7 +86,7 @@ export class AgregarPagoModalComponent implements OnInit {
     };
 
     const adminId = this.authService.getIdAdmin();
-    
+
     this.clientesService.asignarPago(adminId, pagoData).subscribe({
       error: (error: any) => console.log(error),
     });
@@ -95,12 +94,11 @@ export class AgregarPagoModalComponent implements OnInit {
     this.dialogRef.close({ evento: 'pagoCreado', data: pagoData });
   }
 
-
-  chosenMonthHandler(normalizedMonth: _moment.Moment, controlName: string, datepicker: any) {
+  chosenMonthHandler(normalizedMonth: Date, controlName: string, datepicker: any) {
     const ctrl = this.pagoForm.get(controlName);
-    const currentValue = ctrl?.value ? moment(ctrl.value) : moment();
-    currentValue.month(normalizedMonth.month()).year(normalizedMonth.year());
-    ctrl?.setValue(currentValue);
+    const currentValue = ctrl?.value ? parseISO(ctrl.value) : new Date();
+    const updated = setMonth(setYear(currentValue, normalizedMonth.getFullYear()), normalizedMonth.getMonth());
+    ctrl?.setValue(updated.toISOString());
     this.actualizarCantidadMeses();
     datepicker.close();
   }
@@ -108,8 +106,8 @@ export class AgregarPagoModalComponent implements OnInit {
   chosenYearHandler(event: any, controlName: string) {
     const ctrl = this.pagoForm.get(controlName);
     if (event.value) {
-      const date = moment(event.value).startOf('month');
-      ctrl?.setValue(date);
+      const start = startOfMonth(new Date(event.value));
+      ctrl?.setValue(start.toISOString());
     }
   }
 
@@ -118,16 +116,17 @@ export class AgregarPagoModalComponent implements OnInit {
     const hasta = this.pagoForm.get('fechaHasta')?.value;
 
     if (desde && hasta) {
-      const fechaDesde = moment(desde);
-      const fechaHasta = moment(hasta);
+      const fechaDesde = parseISO(desde);
+      const fechaHasta = parseISO(hasta);
 
-      const diferenciaMeses = fechaHasta.diff(fechaDesde, 'months', true); // incluye decimales
-      this.cantidadMeses = Math.floor(diferenciaMeses) + 1; // +1 para incluir ambos meses
+      const diferenciaMeses = differenceInMonths(fechaHasta, fechaDesde);
+      this.cantidadMeses = diferenciaMeses + 1; // incluir ambos meses
     } else if (desde && !hasta) {
       this.cantidadMeses = 1;
     } else {
       this.cantidadMeses = 0;
     }
+
     this.actualizarMonto();
   }
 

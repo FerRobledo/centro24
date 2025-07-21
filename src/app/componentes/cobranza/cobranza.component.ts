@@ -25,7 +25,6 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private cdr: ChangeDetectorRef //inyecta ChangeDetectorRef
   ) {
-    console.log("cobranza component initialized");
   }
 
   ngOnInit() {
@@ -117,7 +116,9 @@ export class CobranzaComponent implements OnInit, OnDestroy {
 
     this.dialogRef.afterClosed().subscribe(result => {
       this.dialogRef = null;
-      this.resetComponent();
+      if(result == 'submit'){
+        this.resetComponent();
+      }
     });
   }
 
