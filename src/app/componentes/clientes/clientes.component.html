@@ -1,8 +1,8 @@
-<div class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl bg-clip-border" >
-  <div class="relative mt-4 h-full text-slate-700 bg-white rounded-none bg-clip-border">
+<div class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl bg-clip-border">
+  <div class="relative mt-4 h-full text-slate-700 bg-white rounded-none bg-clip-border flex flex-col">
     <div class="flex justify-between items-start w-full">
       <div class="flex items-start gap-8 ml-4">
-        <div >
+        <div>
           <h3 class="text-lg font-semibold text-slate-800">
             <i class="fa-solid fa-user-group"></i> Clientes de Centro 24
           </h3>
@@ -20,8 +20,8 @@
           <div class="form-group mt-[7px] mr-4">
             <div class="flex items-center border border-gray-300 rounded px-2 bg-white">
               <i class="fa fa-search text-gray-500 mr-2"></i>
-              <input type="text" class="flex-1 h-8 outline-none py-2 bg-transparent" placeholder="Filtrar" name="filtrar" [(ngModel)]="clientesService.filtroCliente" (keypress)="soloLetras($event)"
-              />
+              <input type="text" class="flex-1 h-8 outline-none py-2 bg-transparent" placeholder="Filtrar" name="filtrar"
+                [(ngModel)]="clientesService.filtroCliente" (keypress)="soloLetras($event)" />
             </div>
           </div>
         </form>
@@ -35,21 +35,21 @@
     </div>
 
     <!-- SI ESTA CARGANDO MUESTRA EL ESTADO DE CARGA -->
-    <ng-container *ngIf="isLoading else matTab">
-      <div class="flex justify-center items-center h-96">
+    <ng-container *ngIf="isLoading; else matTab">
+      <div class="flex justify-center items-center h-full">
         <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
       </div>
     </ng-container>
 
     <!-- SINO MUESTRA LAS LISTAS CLIENTES/PAGOS -->
     <ng-template #matTab>
-      <mat-tab-group (selectedTabChange)="detectChanges()">
-        <mat-tab label="Clientes">
-          <app-listaClientes [clientsOfMonth]="clientsOfMonth"
-            (loadClientsMonthly)="loadClientsMonthly()"></app-listaClientes>
+      <mat-tab-group (selectedTabChange)="detectChanges()" class="flex flex-col h-full">
+        <mat-tab label="Clientes" class="flex flex-col h-full">
+          <app-listaClientes [clientsOfMonth]="clientsOfMonth" (loadClientsMonthly)="loadClientsMonthly()"
+            class="flex-1 overflow-auto"></app-listaClientes>
         </mat-tab>
-        <mat-tab label="Pagos"> 
-          <app-listaPagos [clientes]="clientsOfMonth"></app-listaPagos>
+        <mat-tab label="Pagos" class="flex flex-col h-full">
+          <app-listaPagos [clientes]="clientsOfMonth" class="flex-1 overflow-auto"></app-listaPagos>
         </mat-tab>
       </mat-tab-group>
     </ng-template>
