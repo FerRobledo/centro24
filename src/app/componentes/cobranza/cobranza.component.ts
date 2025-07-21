@@ -117,7 +117,9 @@ export class CobranzaComponent implements OnInit, OnDestroy {
 
     this.dialogRef.afterClosed().subscribe(result => {
       this.dialogRef = null;
-      this.resetComponent();
+      if(result == 'submit'){
+        this.resetComponent();
+      }
     });
   }
 

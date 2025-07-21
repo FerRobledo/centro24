@@ -43,7 +43,7 @@
 
     <!-- SINO MUESTRA LAS LISTAS CLIENTES/PAGOS -->
     <ng-template #matTab>
-      <mat-tab-group>
+      <mat-tab-group (selectedTabChange)="detectChanges()">
         <mat-tab label="Clientes">
           <app-listaClientes [clientsOfMonth]="clientsOfMonth"
             (loadClientsMonthly)="loadClientsMonthly()"></app-listaClientes>

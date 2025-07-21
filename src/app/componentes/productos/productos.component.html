@@ -51,15 +51,15 @@
     </div>
   </div>
 
-  <!-- SI ESTA CARGANDO MUESTRA EL ESTADO DE CARGA -->
-  <ng-container *ngIf="cargando">
+  <!-- SI ESTA cargandoProducto MUESTRA EL ESTADO DE CARGA -->
+  <ng-container *ngIf="cargandoProducto">
     <div class="flex justify-center items-center h-96">
       <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
     </div>
   </ng-container>
     
   <!-- TABLA -->  
-  <div *ngIf="!cargando" class="w-full flex-1 border border-slate-200 rounded-lg mt-4">
+  <div *ngIf="!cargandoProducto" class="w-full flex-1 border border-slate-200 rounded-lg mt-4">
     <div class="overflow-y-auto" style="height: calc(95vh - 115px);">
       <table class="w-full text-center table-fixed min-w-max">
         <!-- Header -->
@@ -226,17 +226,17 @@
       </div>
       <p class="mt-2 text-sm text-red-600" *ngIf="mensaje">{{ mensaje }}</p>
       <div class="flex justify-end space-x-2">
-        <button type="button" (click)="cancelar()" [disabled]="cargando"
+        <button type="button" (click)="cancelar()" [disabled]="cargandoProducto"
           class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
           Cancelar
         </button>
-        <button type="submit" [disabled]="cargando"
+        <button type="submit" [disabled]="cargandoProducto"
           class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
           {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
         </button>
       </div>
     </form>
-    <div *ngIf="cargando" class="absolute inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+    <div *ngIf="cargandoProducto" class="absolute inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
       <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>
   </div>
@@ -259,19 +259,19 @@
     </div>
 
     <div class="flex justify-center space-x-4">
-      <button (click)="eliminarProducto()" [disabled]="cargando"
+      <button (click)="eliminarProducto()" [disabled]="cargandoProducto"
         class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50">
         <i class="fa-solid fa-check mr-1"></i>
         Sí, eliminar
       </button>
-      <button (click)="cancelarEliminar()" [disabled]="cargando"
+      <button (click)="cancelarEliminar()" [disabled]="cargandoProducto"
         class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50">
         <i class="fa-solid fa-times mr-1"></i>
         No, cancelar
       </button>
     </div>
 
-    <div *ngIf="cargando"
+    <div *ngIf="cargandoProducto"
       class="absolute inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 rounded-lg">
       <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-red-500"></div>
     </div>

@@ -80,8 +80,10 @@ export class ClientesComponent implements OnInit, OnDestroy {
     });
 
     this.dialogRef.afterClosed().subscribe(result => {
+      if(result == 'submit'){
+        this.resetComponent();
+      }
       this.dialogRef = null;
-      this.resetComponent();
     });
   }
 
@@ -95,7 +97,9 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
     this.dialogRef.afterClosed().subscribe(result => {
       this.dialogRef = null;
-      this.resetComponent();
+      if(result?.evento == 'pagoCreado'){
+        this.resetComponent();
+      }
     });
   }
 
@@ -112,5 +116,9 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.clientsOfMonth = [];
     this.payThisMonth = {};
     this.loadClientsMonthly();
+  }
+
+  detectChanges(){
+    this.cdr.detectChanges();
   }
 }

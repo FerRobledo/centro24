@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
 import { ProductosService } from 'src/app/services/productos.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { Producto, ProductoDTO } from 'src/assets/dto/producto';
@@ -34,19 +34,22 @@ export class ProductosComponent implements OnInit, OnDestroy {
   productoEditando: ProductoDTO | null = null;
   mostrarConfirmacion: boolean = false;
   productoAEliminar: ProductoDTO | null = null;
-  cargando: boolean = false;
+  cargandoProducto: boolean = false;
   mensaje: string = '';
   nuevoProducto: ProductoDTO = new ProductoDTO();
   filtroTexto: string = '';
+  private subscriptions: Subscription = new Subscription();
+
 
   // Variable para mantener el formato argentino en el input
   precioCostoInput: string = '';
 
   constructor(
-    private productosService: ProductosService, 
+    private productosService: ProductosService,
     private authService: AuthService,
-    private logsService: LogsService
-    ) {
+    private logsService: LogsService,
+    private cdr: ChangeDetectorRef,
+  ) {
     console.log('Componente AppComponent inicializado');
   }
 
@@ -55,31 +58,38 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.cargarProductos(idAdmin);
   }
 
-  ngOnDestroy(): void {
-    console.log("destroy productos")
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe(); //limpia todas las suscripciones
   }
 
   cargarProductos(idAdmin: number) {
-    this.mensaje = 'Cargando productos...';
-    this.cargando = true;
-    this.productosService.getProductos(idAdmin).subscribe({
-      next: (data: Producto[]) => {
-        this.productos = data.map((producto: Producto) => new ProductoDTO({ ...producto, cantidadModificar: null }));
-        this.productosFiltrados = this.productos;
-        this.productosAux = this.productos;
-        this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
-        console.log('Datos recibidos:', data);
-        this.cargando = false;
-      },
-      error: (error) => {
-        console.error('Error al obtener productos:', error);
-        this.cargando = false;
-      },
-      complete: () => {
-        console.log('Solicitud completada');
-        console.log('En complete, cargando =', this.cargando); 
-      }
-    });
+    this.mensaje = 'cargandoProducto productos...';
+    this.cargandoProducto = true;
+    this.cdr.detectChanges();
+    this.subscriptions.add(
+      this.productosService.getProductos(idAdmin).subscribe({
+        next: (data: Producto[]) => {
+          this.productos = data.map((producto: Producto) => new ProductoDTO({ ...producto, cantidadModificar: null }));
+          this.productosFiltrados = this.productos;
+          this.productosAux = this.productos;
+          this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
+          console.log('Datos recibidos:', data);
+          this.cargandoProducto = false;
+          this.cdr.detectChanges();
+
+        },
+        error: (error) => {
+          console.error('Error al obtener productos:', error);
+          this.cargandoProducto = false;
+          this.cdr.detectChanges();
+        },
+        complete: () => {
+          console.log('Solicitud completada');
+          console.log('En complete, cargandoProducto =', this.cargandoProducto);
+        }
+      })
+    );
+    this.cdr.detectChanges();
   }
   filtrarCategoria(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
@@ -147,26 +157,28 @@ export class ProductosComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.productosService.actualizarProducto(productoActualizado).subscribe({
-      next: (updatedProducto: Producto) => {
-        console.log('Respuesta del servidor:', updatedProducto);
-        const index = this.productos.findIndex(p => p.id === producto.id);
-        if (index !== -1) {
-          this.productos[index] = new ProductoDTO({ ...this.productos[index], ...updatedProducto });
-          // Actualizar el producto en el array principal
-          this.productos[index] = new ProductoDTO({
-            ...this.productos[index],
-            ...updatedProducto
-          });
-          this.aplicarFiltros();
+    this.subscriptions.add(
+      this.productosService.actualizarProducto(productoActualizado).subscribe({
+        next: (updatedProducto: Producto) => {
+          console.log('Respuesta del servidor:', updatedProducto);
+          const index = this.productos.findIndex(p => p.id === producto.id);
+          if (index !== -1) {
+            this.productos[index] = new ProductoDTO({ ...this.productos[index], ...updatedProducto });
+            // Actualizar el producto en el array principal
+            this.productos[index] = new ProductoDTO({
+              ...this.productos[index],
+              ...updatedProducto
+            });
+            this.aplicarFiltros();
+            this.cdr.detectChanges();
+          }
+        },
+        error: (error: any) => {
+          console.error('Error al incrementar stock:', error);
+          alert('Error al incrementar el stock. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
         }
-      },
-      error: (error: any) => {
-        console.error('Error al incrementar stock:', error);
-        console.log('Detalles del error:', error.error);
-        alert('Error al incrementar el stock. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
-      }
-    });
+      })
+    );
   }
 
   decrementarStock(producto: ProductoDTO) {
@@ -182,30 +194,31 @@ export class ProductosComponent implements OnInit, OnDestroy {
         return;
       }
 
-      console.log('Intentando decrementar stock. Producto:', productoActualizado);
-      this.productosService.actualizarProducto(productoActualizado).subscribe({
-        next: (updatedProducto: Producto) => {
-          console.log('Respuesta del servidor:', updatedProducto);
-          const index = this.productos.findIndex(p => p.id === producto.id);
-          if (index !== -1) {
-            this.productos[index] = new ProductoDTO({
-              ...this.productos[index],
-              ...updatedProducto
-            });
-            this.aplicarFiltros();
+      this.subscriptions.add(
+        this.productosService.actualizarProducto(productoActualizado).subscribe({
+          next: (updatedProducto: Producto) => {
+            console.log('Respuesta del servidor:', updatedProducto);
+            const index = this.productos.findIndex(p => p.id === producto.id);
+            if (index !== -1) {
+              this.productos[index] = new ProductoDTO({
+                ...this.productos[index],
+                ...updatedProducto
+              });
+              this.aplicarFiltros();
+              this.cdr.detectChanges();
+            }
+          },
+          error: (error: any) => {
+            console.error('Error al decrementar stock:', error);
+            console.log('Detalles del error:', error.error);
+            alert('Error al decrementar el stock. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
           }
-        },
-        error: (error: any) => {
-          console.error('Error al decrementar stock:', error);
-          console.log('Detalles del error:', error.error);
-          alert('Error al decrementar el stock. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
-        }
-      });
+        })
+      );
     }
   }
 
   modificarStock(producto: ProductoDTO) {
-    console.log('Se llamó a modificarStock con:', producto);
     if (producto.cantidadModificar === null || producto.cantidadModificar === undefined || producto.cantidadModificar === 0) {
       alert('Debe ingresar una cantidad válida para modificar el stock.');
       producto.cantidadModificar = null;
@@ -226,30 +239,31 @@ export class ProductosComponent implements OnInit, OnDestroy {
         return;
       }
 
-      console.log('Intentando modificar stock. Producto:', productoActualizado);
-      this.productosService.actualizarProducto(productoActualizado).subscribe({
-        next: (updatedProducto: Producto) => {
-          console.log('Respuesta del servidor:', updatedProducto);
-          const index = this.productos.findIndex(p => p.id === producto.id);
-          if (index !== -1) {
-            this.productos[index] = new ProductoDTO({
-              ...this.productos[index],
-              ...updatedProducto
-            });
-            producto.cantidadModificar = null;
-            this.aplicarFiltros();
+      this.subscriptions.add(
+        this.productosService.actualizarProducto(productoActualizado).subscribe({
+          next: (updatedProducto: Producto) => {
+            console.log('Respuesta del servidor:', updatedProducto);
+            const index = this.productos.findIndex(p => p.id === producto.id);
+            if (index !== -1) {
+              this.productos[index] = new ProductoDTO({
+                ...this.productos[index],
+                ...updatedProducto
+              });
+              producto.cantidadModificar = null;
+              this.aplicarFiltros();
+            }
+          },
+          error: (error: any) => {
+            console.error('Error al modificar stock:', error);
+            alert('Error al modificar el stock. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
           }
-        },
-        error: (error: any) => {
-          console.error('Error al modificar stock:', error);
-          console.log('Detalles del error:', error.error);
-          alert('Error al modificar el stock. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
-        }
-      });
+        })
+      );
     } else {
       alert('No puedes restar más stock del que hay disponible. Stock actual: ' + producto.stock);
       producto.cantidadModificar = null;
     }
+    this.cdr.detectChanges();
   }
 
   modificarGanancia(producto: ProductoDTO) {
@@ -267,29 +281,32 @@ export class ProductosComponent implements OnInit, OnDestroy {
     }
 
     console.log('Intentando modificar ganancia. Producto:', productoActualizado);
-    this.productosService.actualizarProducto(productoActualizado).subscribe({
-      next: (updatedProducto: Producto) => {
-        console.log('Respuesta del servidor:', updatedProducto);
-        const index = this.productos.findIndex(p => p.id === producto.id);
-        if (index !== -1) {
-          this.productos[index] = new ProductoDTO({
-            ...this.productos[index],
-            ...updatedProducto
-          });
-          this.aplicarFiltros();
+    this.subscriptions.add(
+      this.productosService.actualizarProducto(productoActualizado).subscribe({
+        next: (updatedProducto: Producto) => {
+          console.log('Respuesta del servidor:', updatedProducto);
+          const index = this.productos.findIndex(p => p.id === producto.id);
+          if (index !== -1) {
+            this.productos[index] = new ProductoDTO({
+              ...this.productos[index],
+              ...updatedProducto
+            });
+            this.aplicarFiltros();
+          }
+        },
+        error: (error: any) => {
+          console.error('Error al modificar ganancia:', error);
+          console.log('Detalles del error:', error.error);
+          alert('Error al modificar la ganancia. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
         }
-      },
-      error: (error: any) => {
-        console.error('Error al modificar ganancia:', error);
-        console.log('Detalles del error:', error.error);
-        alert('Error al modificar la ganancia. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
-      }
-    });
+      })
+    );
+    this.cdr.detectChanges();
   }
 
   addProducto() {
     this.mensaje = '';
-    this.cargando = true;
+    this.cargandoProducto = true;
 
     // Si el usuario no es admin, establecer valores por defecto para campos sensibles
     if (!this.esAdmin()) {
@@ -300,39 +317,46 @@ export class ProductosComponent implements OnInit, OnDestroy {
     const error = this.nuevoProducto.validateRequired();
     if (error) {
       this.mensaje = error;
-      this.cargando = false;
+      this.cargandoProducto = false;
+      this.cdr.detectChanges();
       return;
     }
 
     const user_id = this.authService.getUserId();
     if (!user_id) {
       alert('Debes estar logeado para agregar un producto');
-      this.cargando = false;
+      this.cargandoProducto = false;
+      this.cdr.detectChanges();
       return;
     }
 
     const precio_venta = this.nuevoProducto.precio_costo + (this.nuevoProducto.precio_costo * (this.nuevoProducto.ganancia || 0) / 100);
     const productoConPrecio = new ProductoDTO({ ...this.nuevoProducto, precio_venta, id_admin: user_id });
 
-    this.productosService.addProducto(productoConPrecio).subscribe(
-      (respuesta: AddProductoResponse) => {
-        this.mensaje = respuesta.message || 'Producto agregado con éxito.';
-        this.cargando = false;
-        if (respuesta.producto) {
-          this.productos.push(new ProductoDTO(respuesta.producto));
-          this.aplicarFiltros();
+    this.subscriptions.add(
+      this.productosService.addProducto(productoConPrecio).subscribe(
+        (respuesta: AddProductoResponse) => {
+          this.mensaje = respuesta.message || 'Producto agregado con éxito.';
+          this.cargandoProducto = false;
+          this.cdr.detectChanges();
+          if (respuesta.producto) {
+            this.productos.push(new ProductoDTO(respuesta.producto));
+            this.aplicarFiltros();
+          }
+          if (respuesta.producto && !this.categoriasUnicas.includes(respuesta.producto.categoria)) {
+            this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
+          }
+          this.cancelar();
+        },
+        (error: any) => {
+          console.error('Error al agregar producto', error);
+          this.mensaje = 'Hubo un problema al agregar el producto. Por favor, intenta de nuevo.';
+          this.cargandoProducto = false;
+          this.cdr.detectChanges();
         }
-        if (respuesta.producto && !this.categoriasUnicas.includes(respuesta.producto.categoria)) {
-          this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
-        }
-        this.cancelar();
-      },
-      (error: any) => {
-        console.error('Error al agregar producto', error);
-        this.mensaje = 'Hubo un problema al agregar el producto. Por favor, intenta de nuevo.';
-        this.cargando = false;
-      }
+      )
     );
+    this.cdr.detectChanges();
   }
 
   cancelar() {
@@ -341,20 +365,22 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.productoEditando = null;
     this.nuevoProducto = new ProductoDTO();
     this.mensaje = '';
-    this.cargando = false;
+    this.cargandoProducto = false;
+    this.cdr.detectChanges();
 
     // Limpiar el input del precio de costo
     this.precioCostoInput = '';
   }
 
   onCargaCompleta() {
-    this.cargando = false;
+    this.cargandoProducto = false;
+    this.cdr.detectChanges();
     const idAdmin = this.authService.getIdAdmin();
     this.cargarProductos(idAdmin)
   }
 
   onCargaIniciada() {
-    this.cargando = true;
+    this.cargandoProducto = true;
     this.mensaje = 'Procesando productos esto puede tardar unos segundos...';
   }
 
@@ -383,12 +409,13 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   actualizarProducto() {
     this.mensaje = '';
-    this.cargando = true;
+    this.cargandoProducto = true;
 
     const user_id = this.authService.getIdAdmin();
     if (!user_id) {
       alert('Debes estar logeado para actualizar un producto');
-      this.cargando = false;
+      this.cargandoProducto = false;
+      this.cdr.detectChanges();
       return;
     }
 
@@ -411,53 +438,58 @@ export class ProductosComponent implements OnInit, OnDestroy {
     const error = productoActualizado.validateRequired();
     if (error) {
       alert(error);
-      this.cargando = false;
+      this.cargandoProducto = false;
+      this.cdr.detectChanges();
       return;
     }
 
-    this.productosService.actualizarProducto(productoActualizado).subscribe({
-      next: (updatedProducto: Producto) => {
-        console.log('Producto actualizado:', updatedProducto);
-        this.mensaje = 'Producto actualizado con éxito.';
-        this.cargando = false;
+    this.subscriptions.add(
+      this.productosService.actualizarProducto(productoActualizado).subscribe({
+        next: (updatedProducto: Producto) => {
+          console.log('Producto actualizado:', updatedProducto);
+          this.mensaje = 'Producto actualizado con éxito.';
+          this.cargandoProducto = false;
+          this.cdr.detectChanges();
+          // Actualizar el producto en el array
+          const index = this.productos.findIndex(p => p.id === updatedProducto.id);
+          if (index !== -1) {
+            this.productos[index] = new ProductoDTO(updatedProducto);
+            this.aplicarFiltros();
 
-        // Actualizar el producto en el array
-        const index = this.productos.findIndex(p => p.id === updatedProducto.id);
-        if (index !== -1) {
-          this.productos[index] = new ProductoDTO(updatedProducto);
-          this.aplicarFiltros();
-
-          // Actualizar categorías únicas si es necesario
-          this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
-        }
-
-        // Crear el log 
-        const nuevoLog: Log = {
-          id_producto: this.productoEditando!.id,
-          id_user: this.authService.getUserId(),
-          accion: 'actualizacion',
-          date: new Date(),
-          user_admin: this.authService.getIdAdmin()
-        };
-
-        // Agregar log a la base de datos
-        this.logsService.crearLog(nuevoLog).subscribe({
-          next: (logCreado) => {
-            console.log('Log de eliminación creado:', logCreado);
-          },
-          error: (errorLog) => {
-            console.error('Error al crear log de eliminación:', errorLog);
+            // Actualizar categorías únicas si es necesario
+            this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           }
-        });
 
-        this.cancelar();
-      },
-      error: (error: any) => {
-        console.error('Error al actualizar producto:', error);
-        this.mensaje = 'Hubo un problema al actualizar el producto. Por favor, intenta de nuevo.';
-        this.cargando = false;
-      }
-    });
+          // Crear el log 
+          const nuevoLog: Log = {
+            id_producto: this.productoEditando!.id,
+            id_user: this.authService.getUserId(),
+            accion: 'actualizacion',
+            date: new Date(),
+            user_admin: this.authService.getIdAdmin()
+          };
+
+          // Agregar log a la base de datos
+          this.logsService.crearLog(nuevoLog).subscribe({
+            next: (logCreado) => {
+              console.log('Log de eliminación creado:', logCreado);
+            },
+            error: (errorLog) => {
+              console.error('Error al crear log de eliminación:', errorLog);
+            }
+          });
+
+          this.cancelar();
+        },
+        error: (error: any) => {
+          console.error('Error al actualizar producto:', error);
+          this.mensaje = 'Hubo un problema al actualizar el producto. Por favor, intenta de nuevo.';
+          this.cargandoProducto = false;
+          this.cdr.detectChanges();
+        }
+      })
+    );
+    this.cdr.detectChanges();
   }
 
   abrirFormularioAgregar() {
@@ -479,54 +511,59 @@ export class ProductosComponent implements OnInit, OnDestroy {
   eliminarProducto() {
     if (!this.productoAEliminar) return;
 
-    this.cargando = true;
-    this.productosService.eliminarProducto(this.productoAEliminar).subscribe({
-      next: (response: any) => {
-        console.log('Producto eliminado:', response);
-        // Remover el producto del array local
-        this.productos = this.productos.filter(p => p.id !== this.productoAEliminar!.id);
+    this.cargandoProducto = true;
+    this.subscriptions.add(
+      this.productosService.eliminarProducto(this.productoAEliminar).subscribe({
+        next: (response: any) => {
+          console.log('Producto eliminado:', response);
+          // Remover el producto del array local
+          this.productos = this.productos.filter(p => p.id !== this.productoAEliminar!.id);
 
-        // Volver a cargar los productos
-        const idAdmin = this.authService.getIdAdmin();
-        this.cargarProductos(idAdmin);
+          // Volver a cargar los productos
+          const idAdmin = this.authService.getIdAdmin();
+          this.cargarProductos(idAdmin);
 
-        // Aplicar todos los filtros
-        this.aplicarFiltros();
+          // Aplicar todos los filtros
+          this.aplicarFiltros();
 
-        // Actualizar categorías únicas
-        this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
-        // Crear el log usando la interfaz Log
-        const nuevoLog: Log = {
-          id_producto: this.productoAEliminar!.id,
-          id_user: this.authService.getUserId(),
-          accion: 'eliminacion',
-          date: new Date(),
-          user_admin: this.authService.getIdAdmin()
-        };
-        // Agregar log a la base de datos
-        this.logsService.crearLog(nuevoLog).subscribe({
-          next: (logCreado) => {
-            console.log('Log de eliminación creado:', logCreado);
-          },
-          error: (errorLog) => {
-            console.error('Error al crear log de eliminación:', errorLog);
-          }
-        });
-        
-        this.cancelarEliminar();
-      },
-      error: (error: any) => {
-        console.error('Error al eliminar producto:', error);
-        this.cargando = false;
-        alert('Error al eliminar el producto. Detalle: ' + (error.error?.message || 'Sin detalles'));
-      }
-    });
+          // Actualizar categorías únicas
+          this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
+          // Crear el log usando la interfaz Log
+          const nuevoLog: Log = {
+            id_producto: this.productoAEliminar!.id,
+            id_user: this.authService.getUserId(),
+            accion: 'eliminacion',
+            date: new Date(),
+            user_admin: this.authService.getIdAdmin()
+          };
+          // Agregar log a la base de datos
+          this.logsService.crearLog(nuevoLog).subscribe({
+            next: (logCreado) => {
+              console.log('Log de eliminación creado:', logCreado);
+            },
+            error: (errorLog) => {
+              console.error('Error al crear log de eliminación:', errorLog);
+            }
+          });
+
+          this.cancelarEliminar();
+        },
+        error: (error: any) => {
+          console.error('Error al eliminar producto:', error);
+          this.cargandoProducto = false;
+          this.cdr.detectChanges();
+          alert('Error al eliminar el producto. Detalle: ' + (error.error?.message || 'Sin detalles'));
+        }
+      })
+    );
+    this.cdr.detectChanges();
   }
 
   cancelarEliminar() {
     this.mostrarConfirmacion = false;
     this.productoAEliminar = null;
-    this.cargando = false;
+    this.cargandoProducto = false;
+    this.cdr.detectChanges();
   }
 
   // Función para formatear el número según el formato argentino (convierte de argentino a número)
