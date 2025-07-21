@@ -6,8 +6,6 @@ import { CobranzaComponent } from '../componentes/cobranza/cobranza.component';
 import { ProductosComponent } from '../componentes/productos/productos.component';
 import { UsuariosComponent } from '../componentes/usuarios/usuarios/usuarios.component';
 import { ClientesComponent } from '../componentes/clientes/clientes.component';
-import { authGuard } from '../auth-guard.guard';
-import { NotFoundComponent } from '../componentes/notFound/notFound.component';
 
 const routes: Routes = [
   {
