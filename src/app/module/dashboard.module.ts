@@ -37,6 +37,8 @@ import { SelectorClientesComponent } from '../componentes/clientes/selectorClien
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
 import { LogsComponent } from '../componentes/logs/logs.component';
+import { ConfirmarDeleteComponent } from '../componentes/productos/confirmar-delete/confirmar-delete.component';
+import { ProductFormComponent } from '../componentes/productos/product-form/product-form.component';
 
 @NgModule({
   declarations: [
@@ -62,6 +64,9 @@ import { LogsComponent } from '../componentes/logs/logs.component';
     HomeComponent,
     SelectorClientesComponent,
     LogsComponent,
+    ConfirmarDeleteComponent,
+    ProductFormComponent,
+
   ],
   imports: [
     CommonModule,
@@ -81,7 +86,7 @@ import { LogsComponent } from '../componentes/logs/logs.component';
     MatDividerModule,
     MatTabsModule,
     MatAutocompleteModule,
-  ],
+],
   providers: [
     provideAnimationsAsync()
   ],

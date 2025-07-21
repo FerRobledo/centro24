@@ -1,10 +1,7 @@
-import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ProductosService } from 'src/app/services/productos.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { Producto, ProductoDTO } from 'src/assets/dto/producto';
-import { MatTableDataSource } from '@angular/material/table';
 import { LogsService } from 'src/app/services/logs.service';
 import { Log } from 'src/assets/dto/log';
 
@@ -24,33 +21,30 @@ interface AddProductoResponse {
 export class ProductosComponent implements OnInit, OnDestroy {
   productos: ProductoDTO[] = [];
   productosFiltrados: ProductoDTO[] = [];
-  productosAux: ProductoDTO[] = [];
   categoriasUnicas: string[] = [];
-  cantidadModificar: number | null = null;
-  categoriaSeleccionada: string = '';   // Filtro principal (categoría)
+  filtroTexto: string = '';
+  filtroStockActivo: boolean = false;
 
+  // Estados del formulario
   mostrarFormulario: boolean = false;
   modoEdicion: boolean = false;
   productoEditando: ProductoDTO | null = null;
+  
+  // Estados del diálogo de confirmación
   mostrarConfirmacion: boolean = false;
   productoAEliminar: ProductoDTO | null = null;
-  cargandoProducto: boolean = false;
+  
+  // Estados generales
+  cargando: boolean = false;
   mensaje: string = '';
   nuevoProducto: ProductoDTO = new ProductoDTO();
-  filtroTexto: string = '';
-  private subscriptions: Subscription = new Subscription();
-
-
-  // Variable para mantener el formato argentino en el input
-  precioCostoInput: string = '';
 
   constructor(
     private productosService: ProductosService,
     private authService: AuthService,
-    private logsService: LogsService,
-    private cdr: ChangeDetectorRef,
-  ) {
-    console.log('Componente AppComponent inicializado');
+    private logsService: LogsService
+    ) {
+    console.log('Componente AppComponent inicializado (desde constructor)');
   }
 
   ngOnInit() {
@@ -62,256 +56,115 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe(); //limpia todas las suscripciones
   }
 
+  // === MÉTODOS DE CARGA ===
   cargarProductos(idAdmin: number) {
-    this.mensaje = 'cargandoProducto productos...';
-    this.cargandoProducto = true;
-    this.cdr.detectChanges();
-    this.subscriptions.add(
-      this.productosService.getProductos(idAdmin).subscribe({
-        next: (data: Producto[]) => {
-          this.productos = data.map((producto: Producto) => new ProductoDTO({ ...producto, cantidadModificar: null }));
-          this.productosFiltrados = this.productos;
-          this.productosAux = this.productos;
-          this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
-          console.log('Datos recibidos:', data);
-          this.cargandoProducto = false;
-          this.cdr.detectChanges();
+    this.mensaje = 'Cargando productos...';
+    this.cargando = true;
+    this.productosService.getProductos(idAdmin).subscribe({
+      next: (data: Producto[]) => {
+        this.productos = data.map((producto: Producto) => new ProductoDTO(producto));
+        this.productosFiltrados = [...this.productos];
+        this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
+        this.cargando = false;
+      },
+      error: (error) => {
+        console.error('Error al obtener productos:', error);
+        this.cargando = false;
+      }
+    });
+  }
 
-        },
-        error: (error) => {
-          console.error('Error al obtener productos:', error);
-          this.cargandoProducto = false;
-          this.cdr.detectChanges();
-        },
-        complete: () => {
-          console.log('Solicitud completada');
-          console.log('En complete, cargandoProducto =', this.cargandoProducto);
-        }
-      })
-    );
-    this.cdr.detectChanges();
-  }
-  filtrarCategoria(event: Event) {
-    const value = (event.target as HTMLSelectElement).value;
-    this.categoriaSeleccionada = value; // Actualiza la categoría seleccionada
-    this.aplicarFiltros(); // Aplica todos los filtros
-  }
+  // === MÉTODOS DE FILTRADO ===
 
   // Filtro por texto
   applyFilter() {
-    let encontro: boolean = false;
-    const filtroLower = this.filtroTexto.toLowerCase();
-
-    // Si el filtro es numérico (sin letras), intentamos buscar por ID
-    const esNumerico = /^[0-9]+$/.test(filtroLower);
-    if (esNumerico) {
-      const porId = this.productosAux.filter(p => p.id.toString() === filtroLower);
-      if (porId.length > 0) {
-        this.productosFiltrados = porId;
-        encontro = true;
-      }
-    }
-    if (!encontro) {
-      // Si no hay coincidencia por ID, filtrar por nombre o dirección
-      this.productosFiltrados = this.productosAux.filter(p =>
-        p.id.toLowerCase().includes(filtroLower) ||
-        p.categoria.toLowerCase().includes(filtroLower)
-      );
-    }
+    this.aplicarTodosLosFiltros();
   }
 
-  filtrarStockMayorCero() {
-    this.aplicarFiltros(true); // Aplicar filtro de stock > 0
-  }
-
-  mostrarTodos() {
-    this.aplicarFiltros(false); // Mostrar todos dentro de la categoría seleccionada
-  }
-
-  aplicarFiltros(filtrarStock: boolean = false) {
+  aplicarTodosLosFiltros() {
     let resultado = [...this.productos];
 
-    if (this.categoriaSeleccionada) {
-      resultado = resultado.filter(p => p.categoria === this.categoriaSeleccionada);
-    }
-
-    if (filtrarStock) {
+    // 1. Filtrar por stock si está activado
+    if (this.filtroStockActivo) {
       resultado = resultado.filter(p => p.stock > 0);
     }
 
-    this.productosFiltrados = resultado.map(p => new ProductoDTO(p));
-
-    console.log('Filtros aplicados. Resultado:', this.productosFiltrados);
-  }
-
-  incrementarStock(producto: ProductoDTO) {
-    // Crear una copia del producto con el stock incrementado
-    const productoActualizado = new ProductoDTO({
-      ...producto,
-      stock: (producto.stock || 0) + 1
-    });
-
-    const error = productoActualizado.validateRequired();
-    if (error) {
-      alert(error);
-      return;
-    }
-
-    this.subscriptions.add(
-      this.productosService.actualizarProducto(productoActualizado).subscribe({
-        next: (updatedProducto: Producto) => {
-          console.log('Respuesta del servidor:', updatedProducto);
-          const index = this.productos.findIndex(p => p.id === producto.id);
-          if (index !== -1) {
-            this.productos[index] = new ProductoDTO({ ...this.productos[index], ...updatedProducto });
-            // Actualizar el producto en el array principal
-            this.productos[index] = new ProductoDTO({
-              ...this.productos[index],
-              ...updatedProducto
-            });
-            this.aplicarFiltros();
-            this.cdr.detectChanges();
-          }
-        },
-        error: (error: any) => {
-          console.error('Error al incrementar stock:', error);
-          alert('Error al incrementar el stock. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
-        }
-      })
-    );
-  }
-
-  decrementarStock(producto: ProductoDTO) {
-    if (producto.stock > 0) {
-      const productoActualizado = new ProductoDTO({
-        ...producto,
-        stock: (producto.stock || 0) - 1
-      });
-
-      const error = productoActualizado.validateRequired();
-      if (error) {
-        alert(error);
-        return;
+    // 2. Filtrar por texto si hay búsqueda
+    if (this.filtroTexto.trim()) {
+      const filtroLower = this.filtroTexto.toLowerCase();
+      const esNumerico = /^[0-9]+$/.test(filtroLower);
+      
+      if (esNumerico) {
+        resultado = resultado.filter(p => p.id.toString() === filtroLower);
+      } else {
+        resultado = resultado.filter(p =>
+          p.id.toLowerCase().includes(filtroLower) ||
+          (p.descripcion?.toLowerCase() || '').includes(filtroLower) ||
+          p.categoria.toLowerCase().includes(filtroLower)
+        );
       }
-
-      this.subscriptions.add(
-        this.productosService.actualizarProducto(productoActualizado).subscribe({
-          next: (updatedProducto: Producto) => {
-            console.log('Respuesta del servidor:', updatedProducto);
-            const index = this.productos.findIndex(p => p.id === producto.id);
-            if (index !== -1) {
-              this.productos[index] = new ProductoDTO({
-                ...this.productos[index],
-                ...updatedProducto
-              });
-              this.aplicarFiltros();
-              this.cdr.detectChanges();
-            }
-          },
-          error: (error: any) => {
-            console.error('Error al decrementar stock:', error);
-            console.log('Detalles del error:', error.error);
-            alert('Error al decrementar el stock. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
-          }
-        })
-      );
     }
+
+    this.productosFiltrados = resultado;
   }
 
-  modificarStock(producto: ProductoDTO) {
-    if (producto.cantidadModificar === null || producto.cantidadModificar === undefined || producto.cantidadModificar === 0) {
-      alert('Debe ingresar una cantidad válida para modificar el stock.');
-      producto.cantidadModificar = null;
-      return;
-    }
+  aplicarFiltros(filtrarStock: boolean = false) {
+    this.filtroStockActivo = filtrarStock;
+    this.aplicarTodosLosFiltros();
+  }
 
-    const cambio = producto.cantidadModificar;
-    const nuevoStock = (producto.stock || 0) + cambio;
-    if (nuevoStock >= 0) {
-      const productoActualizado = new ProductoDTO({
-        ...producto,
-        stock: nuevoStock
-      });
+  filtrarStockMayorCero() {
+    this.filtroStockActivo = true;
+    this.aplicarTodosLosFiltros();
+  }
 
-      const error = productoActualizado.validateRequired();
-      if (error) {
-        alert(error);
-        return;
-      }
+  mostrarTodos() {
+    this.filtroStockActivo = false;
+    this.aplicarTodosLosFiltros();
+  }
 
-      this.subscriptions.add(
-        this.productosService.actualizarProducto(productoActualizado).subscribe({
-          next: (updatedProducto: Producto) => {
-            console.log('Respuesta del servidor:', updatedProducto);
-            const index = this.productos.findIndex(p => p.id === producto.id);
-            if (index !== -1) {
-              this.productos[index] = new ProductoDTO({
-                ...this.productos[index],
-                ...updatedProducto
-              });
-              producto.cantidadModificar = null;
-              this.aplicarFiltros();
-            }
-          },
-          error: (error: any) => {
-            console.error('Error al modificar stock:', error);
-            alert('Error al modificar el stock. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
-          }
-        })
-      );
+
+  // === MÉTODOS DE FORMULARIO ===
+  abrirFormularioAgregar() {
+    this.modoEdicion = false;
+    this.productoEditando = null;
+    this.nuevoProducto = new ProductoDTO();
+    this.mostrarFormulario = true;
+    this.mensaje = '';
+  }
+
+  editarProducto(producto: ProductoDTO) {
+    this.modoEdicion = true;
+    this.productoEditando = new ProductoDTO(producto);
+    this.nuevoProducto = new ProductoDTO(producto);
+    this.mostrarFormulario = true;
+    this.mensaje = '';
+  }
+
+  onFormGuardar(producto: ProductoDTO) {
+    this.nuevoProducto = producto;
+    this.guardarProducto();
+  }
+
+  onFormCancelar() {
+    this.cancelar();
+  }
+
+  guardarProducto() {
+    if (this.modoEdicion) {
+      this.actualizarProducto();
     } else {
-      alert('No puedes restar más stock del que hay disponible. Stock actual: ' + producto.stock);
-      producto.cantidadModificar = null;
+      this.addProducto();
     }
-    this.cdr.detectChanges();
-  }
-
-  modificarGanancia(producto: ProductoDTO) {
-    const nuevoPrecioVenta = producto.precio_costo * (1 + (producto.ganancia || 0) / 100);
-    const productoActualizado = new ProductoDTO({
-      ...producto,
-      ganancia: producto.ganancia,
-      precio_venta: nuevoPrecioVenta
-    });
-
-    const error = productoActualizado.validateRequired();
-    if (error) {
-      alert(error);
-      return;
-    }
-
-    console.log('Intentando modificar ganancia. Producto:', productoActualizado);
-    this.subscriptions.add(
-      this.productosService.actualizarProducto(productoActualizado).subscribe({
-        next: (updatedProducto: Producto) => {
-          console.log('Respuesta del servidor:', updatedProducto);
-          const index = this.productos.findIndex(p => p.id === producto.id);
-          if (index !== -1) {
-            this.productos[index] = new ProductoDTO({
-              ...this.productos[index],
-              ...updatedProducto
-            });
-            this.aplicarFiltros();
-          }
-        },
-        error: (error: any) => {
-          console.error('Error al modificar ganancia:', error);
-          console.log('Detalles del error:', error.error);
-          alert('Error al modificar la ganancia. Verifica los datos o contacta al administrador. Detalle: ' + (error.error?.error || 'Sin detalles'));
-        }
-      })
-    );
-    this.cdr.detectChanges();
   }
 
   addProducto() {
     this.mensaje = '';
     this.cargandoProducto = true;
 
-    // Si el usuario no es admin, establecer valores por defecto para campos sensibles
     if (!this.esAdmin()) {
-      this.nuevoProducto.precio_costo = 0; // Valor por defecto
-      this.nuevoProducto.ganancia = 0; // Valor por defecto
+      this.nuevoProducto.precio_costo = 0;
+      this.nuevoProducto.ganancia = 0;
     }
 
     const error = this.nuevoProducto.validateRequired();
@@ -324,87 +177,31 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
     const user_id = this.authService.getUserId();
     if (!user_id) {
-      alert('Debes estar logeado para agregar un producto');
-      this.cargandoProducto = false;
-      this.cdr.detectChanges();
+      this.mensaje = 'Debes estar logeado para agregar un producto';
+      this.cargando = false;
       return;
     }
 
     const precio_venta = this.nuevoProducto.precio_costo + (this.nuevoProducto.precio_costo * (this.nuevoProducto.ganancia || 0) / 100);
     const productoConPrecio = new ProductoDTO({ ...this.nuevoProducto, precio_venta, id_admin: user_id });
 
-    this.subscriptions.add(
-      this.productosService.addProducto(productoConPrecio).subscribe(
-        (respuesta: AddProductoResponse) => {
-          this.mensaje = respuesta.message || 'Producto agregado con éxito.';
-          this.cargandoProducto = false;
-          this.cdr.detectChanges();
-          if (respuesta.producto) {
-            this.productos.push(new ProductoDTO(respuesta.producto));
-            this.aplicarFiltros();
-          }
-          if (respuesta.producto && !this.categoriasUnicas.includes(respuesta.producto.categoria)) {
-            this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
-          }
-          this.cancelar();
-        },
-        (error: any) => {
-          console.error('Error al agregar producto', error);
-          this.mensaje = 'Hubo un problema al agregar el producto. Por favor, intenta de nuevo.';
-          this.cargandoProducto = false;
-          this.cdr.detectChanges();
+    this.productosService.addProducto(productoConPrecio).subscribe({
+      next: (respuesta: AddProductoResponse) => {
+        this.mensaje = respuesta.message || 'Producto agregado con éxito.';
+        this.cargando = false;
+        if (respuesta.producto) {
+          this.productos.push(new ProductoDTO(respuesta.producto));
+          this.aplicarFiltros();
+          this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
         }
-      )
-    );
-    this.cdr.detectChanges();
-  }
-
-  cancelar() {
-    this.mostrarFormulario = false;
-    this.modoEdicion = false;
-    this.productoEditando = null;
-    this.nuevoProducto = new ProductoDTO();
-    this.mensaje = '';
-    this.cargandoProducto = false;
-    this.cdr.detectChanges();
-
-    // Limpiar el input del precio de costo
-    this.precioCostoInput = '';
-  }
-
-  onCargaCompleta() {
-    this.cargandoProducto = false;
-    this.cdr.detectChanges();
-    const idAdmin = this.authService.getIdAdmin();
-    this.cargarProductos(idAdmin)
-  }
-
-  onCargaIniciada() {
-    this.cargandoProducto = true;
-    this.mensaje = 'Procesando productos esto puede tardar unos segundos...';
-  }
-
-  esAdmin() {
-    return this.authService.esAdmin();
-  }
-
-  editarProducto(producto: ProductoDTO) {
-    this.modoEdicion = true;
-    this.productoEditando = new ProductoDTO(producto);
-    this.nuevoProducto = new ProductoDTO(producto);
-    this.mostrarFormulario = true;
-    this.mensaje = '';
-
-    // Inicializar el input con formato argentino
-    this.precioCostoInput = this.convertirAFormatoArgentino(this.nuevoProducto.precio_costo);
-  }
-
-  guardarProducto() {
-    if (this.modoEdicion) {
-      this.actualizarProducto();
-    } else {
-      this.addProducto();
-    }
+        this.cancelar();
+      },
+      error: (error: any) => {
+        console.error('Error al agregar producto', error);
+        this.mensaje = 'Hubo un problema al agregar el producto.';
+        this.cargando = false;
+      }
+    });
   }
 
   actualizarProducto() {
@@ -413,96 +210,62 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
     const user_id = this.authService.getIdAdmin();
     if (!user_id) {
-      alert('Debes estar logeado para actualizar un producto');
-      this.cargandoProducto = false;
-      this.cdr.detectChanges();
+      this.mensaje = 'Debes estar logeado para actualizar un producto';
+      this.cargando = false;
       return;
     }
 
-    // Si el usuario no es admin, preservar los valores originales de precio_costo y ganancia
     let productoParaActualizar = { ...this.nuevoProducto };
 
     if (!this.esAdmin() && this.productoEditando) {
-      // Mantener los valores originales que el usuario no admin no puede modificar
       productoParaActualizar.precio_costo = this.productoEditando.precio_costo;
       productoParaActualizar.ganancia = this.productoEditando.ganancia;
     }
 
-    // Calcular el precio de venta
     const precio_venta = productoParaActualizar.precio_costo + (productoParaActualizar.precio_costo * (productoParaActualizar.ganancia || 0) / 100);
-    const productoActualizado = new ProductoDTO({
-      ...productoParaActualizar,
-      precio_venta
-    });
+    const productoActualizado = new ProductoDTO({ ...productoParaActualizar, precio_venta });
 
     const error = productoActualizado.validateRequired();
     if (error) {
-      alert(error);
-      this.cargandoProducto = false;
-      this.cdr.detectChanges();
+      this.mensaje = error;
+      this.cargando = false;
       return;
     }
 
-    this.subscriptions.add(
-      this.productosService.actualizarProducto(productoActualizado).subscribe({
-        next: (updatedProducto: Producto) => {
-          console.log('Producto actualizado:', updatedProducto);
-          this.mensaje = 'Producto actualizado con éxito.';
-          this.cargandoProducto = false;
-          this.cdr.detectChanges();
-          // Actualizar el producto en el array
-          const index = this.productos.findIndex(p => p.id === updatedProducto.id);
-          if (index !== -1) {
-            this.productos[index] = new ProductoDTO(updatedProducto);
-            this.aplicarFiltros();
+    this.productosService.actualizarProducto(productoActualizado).subscribe({
+      next: (updatedProducto: Producto) => {
+        this.mensaje = 'Producto actualizado con éxito.';
+        this.cargando = false;
 
-            // Actualizar categorías únicas si es necesario
-            this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
-          }
-
-          // Crear el log 
-          const nuevoLog: Log = {
-            id_producto: this.productoEditando!.id,
-            id_user: this.authService.getUserId(),
-            accion: 'actualizacion',
-            date: new Date(),
-            user_admin: this.authService.getIdAdmin()
-          };
-
-          // Agregar log a la base de datos
-          this.logsService.crearLog(nuevoLog).subscribe({
-            next: (logCreado) => {
-              console.log('Log de eliminación creado:', logCreado);
-            },
-            error: (errorLog) => {
-              console.error('Error al crear log de eliminación:', errorLog);
-            }
-          });
-
-          this.cancelar();
-        },
-        error: (error: any) => {
-          console.error('Error al actualizar producto:', error);
-          this.mensaje = 'Hubo un problema al actualizar el producto. Por favor, intenta de nuevo.';
-          this.cargandoProducto = false;
-          this.cdr.detectChanges();
+        const index = this.productos.findIndex(p => p.id === updatedProducto.id);
+        if (index !== -1) {
+          this.productos[index] = new ProductoDTO(updatedProducto);
+          this.aplicarFiltros();
+          this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
         }
-      })
-    );
-    this.cdr.detectChanges();
+
+        this.crearLog(this.productoEditando!.id, 'actualizacion');
+        this.cancelar();
+      },
+      error: (error: any) => {
+        console.error('Error al actualizar producto:', error);
+        this.mensaje = 'Hubo un problema al actualizar el producto.';
+        this.cargando = false;
+      }
+    });
   }
 
-  abrirFormularioAgregar() {
+  cancelar() {
+    this.mostrarFormulario = false;
     this.modoEdicion = false;
     this.productoEditando = null;
     this.nuevoProducto = new ProductoDTO();
-    this.mostrarFormulario = true;
     this.mensaje = '';
-
-    // Limpiar el input del precio de costo
-    this.precioCostoInput = '';
+    this.cargando = false;
   }
 
+
+  // === MÉTODOS DE ELIMINACIÓN ===
   confirmarEliminar(producto: ProductoDTO) {
     this.productoAEliminar = producto;
     this.mostrarConfirmacion = true;
@@ -511,124 +274,59 @@ export class ProductosComponent implements OnInit, OnDestroy {
   eliminarProducto() {
     if (!this.productoAEliminar) return;
 
-    this.cargandoProducto = true;
-    this.subscriptions.add(
-      this.productosService.eliminarProducto(this.productoAEliminar).subscribe({
-        next: (response: any) => {
-          console.log('Producto eliminado:', response);
-          // Remover el producto del array local
-          this.productos = this.productos.filter(p => p.id !== this.productoAEliminar!.id);
-
-          // Volver a cargar los productos
-          const idAdmin = this.authService.getIdAdmin();
-          this.cargarProductos(idAdmin);
-
-          // Aplicar todos los filtros
-          this.aplicarFiltros();
-
-          // Actualizar categorías únicas
-          this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
-          // Crear el log usando la interfaz Log
-          const nuevoLog: Log = {
-            id_producto: this.productoAEliminar!.id,
-            id_user: this.authService.getUserId(),
-            accion: 'eliminacion',
-            date: new Date(),
-            user_admin: this.authService.getIdAdmin()
-          };
-          // Agregar log a la base de datos
-          this.logsService.crearLog(nuevoLog).subscribe({
-            next: (logCreado) => {
-              console.log('Log de eliminación creado:', logCreado);
-            },
-            error: (errorLog) => {
-              console.error('Error al crear log de eliminación:', errorLog);
-            }
-          });
-
-          this.cancelarEliminar();
-        },
-        error: (error: any) => {
-          console.error('Error al eliminar producto:', error);
-          this.cargandoProducto = false;
-          this.cdr.detectChanges();
-          alert('Error al eliminar el producto. Detalle: ' + (error.error?.message || 'Sin detalles'));
-        }
-      })
-    );
-    this.cdr.detectChanges();
+    this.cargando = true;
+    this.productosService.eliminarProducto(this.productoAEliminar).subscribe({
+      next: (response: any) => {
+        this.productos = this.productos.filter(p => p.id !== this.productoAEliminar!.id);
+        this.aplicarFiltros();
+        this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
+        this.crearLog(this.productoAEliminar!.id, 'eliminacion');
+        this.cancelarEliminar();
+      },
+      error: (error: any) => {
+        console.error('Error al eliminar producto:', error);
+        this.cargando = false;
+      }
+    });
   }
 
   cancelarEliminar() {
     this.mostrarConfirmacion = false;
     this.productoAEliminar = null;
-    this.cargandoProducto = false;
-    this.cdr.detectChanges();
+    this.cargando = false;
   }
 
-  // Función para formatear el número según el formato argentino (convierte de argentino a número)
-  formatearNumeroArgentino(valor: string): number {
-    if (!valor) return 0;
 
-    // Convertir a string si viene como número
-    const valorStr = valor.toString();
-
-    // Si contiene coma, es decimal (formato argentino)
-    if (valorStr.includes(',')) {
-      // Separar parte entera y decimal
-      const partes = valorStr.split(',');
-      const parteEntera = partes[0].replace(/\./g, ''); // Quitar puntos de miles
-      const parteDecimal = partes[1] || '0';
-
-      // Formar el número en formato estándar (punto como decimal)
-      const numeroFormateado = `${parteEntera}.${parteDecimal}`;
-      return parseFloat(numeroFormateado);
-    } else {
-      // Solo contiene puntos (separadores de miles) o es un número simple
-      const numeroSinPuntos = valorStr.replace(/\./g, '');
-      return parseInt(numeroSinPuntos, 10);
-    }
+  // === MÉTODOS DE UTILIDAD ===
+  esAdmin(): boolean {
+    return this.authService.esAdmin();
   }
 
-  // Función para convertir número a formato argentino (para mostrar en el input)
-  convertirAFormatoArgentino(numero: number): string {
-    if (!numero && numero !== 0) return '';
+  crearLog(idProducto: string, accion: string) {
+    const nuevoLog: Log = {
+      id_producto: idProducto,
+      id_user: this.authService.getUserId(),
+      accion: accion,
+      date: new Date(),
+      user_admin: this.authService.getIdAdmin()
+    };
 
-    const numeroStr = numero.toString();
-
-    // Si tiene decimales
-    if (numeroStr.includes('.')) {
-      const partes = numeroStr.split('.');
-      const parteEntera = partes[0];
-      const parteDecimal = partes[1];
-
-      // Formatear parte entera con puntos cada 3 dígitos
-      const enteraFormateada = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-      return `${enteraFormateada},${parteDecimal}`;
-    } else {
-      // Solo parte entera, formatear con puntos
-      return numero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    }
+    this.logsService.crearLog(nuevoLog).subscribe({
+      next: (logCreado) => console.log('Log creado:', logCreado),
+      error: (errorLog) => console.error('Error al crear log:', errorLog)
+    });
   }
 
-  // Función que se ejecuta cuando el usuario termina de editar el precio
-  onPrecioCostoChange(event: any) {
-    const valorIngresado = event.target.value;
-    const numeroFormateado = this.formatearNumeroArgentino(valorIngresado);
-    this.nuevoProducto.precio_costo = numeroFormateado;
-
-    // Actualizar el input con el formato argentino correcto
-    this.precioCostoInput = this.convertirAFormatoArgentino(numeroFormateado);
-    event.target.value = this.precioCostoInput;
+  // === MÉTODOS DE EVENTOS DE CARGA ===
+  onCargaCompleta() {
+    this.cargando = false;
+    const idAdmin = this.authService.getIdAdmin();
+    this.cargarProductos(idAdmin);
   }
 
-  // Función que se ejecuta cuando se enfoca el input
-  onPrecioCostoFocus(event: any) {
-    // Si el input está vacío y hay un valor en el modelo, mostrar el formato argentino
-    if (!event.target.value && this.nuevoProducto.precio_costo) {
-      this.precioCostoInput = this.convertirAFormatoArgentino(this.nuevoProducto.precio_costo);
-      event.target.value = this.precioCostoInput;
-    }
+  onCargaIniciada() {
+    this.cargando = true;
+    this.mensaje = 'Procesando productos esto puede tardar unos segundos...';
   }
+
 }
