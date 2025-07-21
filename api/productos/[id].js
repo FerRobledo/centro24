@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
         return res.status(200).end();
     }
 
-
+    
     // GET
     if (req.method === 'GET') {
         const { id } = req.query;
@@ -39,18 +39,14 @@ module.exports = async (req, res) => {
     // PUT para actualizar cualquier campo del producto
     if (req.method === 'PUT') {
         try {
-            const idProducto = req.query.id; // ID del producto desde la URL
-            const { idAdmin } = req.body; // ID del admin desde el body
-            const payload = req.body; // Datos completos desde el body
-
-            console.log("El payload del update es: ", payload);
-
-            if (!idProducto) {
-                return res.status(400).json({ error: 'ID del producto es requerido' });
+            const { id } = req.query; // Extraer id de los parámetros de la URL
+            if (!id) {
+                return res.status(400).json({ error: 'ID es requerido' });
             }
 
-            if (!idAdmin) {
-                return res.status(400).json({ error: 'ID del administrador es requerido' });
+            // Verificar y parsear el cuerpo de la solicitud
+            if (!req.body || typeof req.body !== 'object') {
+                return res.status(400).json({ error: 'Cuerpo de la solicitud inválido o ausente' });
             }
 
             // Crear instancia de ProductoDTO con los datos del cuerpo
@@ -62,11 +58,11 @@ module.exports = async (req, res) => {
                 return res.status(400).json({ error: 'Datos inválidos', details: error.message });
             }
 
-            // Obtener el producto actual para cálculos o validaciones y verificar que pertenece al admin
-            const selectQuery = 'SELECT precio_costo, ganancia, id_admin FROM productos WHERE id = $1 AND id_admin = $2';
-            const { rows: currentRows } = await pool.query(selectQuery, [idProducto, idAdmin]);
+            // Obtener el producto actual para cálculos o validaciones
+            const selectQuery = 'SELECT precio_costo, ganancia, id_admin FROM productos WHERE id = $1';
+            const { rows: currentRows } = await pool.query(selectQuery, [id]);
             if (currentRows.length === 0) {
-                return res.status(404).json({ error: 'Producto no encontrado o no pertenece al administrador' });
+                return res.status(404).json({ error: 'Producto no encontrado' });
             }
             const currentProducto = currentRows[0];
 
@@ -80,10 +76,8 @@ module.exports = async (req, res) => {
                 productoDTO.precio_venta = nuevoPrecioVenta;
             }
 
-            // Obtener solo los campos a actualizar (excluyendo idAdmin)
+            // Obtener solo los campos a actualizar
             const updates = productoDTO.getUpdates();
-            delete updates.idAdmin; // Remover idAdmin de los updates
-
             if (Object.keys(updates).length === 0) {
                 return res.status(400).json({ error: 'No se proporcionaron campos para actualizar' });
             }
@@ -95,9 +89,8 @@ module.exports = async (req, res) => {
                 updateParams.push(`${key} = $${index + 1}`);
                 values.push(updates[key]);
             });
-            values.push(idProducto); // Agregar id del producto al final para la cláusula WHERE
-            values.push(idAdmin); // Agregar id del admin para la cláusula WHERE
-            const query = `UPDATE productos SET ${updateParams.join(', ')} WHERE id = $${values.length - 1} AND id_admin = $${values.length} RETURNING *`;
+            values.push(id); // Agregar id al final para la cláusula WHERE
+            const query = `UPDATE productos SET ${updateParams.join(', ')} WHERE id = $${values.length} RETURNING *`;
 
             // Ejecutar la consulta
             const { rows } = await pool.query(query, values);
@@ -110,95 +103,45 @@ module.exports = async (req, res) => {
 
     // POST para agregar un producto
     if (req.method === 'POST') {
-        const { accion } = req.body;
+        try {
+            console.log('Datos recibidos en req.body:', req.body); // Depuración
+            const productoDTO = new ProductoDTO(req.body);
+            const error = productoDTO.validateRequired();
+            if (error) {
+                return res.status(400).json({ error });
+            }
 
-        // La accion 'addAll' viene si se quieren agregar varios productos a la vez
-        if (accion != "addAll") {
-            try {
-                const productoDTO = new ProductoDTO(req.body);
+            // Verificar si el producto ya existe
+            const { id, id_admin } = productoDTO;
+            const result = await pool.query('SELECT * FROM productos WHERE id = $1 AND id_admin = $2', [id, id_admin]);
+            if (result.rows.length > 0) {
+                return res.status(400).json({ message: 'El producto ya existe' });
+            }
 
-                // Verificar si el producto ya existe
-                const { id, id_admin } = productoDTO;
-                const result = await pool.query('SELECT * FROM productos WHERE id = $1 AND id_admin = $2', [id, id_admin]);
-                if (result.rows.length > 0) {
-                    return res.status(400).json({ message: 'El producto ya existe' });
-                }
-
-                // Insertar el nuevo producto
-                const { precio_costo, descripcion, imagen, stock, categoria, ganancia, precio_venta } = productoDTO;
-                const query = `
+            // Insertar el nuevo producto
+            const { precio_costo, descripcion, imagen, stock, categoria, ganancia, precio_venta } = productoDTO;
+            const query = `
                 INSERT INTO productos (id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                 RETURNING *
             `;
-                const values = [id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta];
-                const { rows } = await pool.query(query, values);
+            const values = [id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta];
+            const { rows } = await pool.query(query, values);
 
-                return res.status(201).json({ message: 'Producto agregado a la base de datos', producto: rows[0] });
-            } catch (error) {
-                console.error('Error al crear el producto:', error);
-                return res.status(500).json({ message: 'Error al crear el producto', details: error.message });
-            }
-        } else {
-            const productos = req.body.productos;
-            const productosSinDuplicados = filtrarProductosUnicos(productos);
-
-            if (!Array.isArray(productosSinDuplicados) || productosSinDuplicados.length === 0) {
-                return res.status(400).json({ error: 'No se enviaron productos' });
-            }
-
-            const valores = [];
-            const placeholders = [];
-
-            productosSinDuplicados.forEach((p, index) => {
-                const productoDTO = new ProductoDTO(p);
-                const baseIndex = index * 9;
-
-                valores.push(
-                    productoDTO.id,
-                    productoDTO.precio_costo,
-                    productoDTO.descripcion,
-                    productoDTO.imagen,
-                    productoDTO.stock,
-                    productoDTO.categoria,
-                    productoDTO.id_admin,
-                    productoDTO.ganancia,
-                    productoDTO.precio_venta
-                );
-
-                const grupo = `($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, $${baseIndex + 4}, $${baseIndex + 5}, $${baseIndex + 6}, $${baseIndex + 7}, $${baseIndex + 8}, $${baseIndex + 9})`;
-                placeholders.push(grupo);
-            });
-
-            const query = `
-                INSERT INTO productos (id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta)
-                VALUES ${placeholders.join(', ')}
-                ON CONFLICT (id, id_admin)
-                DO UPDATE SET
-                precio_costo = EXCLUDED.precio_costo,
-                descripcion = EXCLUDED.descripcion,
-                imagen = EXCLUDED.imagen,
-                stock = EXCLUDED.stock,
-                categoria = EXCLUDED.categoria,
-                precio_venta = EXCLUDED.precio_venta
-                RETURNING *;
-            `;
-
-            try {
-                const { rows } = await pool.query(query, valores);
-                return res.status(200).json({ message: `Se insertaron/actualizaron ${rows.length} productos`, productos: rows });
-            } catch (error) {
-                console.error('Error al hacer UPSERT de productos:', error);
-                return res.status(500).json({ error: 'Error al insertar o actualizar productos', details: error.message });
-            }
+            return res.status(201).json({ message: 'Producto agregado a la base de datos', producto: rows[0] });
+        } catch (error) {
+            console.error('Error al crear el producto:', error);
+            return res.status(500).json({ message: 'Error al crear el producto', details: error.message });
         }
+    } else {
+        res.status(405).json({ message: 'Método no permitido' });
     }
 
-    // DELETE
+/*
     if (req.method === 'DELETE') {
         try {
             // Extraer id_admin de la ruta y id_producto del query con validación
-            const { id } = req.query; // Usa el operador opcional
+            const {id} = req.query; // Usa el operador opcional
             const id_producto = req.query?.id_producto;
 
             console.log('Parámetros recibidos:', { id_producto, id });
@@ -229,23 +172,8 @@ module.exports = async (req, res) => {
             console.error('Error al eliminar el producto:', error.stack || error.message || error);
             return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
         }
+    } else {
+        return res.status(405).json({ message: 'Método no permitido' });
     }
-
-    // Si ningún método coincide
-    return res.status(405).json({ message: 'Método no permitido' });
-}
-
-function filtrarProductosUnicos(productos) {
-    const vistos = new Set();
-    const unicos = [];
-
-    for (const producto of productos) {
-        const clave = `${producto.id}-${producto.id_admin}`;
-        if (!vistos.has(clave)) {
-            vistos.add(clave);
-            unicos.push(producto);
-        }
-    }
-
-    return unicos;
+*/
 }

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, from, map, mergeMap, Observable, of, toArray } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { Usuario } from 'src/assets/dto/usuario';
 import { Producto, ProductoDTO } from 'src/assets/dto/producto';
 
 @Injectable({
@@ -10,43 +11,30 @@ import { Producto, ProductoDTO } from 'src/assets/dto/producto';
 export class ProductosService {
   private origin = window.location.origin;
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
-  public getProductos(id: number): Observable<any> {
-    return this.http.get(this.origin + '/api/productos/' + id);
+  public getProductos(): Observable<any[]> {
+    const id_admin = this.authService.getIdAdmin();
+    return this.http.get<any[]>(this.origin + '/api/productos/' + id_admin);
   }
 
   public actualizarProducto(producto: ProductoDTO): Observable<Producto> {
-    const idAdmin = this.authService.getIdAdmin();
     const updates = producto.getUpdates();
-    const body = { ...updates, idAdmin };
-    return this.http.put<Producto>(this.origin + '/api/productos/' + producto.id, body);
+    return this.http.put<Producto>(this.origin + '/api/productos/' + producto.id, updates);
   }
 
-  public actualizarStock(id: number, stock: number): Observable<any> {
-    return this.http.put(this.origin + '/api/productos', { id, stock });
-  }
-
-  public addProducto(producto: Producto): Observable<any> {
+  public addProducto(producto: ProductoDTO): Observable<any> {
     const id_admin = this.authService.getIdAdmin();
     const nuevoProducto = new ProductoDTO({ ...producto, id_admin });
     return this.http.post(this.origin + '/api/productos/' + id_admin, nuevoProducto);
   }
 
-  public eliminarProducto(producto: ProductoDTO): Observable<any> {
-    const id_admin = this.authService.getIdAdmin();
+
+  public eliminarProducto(producto: ProductoDTO): Observable<any> { // Cambié a any por simplicidad, ajusta si necesitas Producto
+    const id_admin = this.authService.getIdAdmin(); // Obtener id_admin del servicio de autenticación
     const id_producto = producto.id;
     const url = `${this.origin}/api/productos/${id_admin}`;
-    return this.http.delete<any>(url, { params: { id_producto: id_producto.toString() } });
+    return this.http.delete<any>(url, { params: { id_producto } });
   }
 
-  public addAllProductos(productos: ProductoDTO[]): Observable<void> {
-    const id_admin = this.authService.getIdAdmin();
-    const nuevosProductos = productos.map(producto => ({
-      ...producto,
-      id_admin
-    }));
-    console.log(nuevosProductos.length);
-    return this.http.post<any>(`${this.origin}/api/productos/${id_admin}`, {accion: 'addAll', productos: nuevosProductos})
-  }
 }
