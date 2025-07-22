@@ -129,26 +129,46 @@ module.exports = async (req, res) => {
         }
     }
 
-    // PUT
-    if (req.method === 'PUT') {
-        const idClient = req.query.id;
-        const { idAdmin } = req.body;
-        const payload = req.body;
+  if (req.method === 'PUT') {
+    const { accion, porcentaje, ...payload } = req.body;
+    const idAdmin = req.query.id;
+    const idClient = req.query.idClient;
 
+    if (!idAdmin) {
+    return res.status(400).json({ error: 'Error falta id ' });
+    }
+
+    if (accion === 'incrementar') {
+        try {
+            const { rows } = await pool.query(
+            `UPDATE public.clientes_mensuales
+            SET monto = ROUND(monto + (monto * $1 / 100), 2)
+            WHERE user_admin = $2
+            RETURNING *;`,
+            [porcentaje, idAdmin]
+            );
+            return res.status(200).json(rows);
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Error al incrementar monto', details: error.message });
+        }
+    } else {
         if (!idClient) {
-            return res.status(400).json({ error: 'Error falta id para actualizar usuario' });
+            return res.status(400).json({ error: 'Falta id del cliente para actualizar' });
         }
         try {
-            const { rows } = await pool.query(`
-                UPDATE public.clientes_mensuales
-                SET tipo = $1,
-                    cliente = $2,
-                    mensual = $3,
-                    bonificacion = $4,
-                    monto = $5
-                WHERE id_client = $6 AND user_admin = $7
-                RETURNING *;
-            `, [payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.monto, idClient, idAdmin]);
+            const { rows } = await pool.query(
+            `UPDATE public.clientes_mensuales
+            SET tipo = $1,
+                cliente = $2,
+                mensual = $3,
+                bonificacion = $4,
+                monto = $5
+            WHERE id_client = $6 AND user_admin = $7
+            RETURNING *;`,
+            [payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.monto, idClient, idAdmin]
+            );
 
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'Cliente no encontrado o no autorizado' });
@@ -157,9 +177,10 @@ module.exports = async (req, res) => {
             return res.status(200).json(rows[0]);
         } catch (error) {
             console.log(error);
-            return res.status(500).json({ error: 'Error no se pudo actualizar el cliente', details: error.message });
+            return res.status(500).json({ error: 'Error al actualizar cliente', details: error.message });
         }
-    }
+        }
+    } 
 
     // DELETE
     if (req.method === 'DELETE') {
@@ -213,7 +234,47 @@ module.exports = async (req, res) => {
         }
     }
 
-    // Si no es ninguno de los métodos soportados
-    res.setHeader('Allow', 'GET, POST, PUT, DELETE, OPTIONS');
-    return res.status(405).json({ error: `Método ${req.method} no permitido` });
-};
+    // GET MES CLIENT
+    if (req.method === 'GET') {
+        const month = req.query.monthSelected;
+
+        if (!month) {
+            return res.status(400).json({
+                error: 'Error falta mes',
+                details: 'No se recibió el mes necesario',
+            });
+        }
+
+        try {
+            const { rows } = await pool.query(
+                `
+        SELECT * 
+        FROM public.clientes_mensuales cm
+        JOIN public.pagos_mensuales pm 
+          ON cm.id_client = pm.id_client
+        WHERE pm.mes = $1
+        `,
+                [month]
+            );
+
+            res.json(rows);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({
+                error: 'Error no se pudo obtener los clientes del mes',
+                details: error.message,
+            });
+        }
+    }
+}
+async function getPagos(id_cliente, id_admin) {
+    const query = `
+        SELECT *  
+        FROM pagos_mensuales
+        WHERE id_client = $1 and id_admin = $2
+        ORDER BY fecha_pago DESC
+    `;
+    const { rows } = await pool.query(query, [id_cliente, id_admin]);
+    return rows;
+}
+
