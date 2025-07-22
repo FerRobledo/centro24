@@ -47,6 +47,9 @@ export class CobranzaComponent implements OnInit, OnDestroy {
         this.cobranzaService.closeClientsOfDay(id).subscribe({
           next: (data) => {
             this.collectionDay = data.total;
+            if(data === 0){
+              this.collectionDay = 0;
+            }
             this.cdr.detectChanges(); //revisá este componente ya mismo por si hay algo que cambió y actualizá el HTML.
           },
           error: (error) => {

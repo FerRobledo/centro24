@@ -24,7 +24,7 @@
             <br>
             {{ today | date:'dd/MM/yyyy' }}
           </p>
-          <input type="text" [value]="(collectionDay > 0) ? ('$' + (collectionDay | number:'1.0-0')) : ''"
+          <input type="text" [value]="(collectionDay >= 0) ? ('$' + (collectionDay | number:'1.0-0')) : ''"
             placeholder="Total diario"
             class="text-center justify-center border rounded-md px-2 py-1 w-28 text-sm h-[35px]">
         </div>
