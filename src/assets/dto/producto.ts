@@ -31,7 +31,7 @@ export class ProductoDTO {
     this.stock = producto.stock || 0;
     this.categoria = producto.categoria || '';
     this.id_admin = producto.id_admin || 0; // Valor por defecto 0 si no se proporciona
-    this.ganancia = producto.ganancia || null;
+    this.ganancia = producto.ganancia ?? 0;  //preserva el cero
     this.precio_venta = producto.precio_venta || 0;
     this.cantidadModificar = producto.cantidadModificar || null;
   }
@@ -57,7 +57,7 @@ export class ProductoDTO {
     if (this.stock !== 0) updates.stock = this.stock;
     if (this.categoria !== '') updates.categoria = this.categoria;
     if (this.id_admin !== 0) updates.id_admin = this.id_admin;
-    if (this.ganancia !== null) updates.ganancia = this.ganancia; // Solo si se proporciona
+    if (this.ganancia !== undefined && this.ganancia !== null) updates.ganancia = this.ganancia; // Incluye 0
     if (this.precio_venta !== 0) updates.precio_venta = this.precio_venta;
     return updates;
   }

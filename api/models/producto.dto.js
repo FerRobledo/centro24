@@ -7,7 +7,7 @@ class ProductoDTO {
         this.stock = stock || 0;
         this.categoria = categoria || '';
         this.id_admin = id_admin || 0; // Valor por defecto 0 si no se proporciona
-        this.ganancia = ganancia || null;
+        this.ganancia = ganancia ?? null;
         this.precio_venta = precio_venta || 0;
         this.cantidadModificar = cantidadModificar || null;
     }
@@ -27,14 +27,14 @@ class ProductoDTO {
     getUpdates() {
         const updates = {};
         if (this.id) updates.id = this.id;
-        if (this.precio_costo !== 0) updates.precio_costo = this.precio_costo;
+        if (this.precio_costo !== undefined && this.precio_costo !== null) updates.precio_costo = this.precio_costo;
         if (this.descripcion !== null) updates.descripcion = this.descripcion; // Solo si se proporciona
         if (this.imagen !== null) updates.imagen = this.imagen; // Solo si se proporciona
-        if (this.stock !== 0) updates.stock = this.stock;
+        if (this.stock !== undefined && this.stock !== null) updates.stock = this.stock;
         if (this.categoria) updates.categoria = this.categoria;
-        if (this.id_admin !== 0) updates.id_admin = this.id_admin;
-        if (this.ganancia !== null) updates.ganancia = this.ganancia; // Solo si se proporciona
-        if (this.precio_venta !== 0) updates.precio_venta = this.precio_venta;
+        if (this.id_admin !== undefined && this.id_admin !== null) updates.id_admin = this.id_admin;
+        if (this.ganancia !== undefined && this.ganancia !== null) updates.ganancia = this.ganancia; // Incluye explícitamente 0
+        if (this.precio_venta !== undefined && this.precio_venta !== null) updates.precio_venta = this.precio_venta;
         return updates;
     }
 }
