@@ -65,7 +65,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     this.subscriptions.add(
-      this.productosService.getProductos().subscribe({
+      this.productosService.getProductos(idAdmin).subscribe({
         next: (data: Producto[]) => {
           this.productos = data.map((producto: Producto) => new ProductoDTO(producto));
           this.productosFiltrados = [...this.productos];
