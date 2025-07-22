@@ -18,11 +18,36 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    this.clientsOfMonth = this.clientsOfMonth.map(client => {
+      const pagos = client.pagos || [];
+      if (pagos.length > 0) {
+        const pagosOrdenados = pagos.sort((a: { periodo_hasta: string | number | Date; }, b: { periodo_hasta: string | number | Date; }) =>
+          new Date(b.periodo_hasta).getTime() - new Date(a.periodo_hasta).getTime()
+        );
+        const ultimoPago = new Date(pagosOrdenados[0].periodo_hasta);
+        const hoy = new Date();
+
+        const mesesActivos = this.calcularMesesDiferencia(hoy, ultimoPago);
+
+        return {
+          ...client,
+          mesesActivos: mesesActivos,
+          periodoHasta: ultimoPago
+        };
+      }
+
+      return {
+        ...client,
+        mesesActivos: 0,
+        periodoHasta: null
+      };
+    });
   }
 
   ngOnDestroy(): void {
     this.dialog.closeAll();
   }
+
   @Output() loadClientsMonthly = new EventEmitter<void>();
   @Input() clientsOfMonth: any[] = [];
   clicked: Boolean = false;
@@ -58,5 +83,12 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
         },
       })
     }
+  }
+  
+  calcularMesesDiferencia(desde: Date, hasta: Date): number {
+    const anios = hasta.getFullYear() - desde.getFullYear();
+    const meses = hasta.getMonth() - desde.getMonth();
+    const total = anios * 12 + meses;
+    return total >= 0 ? total + 1 : 0;
   }
 }

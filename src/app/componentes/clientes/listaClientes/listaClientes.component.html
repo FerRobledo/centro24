@@ -1,52 +1,52 @@
-<div class="p-0 overflow-y-auto h-[75vh] border border-gray-200 rounded">
-  <table class="w-full mt-4 text-left table-auto min-w-max border-collapse">
+<div class="p-0 overflow-y-auto h-[79vh] border border-gray-200 rounded">
+  <table class="w-full table-auto min-w-max border-collapse text-center">
     <thead>
       <tr>
         <th
-          class="sticky top-0 bg-slate-50 z-10 p-4 w-16 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100">
-          <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-            Tipo
+          class="sticky top-0 bg-slate-50 z-10 p-4 w-20 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100 align-middle text-center">
+          <p class="font-sans text-sm font-normal leading-none text-slate-500 m-0">
+            N° de cliente
           </p>
         </th>
         <th
-          class="sticky top-0 bg-slate-50 z-10 p-4 w-20 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100">
-          <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-            Num de cliente
-          </p>
-        </th>
-        <th
-          class="sticky top-0 bg-slate-50 z-10 p-4 w-24 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100">
-          <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+          class="sticky top-0 bg-slate-50 z-10 p-4 w-24 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100 align-middle text-center">
+          <p class="font-sans text-sm font-normal leading-none text-slate-500 m-0">
             Cliente
           </p>
         </th>
         <th
-          class="sticky top-0 bg-slate-50 z-10 p-4 w-16 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100">
-          <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+          class="sticky top-0 bg-slate-50 z-10 p-4 w-16 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100 align-middle text-center">
+          <p class="font-sans text-sm font-normal leading-none text-slate-500 m-0">
+            Tipo
+          </p>
+        </th>
+        <th
+          class="sticky top-0 bg-slate-50 z-10 p-4 w-16 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100 align-middle text-center">
+          <p class="font-sans text-sm font-normal leading-none text-slate-500 m-0">
             Mensual
           </p>
         </th>
         <th
-          class="sticky top-0 bg-slate-50 z-10 p-4 w-16 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100">
-          <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+          class="sticky top-0 bg-slate-50 z-10 p-4 w-16 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100 align-middle text-center">
+          <p class="font-sans text-sm font-normal leading-none text-slate-500 m-0">
             Bonificacion
           </p>
         </th>
         <th
-          class="sticky top-0 bg-slate-50 z-10 p-2 w-16 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100">
-          <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+          class="sticky top-0 bg-slate-50 z-10 p-4 w-16 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100 align-middle text-center">
+          <p class="font-sans text-sm font-normal leading-none text-slate-500 m-0">
             Monto
           </p>
         </th>
         <th
-          class="sticky top-0 bg-slate-50 z-10 p-2 w-16 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100">
-          <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+          class="sticky top-0 bg-slate-50 z-10 p-2 w-16 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100 align-middle text-center">
+          <p class="font-sans text-sm font-normal leading-none text-slate-500 m-0">
             Pago
           </p>
         </th>
         <th
-          class="sticky top-0 bg-slate-50 z-10 p-2 w-20 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100">
-          <p class="flex justify-center items-center gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+          class="sticky top-0 bg-slate-50 z-10 p-2 w-20 border-b border-slate-300 transition-colors cursor-pointer hover:bg-slate-100 align-middle text-center">
+          <p class="font-sans text-sm font-normal leading-none text-slate-500 m-0">
             Modificar
           </p>
         </th>
@@ -54,14 +54,14 @@
     </thead>
     <tbody *ngIf="clientsOfMonth.length > 0">
       <tr *ngFor="let client of clientsOfMonth | filtroClientes:'cliente':clientesService.filtroCliente">
-        <td class="p-4 w-16 border-b border-slate-200">
-          <p class="text-sm text-slate-500">{{ client.tipo }}</p>
-        </td>
         <td class="p-4 w-20 border-b border-slate-200">
           <p class="text-sm text-slate-500">{{ client.id_client }}</p>
         </td>
         <td class="p-4 w-24 border-b border-slate-200">
           <p class="text-sm text-slate-500">{{ client.cliente }}</p>
+        </td>
+        <td class="p-4 w-16 border-b border-slate-200">
+          <p class="text-sm text-slate-500">{{ client.tipo }}</p>
         </td>
         <td class="p-4 w-16 border-b border-slate-200">
           <p class="text-sm text-slate-500">{{ client.mensual }}</p>
@@ -72,8 +72,35 @@
         <td class="p-4 w-16 border-b border-slate-200">
           <p class="text-sm text-slate-500">{{ client.monto }}</p>
         </td>
-        <td class="p-4 w-16 border-b border-slate-200">
-          <p class="text-sm text-slate-500">{{ client.periodo_hasta | date: 'yyyy-MM' }}</p>
+        <td class="p-4 w-32 border-b border-slate-200 text-center">
+          <div class="flex flex-col items-center text-sm">
+
+            <!-- Línea 1: Meses activos -->
+            <ng-container *ngIf="client.mesesActivos > 0; else sinPago">
+              <div class="font-semibold" [ngClass]="{
+                'text-green-600': client.mesesActivos > 1,
+                'text-yellow-600 flex items-center gap-1': client.mesesActivos === 1
+              }">
+                <ng-container *ngIf="client.mesesActivos === 1">
+                  Último mes pago
+                </ng-container>
+                <ng-container *ngIf="client.mesesActivos > 1">
+                  {{ client.mesesActivos }} meses pagos
+                </ng-container>
+              </div>
+
+              <!-- Línea 2: Hasta qué mes -->
+              <div class="text-slate-500 text-xs mt-1">
+                {{ client.periodoHasta | date: 'MMMM yyyy' }}
+              </div>
+            </ng-container>
+
+            <!-- Si no tiene pagos -->
+            <ng-template #sinPago>
+              <div class="text-red-600 font-semibold">Sin pagos</div>
+            </ng-template>
+
+          </div>
         </td>
         <td class="p-2 w-20 border-b border-slate-200">
           <div class="flex gap-2 justify-center items-center">
