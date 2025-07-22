@@ -5,6 +5,8 @@ import { ClientesService } from 'src/app/services/clientes.service';
 import { AgregarPagoModalComponent } from './agregarPagoModal/agregarPagoModal.component';
 import { InsertarClienteComponent } from './insertarCliente/insertarCliente.component';
 import { Subscription } from 'rxjs';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { ConfirmarDeleteComponent } from '../productos/confirmar-delete/confirmar-delete.component';
 
 @Component({
   selector: 'app-clientes',
@@ -12,6 +14,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./clientes.component.css']
 })
 export class ClientesComponent implements OnInit, OnDestroy {
+  porcentaje: number | null = null; // enlazado al input
   clientsOfMonth: any[] = [];
   months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   payThisMonth: { [id: number]: any } = {};
@@ -120,5 +123,54 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   detectChanges(){
     this.cdr.detectChanges();
+  }
+
+  abrirConfirmacion() {
+    let titulo = 'Confirmar incremento';
+    let mensaje = '';
+  
+    if (!this.porcentaje || isNaN(this.porcentaje)) {
+      titulo = 'Atención';
+      mensaje = 'Por favor, ingrese un porcentaje válido antes de continuar.';
+    } else {
+      mensaje = `¿Seguro que querés aplicar un incremento del ${this.porcentaje}%?`;
+    }
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: titulo,
+        message: mensaje
+      }
+    });
+    
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        
+        const idAdmin = this.authService.getIdAdmin();
+        this.cdr.detectChanges();
+      
+        if (idAdmin && this.porcentaje !== null) {
+          this.subscriptions.add(
+            this.clientesService.incrementClient(idAdmin, this.porcentaje).subscribe({
+              next: (data) => {
+                console.log(data);
+                this.cdr.detectChanges();
+                this.loadClientsMonthly();
+              },
+              error: (error) => {
+                console.error(error);
+                this.cdr.detectChanges();
+                this.loadClientsMonthly();
+              },
+              complete: () => {
+                this.cdr.detectChanges();
+                this.loadClientsMonthly();
+              }
+            })
+          );
+        }
+      }      
+    });
   }
 }

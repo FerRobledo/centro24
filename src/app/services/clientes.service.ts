@@ -39,4 +39,9 @@ export class ClientesService {
     const data = {infoPago, accion:'addPago'}
     return this.http.post(this.origin + '/api/clientes/' + idAdmin, data)
   }
+
+  public incrementClient(idAdmin: number, porcentaje: number): Observable<any> {
+    const body = { porcentaje, accion:'incrementar' }; 
+    return this.http.put(this.origin + '/api/clientes/' + idAdmin, body);
+  }
 }
