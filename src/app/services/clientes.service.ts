@@ -44,4 +44,9 @@ export class ClientesService {
     const body = { porcentaje, accion:'incrementar' }; 
     return this.http.put(this.origin + '/api/clientes/' + idAdmin, body);
   }
+  
+  public deletePago(idAdmin: number, pago: any): Observable<any>{
+    const body = {pago, accion:'deletePago'};
+    return this.http.delete(this.origin + '/api/clientes/' + idAdmin, { body });
+  }
 }

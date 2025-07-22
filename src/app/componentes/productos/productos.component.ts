@@ -25,6 +25,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   categoriasUnicas: string[] = [];
   filtroTexto: string = '';
   filtroStockActivo: boolean = false;
+  mostrarSoloStock: boolean = false;
 
   // Estados del formulario
   mostrarFormulario: boolean = false;
@@ -92,10 +93,15 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   aplicarTodosLosFiltros() {
     let resultado = [...this.productos];
+    console.log('Productos iniciales:', resultado.length);
+    console.log('Filtro stock activo:', this.filtroStockActivo);
 
     // 1. Filtrar por stock si está activado
     if (this.filtroStockActivo) {
-      resultado = resultado.filter(p => p.stock > 0);
+      const productosConStock = resultado.filter(p => p.stock > 0);
+      console.log('Productos con stock > 0:', productosConStock.length);
+      console.log('Stocks encontrados:', resultado.map(p => ({ id: p.id, stock: p.stock })));
+      resultado = productosConStock;
     }
 
     // 2. Filtrar por texto si hay búsqueda
@@ -115,6 +121,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     }
 
     this.productosFiltrados = resultado;
+    console.log('Productos filtrados finales:', this.productosFiltrados.length);
   }
 
   aplicarFiltros(filtrarStock: boolean = false) {
@@ -124,12 +131,23 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   filtrarStockMayorCero() {
     this.filtroStockActivo = true;
+    this.mostrarSoloStock = true;
     this.aplicarTodosLosFiltros();
   }
 
   mostrarTodos() {
     this.filtroStockActivo = false;
+    this.mostrarSoloStock = false;
     this.aplicarTodosLosFiltros();
+  }
+
+  // Método para el toggle switch
+  toggleFiltroStock(checked: boolean) {
+    console.log('Toggle activado:', checked); // Para debug
+    this.mostrarSoloStock = checked;
+    this.filtroStockActivo = checked;
+    this.aplicarTodosLosFiltros();
+    console.log('Productos filtrados:', this.productosFiltrados.length); // Para debug
   }
 
 

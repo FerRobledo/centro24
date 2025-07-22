@@ -62,7 +62,8 @@
             class="flex-1 overflow-auto"></app-listaClientes>
         </mat-tab>
         <mat-tab label="Pagos" class="flex flex-col h-full">
-          <app-listaPagos [clientes]="clientsOfMonth" class="flex-1 overflow-auto"></app-listaPagos>
+          <app-listaPagos [clientes]="clientsOfMonth" (loadClientsMonthly)="loadClientsMonthly()" class="flex-1
+            overflow-auto"></app-listaPagos>
         </mat-tab>
       </mat-tab-group>
     </ng-template>
