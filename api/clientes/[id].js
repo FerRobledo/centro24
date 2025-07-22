@@ -129,69 +129,58 @@ module.exports = async (req, res) => {
         }
     }
 
-    if (req.method === 'PUT') {
-        const { accion, porcentaje, ...payload } = req.body;
-        const idAdmin = req.query.id;
+  if (req.method === 'PUT') {
+    const { accion, porcentaje, ...payload } = req.body;
+    const idAdmin = req.query.id;
+    const idClient = req.query.idClient;
 
-        if (!idAdmin) {
-            return res.status(500).json({
-                error: 'Error falta id para actualizar usuario',
-                details: 'No se recibió el ID en la URL',
-            });
-        }
-
-        if (accion === 'incrementar') {
-            try {
-                const { rowCount } = await pool.query(
-                    `UPDATE public.clientes_mensuales
-                    SET monto = ROUND(monto + (monto * $1 / 100), 2)
-                    WHERE user_admin = $2;`,
-                    [porcentaje, idAdmin]
-                );
-
-                return res.status(200).json({
-                    message: `Incremento del ${porcentaje}% aplicado correctamente.`,
-                    updated: rowCount,
-                });
-            } catch (error) {
-                console.error(error);
-                return res.status(500).json({
-                    error: 'Error no se pudo actualizar el incremento',
-                    details: error.message,
-                });
-            }
-        } else {
-            // code para actualizar UN cliente
-            const idClient = req.query.id;
-            const { idAdmin } = req.body;
-            const payload = req.body;
-
-            if (!idClient) {
-                return res.status(400).json({ error: 'Error falta id para actualizar usuario' });
-            }
-            try {
-                const { rows } = await pool.query(`
-                    UPDATE public.clientes_mensuales
-                    SET tipo = $1,
-                        cliente = $2,
-                        mensual = $3,
-                        bonificacion = $4,
-                        monto = $5
-                    WHERE id_client = $6 AND user_admin = $7
-                    RETURNING *;
-                `, [payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.monto, idClient, idAdmin]);
-
-                if (rows.length === 0) {
-                    return res.status(404).json({ error: 'Cliente no encontrado o no autorizado' });
-                }
-
-                return res.status(200).json(rows[0]);
-            } catch (error) {
-                console.log(error);
-                return res.status(500).json({ error: 'Error no se pudo actualizar el cliente', details: error.message });
-            }
-        }
+    if (!idAdmin) {
+    return res.status(400).json({ error: 'Error falta id ' });
     }
+
+    if (accion === 'incrementar') {
+        try {
+            const { rows } = await pool.query(
+            `UPDATE public.clientes_mensuales
+            SET monto = ROUND(monto + (monto * $1 / 100), 2)
+            WHERE user_admin = $2
+            RETURNING *;`,
+            [porcentaje, idAdmin]
+            );
+            return res.status(200).json(rows);
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Error al incrementar monto', details: error.message });
+        }
+    } else {
+        if (!idClient) {
+            return res.status(400).json({ error: 'Falta id del cliente para actualizar' });
+        }
+        try {
+            const { rows } = await pool.query(
+            `UPDATE public.clientes_mensuales
+            SET tipo = $1,
+                cliente = $2,
+                mensual = $3,
+                bonificacion = $4,
+                monto = $5
+            WHERE id_client = $6 AND user_admin = $7
+            RETURNING *;`,
+            [payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.monto, idClient, idAdmin]
+            );
+
+            if (rows.length === 0) {
+                return res.status(404).json({ error: 'Cliente no encontrado o no autorizado' });
+            }
+
+            return res.status(200).json(rows[0]);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ error: 'Error al actualizar cliente', details: error.message });
+        }
+        }
+    } 
 
     // DELETE
     if (req.method === 'DELETE') {
@@ -278,8 +267,6 @@ module.exports = async (req, res) => {
         }
     }
 }
-
-
 async function getPagos(id_cliente, id_admin) {
     const query = `
         SELECT *  
@@ -291,7 +278,3 @@ async function getPagos(id_cliente, id_admin) {
     return rows;
 }
 
-
-res.setHeader('Allow', 'GET, POST, PUT, DELETE, OPTIONS');
-return res.status(405).json({ error: `Método ${req.method} no permitido` });
-;
