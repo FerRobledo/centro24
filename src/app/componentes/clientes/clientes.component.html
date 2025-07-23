@@ -1,58 +1,21 @@
 <div class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl bg-clip-border">
-  <div class="relative mt-4 h-full text-slate-700 bg-white rounded-none bg-clip-border flex flex-col">
-    <div class="flex justify-between items-start w-full">
-      <div class="flex items-start gap-8 ml-4">
-        <div>
-          <h3 class="text-lg font-semibold text-slate-800">
-            <i class="fa-solid fa-user-group"></i> Clientes de Centro 24
-          </h3>
-          <p class="text-slate-500">Listar clientes mensuales</p>
-        </div>
-      </div>
-      <div class="flex items-center">
-        <button (click)="agregarCliente()"
-          class="flex select-none items-center gap-1 rounded bg-green-600 py-2 mr-12 mt-2 px-4 text-xs font-semibold text-white"
-          type="button">
-          <i class="fa-solid fa-user-plus"></i>
-          Agregar cliente
-        </button>
-        <form>
-          <div class="form-group mt-[7px] mr-4">
-            <div class="flex items-center border border-gray-300 rounded px-2 bg-white">
-              <i class="fa fa-search text-gray-500 mr-2"></i>
-              <input type="text" class="flex-1 h-8 outline-none py-2 bg-transparent" placeholder="Filtrar"
-                name="filtrar" [(ngModel)]="clientesService.filtroCliente" (keypress)="soloLetras($event)" />
-            </div>
-          </div>
-        </form>
-      </div>
-      <button (click)="agregarPago()"
-        class="flex select-none items-center gap-2 rounded bg-green-600 py-2 mr-8 mt-2 px-4 text-xs font-semibold text-white"
-        type="button">
-        <i class="fa-solid fa-user-plus"></i>
-        Agregar pago
-      </button>
-    </div>
-
     <!-- SI ESTA CARGANDO MUESTRA EL ESTADO DE CARGA -->
     <ng-container *ngIf="isLoading; else matTab">
       <div class="flex justify-center items-center h-full">
         <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
       </div>
     </ng-container>
-
     <!-- SINO MUESTRA LAS LISTAS CLIENTES/PAGOS -->
     <ng-template #matTab>
       <mat-tab-group (selectedTabChange)="detectChanges()" class="flex flex-col h-full">
         <mat-tab label="Clientes" class="flex flex-col h-full">
           <app-listaClientes [clientsOfMonth]="clientsOfMonth" (loadClientsMonthly)="loadClientsMonthly()"
-            class="flex-1 overflow-auto"></app-listaClientes>
+            class="flex-1"></app-listaClientes>
         </mat-tab>
         <mat-tab label="Pagos" class="flex flex-col h-full">
-          <app-listaPagos [clientes]="clientsOfMonth" (loadClientsMonthly)="loadClientsMonthly()" class="flex-1
-            overflow-auto"></app-listaPagos>
+          <app-listaPagos [clientes]="clientsOfMonth" (loadClientsMonthly)="loadClientsMonthly()" class="flex-1"></app-listaPagos>
         </mat-tab>
       </mat-tab-group>
     </ng-template>
+
   </div>
-</div>

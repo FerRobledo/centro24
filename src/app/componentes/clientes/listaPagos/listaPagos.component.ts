@@ -18,9 +18,11 @@ export class ListaPagosComponent implements OnInit {
   listaPagos: any[] = [];
   @Output() loadClientsMonthly = new EventEmitter<void>();
   eliminandoPagoId: number | null = null; // guarda el id del pago que está siendo eliminado
+  filtroPago: string = '';
 
   ngOnInit() {
     this.generarListaPagos();
+    console.log(this.listaPagos);
   }
 
   generarListaPagos() {
@@ -46,4 +48,6 @@ export class ListaPagosComponent implements OnInit {
       },
     });
   }
+
+  agregarPago(){};
 }

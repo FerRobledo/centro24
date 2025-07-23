@@ -68,21 +68,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
     );
   }
 
-  agregarCliente() {
-    this.dialogRef = this.dialog.open(InsertarClienteComponent, {
-      maxWidth: '100%',
-      data: { accion: "agregar" },
-      disableClose: false,
-      autoFocus: true,
-    });
-
-    this.dialogRef.afterClosed().subscribe(result => {
-      if (result == 'submit') {
-        this.resetComponent();
-      }
-      this.dialogRef = null;
-    });
-  }
+  
 
   agregarPago() {
     this.dialogRef = this.dialog.open(AgregarPagoModalComponent, {
@@ -99,16 +85,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  soloLetras(event: KeyboardEvent): void {
-    const pattern = /[a-zA-Z\s]/;
-    const inputChar = String.fromCharCode(event.keyCode || event.which);
-
-    if (!pattern.test(inputChar)) {
-      event.preventDefault();
-    }
-  }
-
+  
   private resetComponent() {
     this.clientsOfMonth = [];
     this.payThisMonth = {};
