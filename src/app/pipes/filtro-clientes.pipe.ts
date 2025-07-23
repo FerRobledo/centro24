@@ -4,8 +4,15 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'filtroClientes'
 })
 export class FiltroClientesPipe implements PipeTransform {
-  transform(lista: any[], campo: string, valor: string): any[] { //lista es la de clients, campo es porq lo quiero filtrar y valor es lo que escribo en el input
+  transform(lista: any[], campo: string, valor: string): any[] {
     if (!valor) return lista;
-    return lista.filter(item => item[campo]?.toLowerCase().includes(valor.toLowerCase()));
+
+    const valorLower = valor.toLowerCase();
+
+    return lista.filter(item =>
+      item.tipo?.toLowerCase().includes(valorLower) ||
+      item.cliente?.toLowerCase().includes(valorLower) ||
+      item.id_client?.toString().includes(valor)
+    );
   }
 }

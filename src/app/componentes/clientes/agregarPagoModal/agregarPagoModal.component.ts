@@ -1,6 +1,6 @@
 import { DIALOG_DATA } from '@angular/cdk/dialog';
 import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
@@ -20,19 +20,32 @@ export class AgregarPagoModalComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private clientesService: ClientesService,
-    @Inject(DIALOG_DATA) public clientes: any[] = []
+    @Inject(DIALOG_DATA) public data: any,
   ) { }
 
   pagoForm!: FormGroup;
   error: string = "";
   cantidadMeses: number = 0;
   monto: number = 0;
+  clientsOfMonts: any[] = [];
   @Output() iniciarCarga = new EventEmitter<void>();
+  cliente: any = null;
+  controlCliente!: FormControl<any>;
 
   ngOnInit() {
+    // Verificás si viene `client` y lo asignás
+    if (this.data?.client) {
+      this.cliente = this.data.client;
+    }
+
+    // Asignás los clientes (por si los necesitás en un select, por ejemplo)
+    if (this.data?.clients) {
+      this.clientsOfMonts = this.data.clients;
+    }
+
     this.pagoForm = this.fb.group(
       {
-        client: [null, [Validators.required]],
+        client: [this.cliente, [Validators.required]],
         fechaDesde: ['', [Validators.required]],
         fechaHasta: [''],
       },
@@ -40,7 +53,14 @@ export class AgregarPagoModalComponent implements OnInit {
         validators: this.validarFechas
       }
     );
+
+    this.pagoForm.get('client')?.valueChanges.subscribe(cliente => {
+      this.actualizarMonto(cliente);
+    });
+
+    this.controlCliente = this.pagoForm.get('client') as FormControl<any>;
   }
+
 
   validarFechas(form: AbstractControl): ValidationErrors | null {
     const desde = form.get('fechaDesde')?.value;
@@ -128,14 +148,15 @@ export class AgregarPagoModalComponent implements OnInit {
       this.cantidadMeses = 0;
     }
 
-    this.actualizarMonto();
+    this.actualizarMonto(this.pagoForm.get('client')?.value);
   }
 
 
-  actualizarMonto() {
-    const client = this.pagoForm.value.client;
+  actualizarMonto(client: any) {
     if (client) {
       this.monto = client.monto * this.cantidadMeses;
+    } else {
+      this.monto = 0; // o el valor que corresponda si no hay cliente
     }
   }
 

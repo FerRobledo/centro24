@@ -8,7 +8,7 @@
 
     <form class="space-y-2 justify-center flex flex-col" [formGroup]="pagoForm" (ngSubmit)="crearPago()">
 
-      <app-selectorClientes [clientes]="clientes" (clienteSeleccionadoChange)="onClienteSeleccionado($event)"></app-selectorClientes>
+      <app-selectorClientes [clientes]="clientsOfMonts" [control]="controlCliente" (clienteSeleccionadoChange)="onClienteSeleccionado($event)"></app-selectorClientes>
 
       <div class="flex w-full justify-between">
         <mat-form-field appearance="fill">
