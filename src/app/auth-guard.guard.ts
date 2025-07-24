@@ -7,7 +7,7 @@ import { AuthService } from './services/auth.service';
 // Función para verificar si el token está vencido
 const isTokenExpired = (token: string | null): boolean => {
   if (!token) return true; // Si no hay token, lo consideramos expirado
-  
+
   try {
     const payload = JSON.parse(atob(token.split('.')[1])); // Decodificar el payload del JWT
     const expiry = payload.exp * 1000; // Convertir a milisegundos
@@ -18,16 +18,34 @@ const isTokenExpired = (token: string | null): boolean => {
 };
 
 // Usamos `inject` para obtener las dependencias de AuthService y Router
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = async (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
   const token = authService.getToken();
 
-  // Verificar si el token está presente
-  if (!isTokenExpired(token)) {
-    return true; // Permite el acceso a la ruta
-  } else {
-    router.navigate(['/login']); // Redirige al login si no está autenticado
-    return false; // Bloquea el acceso
+  // Validación local: si no hay token o expiró
+  if (isTokenExpired(token)) {
+    router.navigate(['/login']);
+    return false;
   }
+
+  // Validación remota contra el backend
+  const isValid = await authService.validateToken();
+  if (!isValid) {
+    router.navigate(['/login']);
+    return false;
+  }
+
+  const userRoles = authService.getUserRoles().map((r: string) => r.toLowerCase());
+  const rolRequerido = state.url.slice(1).toLowerCase();
+
+  if (rolRequerido === '' || rolRequerido === 'home') return true;
+  if (userRoles.includes('admin')) return true;
+
+  if (!userRoles.includes(rolRequerido)) {
+    router.navigate(['/']);
+    return false;
+  }
+
+  return true;
 };
