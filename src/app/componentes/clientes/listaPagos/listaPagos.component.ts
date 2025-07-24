@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
+import { AgregarPagoModalComponent } from '../agregarPagoModal/agregarPagoModal.component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-listaPagos',
@@ -8,9 +10,10 @@ import { ClientesService } from 'src/app/services/clientes.service';
   styleUrls: ['./listaPagos.component.css']
 })
 export class ListaPagosComponent implements OnInit {
-
+  private dialogRef: MatDialogRef<any> | null = null;
   constructor(
     private clienteService: ClientesService,
+    public dialog: MatDialog,
     private authService: AuthService,
   ) { }
 
@@ -18,9 +21,11 @@ export class ListaPagosComponent implements OnInit {
   listaPagos: any[] = [];
   @Output() loadClientsMonthly = new EventEmitter<void>();
   eliminandoPagoId: number | null = null; // guarda el id del pago que está siendo eliminado
+  filtroPago: string = '';
 
   ngOnInit() {
     this.generarListaPagos();
+    console.log(this.listaPagos);
   }
 
   generarListaPagos() {
@@ -44,6 +49,22 @@ export class ListaPagosComponent implements OnInit {
         console.log(error);
         this.eliminandoPagoId = null;
       },
+    });
+  }
+
+  agregarPago() {
+    this.dialogRef = this.dialog.open(AgregarPagoModalComponent, {
+      maxWidth: '100%',
+      data: { clients: this.clientes },
+      disableClose: false,
+      autoFocus: true,
+    });
+
+    this.dialogRef.afterClosed().subscribe(result => {
+      this.dialogRef = null;
+      if (result?.evento == 'pagoCreado') {
+        this.loadClientsMonthly.emit();
+      }
     });
   }
 }

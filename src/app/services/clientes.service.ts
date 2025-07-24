@@ -7,7 +7,6 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ClientesService {
-  filtroCliente: string = '';
   private origin = window.location.origin;
 
   constructor(private http: HttpClient) { }

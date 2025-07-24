@@ -22,6 +22,7 @@ export class InsertarClienteComponent implements OnInit {
   client: any = { tipo: '', cliente: '', mensual: '', bonificacion: '', monto: '' };
   meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   formMeses = new FormGroup({});
+  cargando: boolean = false;
 
   constructor(
     public dialogRef: MatDialogRef<InsertarClienteComponent>,
@@ -59,21 +60,28 @@ export class InsertarClienteComponent implements OnInit {
       mesesPagados  //aplano el form y agrego el meses pagados todo el payload
     };
     const idAdmin = this.authService.getIdAdmin();
+    this.cargando = true;
 
     if (this.accion == 'editar' && this.data.client?.id_client) {
       this.clientstService.updateClient(this.data.client.id_client, idAdmin, payload).subscribe({
         error: (err) => {
           console.error('Error al actualizar:', err);
+        },
+        complete: () => {
+          this.dialogRef.close("submit"); //cierro modal
+          this.cargando = false;
         }
       });
-      this.dialogRef.close("submit"); //cierro modal
     } else {
       this.clientstService.postClientDaily(payload, idAdmin).subscribe({
         error: (err) => {
           console.error('Error al registrar:', err);
+        },
+        complete: () => {
+          this.dialogRef.close("submit"); //cierro modal
+          this.cargando = false;
         }
       });
-      this.dialogRef.close("submit"); //cierro modal
     }
   }
 
@@ -109,14 +117,5 @@ export class InsertarClienteComponent implements OnInit {
 
   asFormControl(control: AbstractControl | null): FormControl {
     return control as FormControl;
-  }
-
-  soloLetras(event: KeyboardEvent): void { //cuando escucha el teclado, solo te deja escribir letras
-    const pattern = /[a-zA-Z\s]/;
-    const inputChar = String.fromCharCode(event.keyCode || event.which);
-
-    if (!pattern.test(inputChar)) {
-      event.preventDefault();
-    }
   }
 }

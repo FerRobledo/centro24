@@ -1,10 +1,10 @@
 <mat-form-field class="w-full" appearance="fill">
 
   <mat-label>Buscar cliente</mat-label>
-  <input type="text" placeholder="Escribí un nombre..." aria-label="Cliente" matInput [formControl]="clienteControl"
-    [matAutocomplete]="auto">
+  <input type="text" placeholder="Escribí un nombre..." aria-label="Cliente" matInput [formControl]="control"
+    (focus)="onFocus($event)" [matAutocomplete]="auto">
 
-  <mat-autocomplete #auto="matAutocomplete" [displayWith]="mostrarCliente" (optionSelected)="seleccionarCliente($event)">
+  <mat-autocomplete #auto="matAutocomplete" [displayWith]="mostrarCliente">
     <mat-option *ngFor="let cliente of clientesFiltrados" [value]="cliente">
       <div class="flex flex-col">
         <div class="font-semibold text-sm text-black">
