@@ -125,7 +125,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   aplicarFiltros(filtrarStock: boolean = false) {
+    // Resetear toggle a "Todos" cuando se aplican filtros después de operaciones CRUD
     this.filtroStockActivo = filtrarStock;
+    this.mostrarSoloStock = filtrarStock;
     this.aplicarTodosLosFiltros();
   }
 
