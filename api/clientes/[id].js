@@ -116,9 +116,9 @@ module.exports = async (req, res) => {
             try {
                 const { rows } = await pool.query(
                     `INSERT INTO public.clientes_mensuales
-                    (tipo, cliente, mensual, bonificacion, user_admin, monto)
-                    VALUES ($2, $3, $4, $5, $1, $6) RETURNING *`,
-                    [id, payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.monto]
+                    (tipo, cliente, mensual, user_admin)
+                    VALUES ($2, $3, $4, $1) RETURNING *`,
+                    [id, payload.tipo, payload.cliente, payload.mensual]
                 );
                 console.log(rows);
                 return res.status(201).json(rows[0]);
@@ -142,7 +142,7 @@ module.exports = async (req, res) => {
         try {
             const { rows } = await pool.query(
             `UPDATE public.clientes_mensuales
-            SET monto = ROUND(monto + (monto * $1 / 100), 2)
+            SET mensual = ROUND(mensual + (mensual * $1 / 100), 2)
             WHERE user_admin = $2
             RETURNING *;`,
             [porcentaje, idAdmin]
@@ -151,7 +151,7 @@ module.exports = async (req, res) => {
 
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ error: 'Error al incrementar monto', details: error.message });
+            return res.status(500).json({ error: 'Error al incrementar monto mensual', details: error.message });
         }
     } else {
         if (!idClient) {
@@ -163,11 +163,9 @@ module.exports = async (req, res) => {
             SET tipo = $1,
                 cliente = $2,
                 mensual = $3,
-                bonificacion = $4,
-                monto = $5
-            WHERE id_client = $6 AND user_admin = $7
+            WHERE id_client = $4 AND user_admin = $5
             RETURNING *;`,
-            [payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.monto, idClient, idAdmin]
+            [payload.tipo, payload.cliente, payload.mensual, idClient, idAdmin]
             );
 
             if (rows.length === 0) {

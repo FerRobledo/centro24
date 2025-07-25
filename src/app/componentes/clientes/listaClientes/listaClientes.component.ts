@@ -135,87 +135,53 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
   }
 
   mapearClientes() {
-    const hoy = new Date();
+    this.mapearMesesClientes();
+    this.mapearMontos();
+  }
 
+  mapearMontos(){
+    this.clientsOfMonth = this.clientsOfMonth.map(client =>{
+      let monto = 0;
+      if(client.tipo == "Mensual"){
+        monto = client.mensual;
+      } else if(client.tipo == "Semestral") {
+        monto = client.mensual * 5;
+      }
+
+      return {
+        ...client,
+        monto: monto,
+      }
+    })
+  }
+
+  mapearMesesClientes() {
+    const hoy = new Date;
     this.clientsOfMonth = this.clientsOfMonth.map(client => {
-      const pagos = client.pagos || [];
 
-      if (pagos.length > 0) {
-        // Ordenar pagos por fecha inicio
-        const pagosOrdenados = pagos
-          .map((p: { periodo_desde: string | number | Date; periodo_hasta: string | number | Date; }) => ({
-            desde: new Date(p.periodo_desde),
-            hasta: new Date(p.periodo_hasta)
-          }))
-          .sort((a: { desde: { getTime: () => number; }; }, b: { desde: { getTime: () => number; }; }) => a.desde.getTime() - b.desde.getTime());
+      const ultimoPago = client.pagos[client.pagos.length - 1];
 
-        // Combinar periodos
-        const periodosCombinados: { desde: Date; hasta: Date }[] = [];
-        let periodoActual = pagosOrdenados[0];
+      let mesesVigente = 0;
+      let periodoHasta;
 
-        for (let i = 1; i < pagosOrdenados.length; i++) {
-          const pago = pagosOrdenados[i];
+      // Si tiene pagos hacer el calculo de cuantos meses le quedan
+      if (ultimoPago) {
+        periodoHasta = new Date(ultimoPago.periodo_hasta);
+        mesesVigente = this.calcularMesesDiferencia(hoy, periodoHasta);
+      }
 
-          if (pago.desde <= periodoActual.hasta) {
-            // Hay solapamiento o continuidad, extendemos periodoActual
-            if (pago.hasta > periodoActual.hasta) {
-              periodoActual.hasta = pago.hasta;
-            }
-          } else {
-            // No solapan, guardamos periodoActual y comenzamos uno nuevo
-            periodosCombinados.push(periodoActual);
-            periodoActual = pago;
-          }
-        }
-        // Agregar último periodo
-        periodosCombinados.push(periodoActual);
-
-        // Sumar meses de los periodos combinados
-        let totalMesesPagados = 0;
-        let ultimoPeriodoHasta = periodosCombinados[0].hasta;
-
-        for (const periodo of periodosCombinados) {
-          totalMesesPagados += this.calcularMesesDiferencia(periodo.desde, periodo.hasta);
-
-          if (periodo.hasta > ultimoPeriodoHasta) {
-            ultimoPeriodoHasta = periodo.hasta;
-          }
-        }
-
-        // Calcular mes siguiente al último periodo para deuda
-        const mesSiguienteAlUltimoPago = new Date(ultimoPeriodoHasta);
-        mesSiguienteAlUltimoPago.setMonth(mesSiguienteAlUltimoPago.getMonth() + 1);
-
-        // Calcular meses adeudados
-        const mesesAdeudados = this.calcularMesesDiferencia(mesSiguienteAlUltimoPago, hoy);
-
-        return {
-          ...client,
-          mesesActivos: totalMesesPagados,
-          periodoHasta: ultimoPeriodoHasta,
-          mesesAdeudados
-        };
-      } else {
-        const fechaAlta = new Date(client.fecha);
-        const mesesAdeudados = this.calcularMesesDiferencia(fechaAlta, hoy);
-
-        return {
-          ...client,
-          mesesActivos: 0,
-          periodoHasta: null,
-          mesesAdeudados
-        };
+      console.log(mesesVigente);
+      return {
+        ...client,
+        mesesVigente: mesesVigente,
+        periodoHasta: periodoHasta,
       }
     });
   }
-
-
-
   calcularMesesDiferencia(desde: Date, hasta: Date): number {
-    const anios = hasta.getFullYear() - desde.getFullYear();
-    const meses = hasta.getMonth() - desde.getMonth();
-    const totalMeses = anios * 12 + meses + 1; // +1 para incluir ambos meses
-    return totalMeses > 0 ? totalMeses : 0;
+    const yearDiff = hasta.getFullYear() - desde.getFullYear();
+    const monthDiff = hasta.getMonth() - desde.getMonth();
+    return yearDiff * 12 + monthDiff + 1;
   }
 
   agregarPago(client: any) {
@@ -234,7 +200,7 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     });
   }
 
-  detectChanges(){
+  detectChanges() {
     this.cdr.detectChanges();
   }
 }
