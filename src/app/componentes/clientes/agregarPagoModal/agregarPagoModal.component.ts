@@ -1,5 +1,5 @@
 import { DIALOG_DATA } from '@angular/cdk/dialog';
-import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from 'src/app/services/auth.service';
@@ -21,6 +21,7 @@ export class AgregarPagoModalComponent implements OnInit {
     private authService: AuthService,
     private clientesService: ClientesService,
     @Inject(DIALOG_DATA) public data: any,
+    private cdr: ChangeDetectorRef
   ) { }
 
   pagoForm!: FormGroup;
@@ -31,6 +32,8 @@ export class AgregarPagoModalComponent implements OnInit {
   @Output() iniciarCarga = new EventEmitter<void>();
   cliente: any = null;
   controlCliente!: FormControl<any>;
+  descuento: number = 0;
+
 
   ngOnInit() {
     // Verificás si viene `client` y lo asignás
@@ -154,11 +157,24 @@ export class AgregarPagoModalComponent implements OnInit {
 
   actualizarMonto(client: any) {
     if (client) {
-      this.monto = client.monto * this.cantidadMeses;
+      if (client.tipo === 'Semestral') {
+        const mesesGratis = Math.floor(this.cantidadMeses / 6); // 1 mes gratis cada 6
+        const montoMensual = client.monto;
+        const mesesPagados = this.cantidadMeses - mesesGratis;
+
+        this.descuento = montoMensual * mesesGratis;
+        this.monto = montoMensual * mesesPagados;
+      } else {
+        this.monto = client.monto * this.cantidadMeses;
+        this.descuento = 0;
+      }
     } else {
-      this.monto = 0; // o el valor que corresponda si no hay cliente
+      this.monto = 0;
+      this.descuento = 0;
     }
   }
+
+
 
   get valorMensual() {
     const client = this.pagoForm.value.client;
@@ -171,5 +187,6 @@ export class AgregarPagoModalComponent implements OnInit {
 
   onClienteSeleccionado(cliente: any) {
     this.pagoForm.get('client')?.setValue(cliente);
+    this.cdr.detectChanges();
   }
 }

@@ -2,11 +2,7 @@ import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
-import { AgregarPagoModalComponent } from './agregarPagoModal/agregarPagoModal.component';
-import { InsertarClienteComponent } from './insertarCliente/insertarCliente.component';
 import { Subscription } from 'rxjs';
-import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
-import { ConfirmarDeleteComponent } from '../productos/confirmar-delete/confirmar-delete.component';
 
 @Component({
   selector: 'app-clientes',
