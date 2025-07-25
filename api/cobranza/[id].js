@@ -59,7 +59,7 @@ module.exports = async (req, res) => {
             const { rows } = await pool.query(
                 "INSERT INTO public.caja" +
                 " (fecha, detalle, efectivo, debito, credito, transferencia, cheque, observacion, gasto, user_admin)" +
-                " VALUES (CURRENT_DATE, $2, $3, $4, $5, $6, $7, $8, $9, $10, $1)", [id, payload.detalle, payload.efectivo, payload.debito, payload.credito, payload.transferencia, payload.cheque, payload.observacion, payload.gasto]
+                " VALUES (CURRENT_DATE, $2, $3, $4, $5, $6, $7, $8, $9, $1)", [id, payload.detalle, payload.efectivo, payload.debito, payload.credito, payload.transferencia, payload.cheque, payload.observacion, payload.gasto]
             );
             return res.status(200).json(rows);
         } catch (error) {
@@ -82,7 +82,7 @@ module.exports = async (req, res) => {
             const { rows } = await pool.query(
                 "UPDATE public.caja" +
                 " SET detalle=$1, efectivo=$2, debito=$3, credito=$4, transferencia=$5, cheque=$6, observacion=$7, gasto=$8, user_admin=$9" +
-                " WHERE id=$11;", [payload.detalle, payload.efectivo, payload.debito, payload.credito, payload.transferencia, payload.cheque, payload.observacion, payload.gasto, idAdmin, idClient]
+                " WHERE id=$10;", [payload.detalle, payload.efectivo, payload.debito, payload.credito, payload.transferencia, payload.cheque, payload.observacion, payload.gasto, idAdmin, idClient]
             );
             return res.status(200).json(rows);
         } catch (error) {
