@@ -116,9 +116,9 @@ module.exports = async (req, res) => {
             try {
                 const { rows } = await pool.query(
                     `INSERT INTO public.clientes_mensuales
-                    (tipo, cliente, mensual, bonificacion, user_admin, monto)
-                    VALUES ($2, $3, $4, $5, $1, $6) RETURNING *`,
-                    [id, payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.monto]
+                    (tipo, cliente, mensual, user_admin, monto)
+                    VALUES ($2, $3, $4, $1, $5) RETURNING *`,
+                    [id, payload.tipo, payload.cliente, payload.mensual, payload.monto]
                 );
                 console.log(rows);
                 return res.status(201).json(rows[0]);
@@ -163,11 +163,10 @@ module.exports = async (req, res) => {
             SET tipo = $1,
                 cliente = $2,
                 mensual = $3,
-                bonificacion = $4,
-                monto = $5
-            WHERE id_client = $6 AND user_admin = $7
+                monto = $4
+            WHERE id_client = $5 AND user_admin = $6
             RETURNING *;`,
-            [payload.tipo, payload.cliente, payload.mensual, payload.bonificacion, payload.monto, idClient, idAdmin]
+            [payload.tipo, payload.cliente, payload.mensual, payload.monto, idClient, idAdmin]
             );
 
             if (rows.length === 0) {

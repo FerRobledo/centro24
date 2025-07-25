@@ -13,11 +13,12 @@
 
       <div class="flex justify-center items-center mt-[0.12rem] gap-5 w-full">
         <button (click)="closeDay()"
-          class="flex select-none items-center w-28 gap-2 rounded bg-green-600 py-2 px-2 text-xs font-semibold text-white"
+          class="flex select-none items-center gap-2 whitespace-nowrap w-fit rounded bg-green-600 py-2 px-3 text-xs font-semibold text-white"
           type="button">
           <i class="fa-solid fa-lock"></i>
           Cerrar caja
         </button>
+
         <div class="flex items-center gap-2">
           <p class="text-slate-500 font-medium text-sm">
             Recaudación:
@@ -28,197 +29,203 @@
             placeholder="Total diario"
             class="text-center justify-center border rounded-md px-2 py-1 w-28 text-sm h-[35px]">
         </div>
-      </div>
 
-      <div class="flex justify-end mr-4 mt-2">
-        <button (click)="nuevaCobranza()"
-          class="flex select-none items-center gap-2 rounded bg-green-600 py-2 px-4 text-xs font-semibold text-white"
+        <button (click)="openHistorial()"
+          class="flex select-none items-center gap-2 w-fit rounded bg-green-600 py-2 px-3 text-xs font-semibold text-white"
           type="button">
-          <i class="fa-solid fa-user-plus"></i>
-          Agregar cliente
+          Historial
         </button>
       </div>
+      <div class="flex justify-center items-center mt-[0.12rem] gap-2 w-full">
+        <div class="flex justify-end mt-2">
+          <button (click)="nuevaCobranza()"
+            class="flex select-none items-center gap-2 rounded bg-green-600 py-2 px-4 text-xs font-semibold text-white"
+            type="button">
+            <i class="fa-solid fa-user-plus"></i>
+            Agregar cliente
+          </button>
+        </div>
+      </div>
+
     </div>
+    <ng-container *ngIf="!isLoadingCobranza else carga">
 
+      <div class="p-0 overflow-y-scroll ">
+        <table class="w-full mt-4 text-left table-auto min-w-max">
+          <thead>
+            <tr>
+              <th
+                class="p-4 w-28 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+                <p
+                  class="flex items-center justify-between gap-1 font-sans text-sm font-normal leading-none text-slate-500">
+                  Fecha
 
+                </p>
+              </th>
+              <th
+                class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+                <p
+                  class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+                  Detalle
+
+                </p>
+              </th>
+              <th
+                class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+                <p
+                  class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+                  Efectivo
+
+                </p>
+              </th>
+              <th
+                class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+                <p
+                  class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+                  Debito
+
+                </p>
+              </th>
+              <th
+                class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+                <p
+                  class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+                  Credito
+                </p>
+              </th>
+              <th
+                class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+                <p
+                  class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                  Transferencia
+                </p>
+              </th>
+              <th
+                class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+                <p
+                  class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                  Cheque
+                </p>
+              </th>
+              <th
+                class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+                <p
+                  class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                  Gasto
+                </p>
+              </th>
+              <th
+                class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+                <p
+                  class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                  Retiro
+                </p>
+              </th>
+              <th
+                class="p-1 w-20 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+                <p
+                  class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                  Observacion
+                </p>
+              </th>
+              <th
+                class="p-2 w-5 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+                <p
+                  class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                  Modificar
+                </p>
+              </th>
+            </tr>
+          </thead>
+          <tbody *ngIf="clientsOfDay.length > 0">
+            <tr *ngFor="let cliente of clientsOfDay">
+              <td class="p-4 border-b border-slate-200">
+                <p class="text-sm text-slate-500">
+                  {{cliente.fecha | date: 'yyyy-MM-dd'}}
+                </p>
+              </td>
+              <td class="p-4 border-b border-slate-200">
+                <div class="flex flex-col">
+                  <p class="text-sm font-semibold text-slate-700">
+                    {{cliente.detalle}}
+                  </p>
+                </div>
+              </td>
+              <td class="p-4 border-b border-slate-200">
+                <div class="flex flex-col">
+                  <p class="text-sm font-semibold text-slate-500">
+                    ${{cliente.efectivo | number:'1.0-0'}}
+                  </p>
+                </div>
+              </td>
+              <td class="p-4 border-b border-slate-200">
+                <div class="flex flex-col">
+                  <p class="text-sm font-semibold text-slate-500">
+                    ${{cliente.debito | number:'1.0-0'}}
+                  </p>
+                </div>
+              </td>
+              <td class="p-4 border-b border-slate-200">
+                <div class="flex flex-col">
+                  <p class="text-sm font-semibold text-slate-500">
+                    ${{cliente.credito | number:'1.0-0'}}
+                  </p>
+                </div>
+              </td>
+              <td class="p-4 border-b border-slate-200">
+                <div class="flex flex-col">
+                  <p class="text-sm font-semibold text-slate-500">
+                    ${{cliente.transferencia | number:'1.0-0'}}
+                  </p>
+                </div>
+              </td>
+              <td class="p-4 border-b border-slate-200">
+                <div class="flex flex-col">
+                  <p class="text-sm font-semibold text-slate-500">
+                    ${{cliente.cheque | number:'1.0-0'}}
+                  </p>
+                </div>
+              </td>
+              <td class="p-4 border-b border-slate-200">
+                <div class="flex flex-col">
+                  <p class="text-sm font-semibold text-slate-500">
+                    ${{cliente.gasto | number:'1.0-0'}}
+                  </p>
+                </div>
+              </td>
+              <td class="p-4 border-b border-slate-200">
+                <div class="flex flex-col">
+                  <p class="text-sm font-semibold text-slate-500">
+                    ${{cliente.retiro | number:'1.0-0'}}
+                  </p>
+                </div>
+              </td>
+              <td class="p-4 border-b border-slate-200">
+                <div class="flex flex-col">
+                  <p class="text-sm font-semibold text-slate-500">
+                    {{cliente.observacion}}
+                  </p>
+                </div>
+              </td>
+              <td class="p-4 border-b border-slate-200">
+                <div class="flex gap-2">
+                  <!--cliente viene del for-->
+                  <button (click)="updateClient(cliente)" class="text-slate-500 hover:text-blue-600" title="Editar">
+                    <i class="fa-solid fa-pencil"></i>
+                  </button>
+                  <button (click)="deleteClient(cliente)" class="text-slate-500 hover:text-red-600" title="Eliminar">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+    <ng-template #carga>
+      <div class="flex justify-center items-center h-96">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
+      </div>
+    </ng-template>
   </div>
-  <ng-container *ngIf="!isLoadingCobranza else carga">
-
-    <div class="p-0 overflow-y-scroll ">
-      <table class="w-full mt-4 text-left table-auto min-w-max">
-        <thead>
-          <tr>
-            <th
-              class="p-4 w-28 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-1 font-sans text-sm font-normal leading-none text-slate-500">
-                Fecha
-
-              </p>
-            </th>
-            <th
-              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Detalle
-
-              </p>
-            </th>
-            <th
-              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Efectivo
-
-              </p>
-            </th>
-            <th
-              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Debito
-
-              </p>
-            </th>
-            <th
-              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Credito
-              </p>
-            </th>
-            <th
-              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                Transferencia
-              </p>
-            </th>
-            <th
-              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                Cheque
-              </p>
-            </th>
-            <th
-              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                Gasto
-              </p>
-            </th>
-            <th
-              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                Retiro
-              </p>
-            </th>
-            <th
-              class="p-1 w-20 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                Observacion
-              </p>
-            </th>
-            <th
-              class="p-2 w-5 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                Modificar
-              </p>
-            </th>
-          </tr>
-        </thead>
-        <tbody *ngIf="clientsOfDay.length > 0">
-          <tr *ngFor="let cliente of clientsOfDay">
-            <td class="p-4 border-b border-slate-200">
-              <p class="text-sm text-slate-500">
-                {{cliente.fecha | date: 'yyyy-MM-dd'}}
-              </p>
-            </td>
-            <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-700">
-                  {{cliente.detalle}}
-                </p>
-              </div>
-            </td>
-            <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.efectivo | number:'1.0-0'}}
-                </p>
-              </div>
-            </td>
-            <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.debito | number:'1.0-0'}}
-                </p>
-              </div>
-            </td>
-            <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.credito | number:'1.0-0'}}
-                </p>
-              </div>
-            </td>
-            <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.transferencia | number:'1.0-0'}}
-                </p>
-              </div>
-            </td>
-            <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.cheque | number:'1.0-0'}}
-                </p>
-              </div>
-            </td>
-            <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.gasto | number:'1.0-0'}}
-                </p>
-              </div>
-            </td>
-            <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.retiro | number:'1.0-0'}}
-                </p>
-              </div>
-            </td>
-            <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
-                  {{cliente.observacion}}
-                </p>
-              </div>
-            </td>
-            <td class="p-4 border-b border-slate-200">
-              <div class="flex gap-2"> <!--cliente viene del for-->
-                <button (click)="updateClient(cliente)" class="text-slate-500 hover:text-blue-600" title="Editar">
-                  <i class="fa-solid fa-pencil"></i>
-                </button>
-                <button (click)="deleteClient(cliente)" class="text-slate-500 hover:text-red-600" title="Eliminar">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </ng-container>
-  <ng-template #carga>
-    <div class="flex justify-center items-center h-96">
-      <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
-    </div>
-  </ng-template>
-</div>

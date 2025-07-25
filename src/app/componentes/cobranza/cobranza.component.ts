@@ -4,6 +4,7 @@ import { CobranzaService } from 'src/app/services/cobranza.service';
 import { RegisterClienteComponent } from 'src/app/componentes/cobranza/registerCliente/registerCliente.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
+import { HistorialClientsComponent } from '../historial-clients/historial-clients.component';
 
 @Component({
   selector: 'app-cobranza',
@@ -16,11 +17,12 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   collectionDay = -1;
   today: Date = new Date();
   isLoadingCobranza: boolean = false;
-  private dialogRef: MatDialogRef<RegisterClienteComponent> | null = null;
+  dialogRef: MatDialogRef<any> | null = null;
   private subscriptions: Subscription = new Subscription();
 
   constructor(
     private cobranzaService: CobranzaService,
+    private historialComponent: HistorialClientsComponent,
     private authService: AuthService,
     public dialog: MatDialog,
     private cdr: ChangeDetectorRef //inyecta ChangeDetectorRef
@@ -47,6 +49,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
         this.cobranzaService.closeClientsOfDay(id).subscribe({
           next: (data) => {
             this.collectionDay = data.total;
+            this.historialComponent
             if(data === 0){
               this.collectionDay = 0;
             }
@@ -131,5 +134,18 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     this.collectionDay = -1;
     this.loadClientsDaily();
     this.cdr.detectChanges(); 
+  }
+
+  openHistorial() {
+    this.dialogRef = this.dialog.open(HistorialClientsComponent, {
+      maxWidth: '100%',
+      //data: { accion: "agregar" },
+      disableClose: false,
+      autoFocus: true,
+    });
+
+    this.dialogRef.afterClosed().subscribe(result => {
+      this.dialogRef = null;
+    });
   }
 }
