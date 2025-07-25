@@ -44,7 +44,6 @@
             <th class="w-32 p-3 border-b border-slate-300 text-slate-500">Cliente</th>
             <th class="w-24 p-3 border-b border-slate-300 text-slate-500">Tipo</th>
             <th class="w-24 p-3 border-b border-slate-300 text-slate-500">Mensual</th>
-            <th class="w-28 p-3 border-b border-slate-300 text-slate-500">Bonificación</th>
             <th class="w-28 p-3 border-b border-slate-300 text-slate-500">Monto</th>
             <th class="w-40 p-3 border-b border-slate-300 text-slate-500">Pago</th>
             <th class="w-28 p-3 border-b border-slate-300 text-slate-500">Modificar</th>
@@ -66,23 +65,20 @@
               {{ client.mensual | currency:'ARS':'symbol':'1.0-2':'es-AR' }}
             </td>
             <td class="p-3 border-b border-slate-200 text-slate-600 truncate">
-              {{ client.bonificacion | currency:'ARS':'symbol':'1.0-2':'es-AR' }}
-            </td>
-            <td class="p-3 border-b border-slate-200 text-slate-600 truncate">
               {{ client.monto | currency:'ARS':'symbol':'1.0-2':'es-AR' }}
             </td>
             <td class="relative group p-3 border-b border-slate-200 text-center">
               <div class="flex flex-col items-center text-sm">
-                <ng-container *ngIf="client.mesesActivos > 0; else sinPago">
+                <ng-container *ngIf="client.mesesVigente > 0; else sinPago">
                   <div class="font-semibold" [ngClass]="{
-                    'text-green-600': client.mesesActivos > 1,
-                    'text-yellow-600 flex items-center gap-1': client.mesesActivos === 1
+                    'text-green-600': client.mesesVigente > 1,
+                    'text-yellow-600 flex items-center gap-1': client.mesesVigente === 1
                   }">
-                    <ng-container *ngIf="client.mesesActivos === 1">
+                    <ng-container *ngIf="client.mesesVigente === 1">
                       Último mes pago
                     </ng-container>
-                    <ng-container *ngIf="client.mesesActivos > 1">
-                      {{ client.mesesActivos }} meses pagos
+                    <ng-container *ngIf="client.mesesVigente > 1">
+                      {{ client.mesesVigente }} meses pagos
                     </ng-container>
                   </div>
                   <div class="text-slate-500 text-xs mt-1">
@@ -92,8 +88,8 @@
 
                 <ng-template #sinPago>
                   <div class="text-red-600 font-semibold">Sin pagos</div>
-                  <div *ngIf="client.mesesAdeudados > 0" class="text-xs text-slate-500 mt-1">
-                    Debe {{ client.mesesAdeudados }} mes{{ client.mesesAdeudados > 1 ? 'es' : '' }} desde alta
+                  <div *ngIf="client.mesesVigente > 0" class="text-xs text-slate-500 mt-1">
+                    Debe {{ client.mesesVigente }} mes{{ client.mesesVigente > 1 ? 'es' : '' }} desde alta
                   </div>
                 </ng-template>
               </div>

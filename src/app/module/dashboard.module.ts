@@ -40,6 +40,7 @@ import { ProductFormComponent } from '../componentes/productos/product-form/prod
 import { MatOptionModule, MatNativeDateModule, NativeDateAdapter, DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatRadioModule } from '@angular/material/radio';
 
 export const MONTH_YEAR_FORMATS = {
   parse: {
@@ -98,7 +99,8 @@ export const MONTH_YEAR_FORMATS = {
     MatAutocompleteModule,
     MatNativeDateModule,
     MatButtonModule,
-    MatCardModule
+    MatCardModule,
+    MatRadioModule,
   ],
   providers: [
     provideAnimationsAsync(),
