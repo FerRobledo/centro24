@@ -112,7 +112,7 @@
               class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
               <p
                 class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                Retiro
+                Total
               </p>
             </th>
             <th
@@ -148,49 +148,49 @@
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
                 <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.efectivo | number:'1.0-0'}}
+                  {{cliente.efectivo | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
                 <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.debito | number:'1.0-0'}}
+                  {{cliente.debito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
                 <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.credito | number:'1.0-0'}}
+                  {{cliente.credito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
                 <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.transferencia | number:'1.0-0'}}
+                  {{cliente.transferencia | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
                 <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.cheque | number:'1.0-0'}}
+                  {{cliente.cheque | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
                 <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.gasto | number:'1.0-0'}}
+                  {{cliente.gasto | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
                 <p class="text-sm font-semibold text-slate-500">
-                  ${{cliente.retiro | number:'1.0-0'}}
+                  {{getTotal(cliente) | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
