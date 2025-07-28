@@ -14,6 +14,7 @@ import { HistorialClientsComponent } from '../historial-clients/historial-client
 export class CobranzaComponent implements OnInit, OnDestroy {
   public clientEdit: any = null;
   clientsOfDay: any[] = [];
+  historyCierres: any[] = [];
   collectionDay = -1;
   today: Date = new Date();
   isLoadingCobranza: boolean = false;
@@ -135,27 +136,40 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   }
 
   openHistorial() {
-    this.dialogRef = this.dialog.open(HistorialClientsComponent, {
-      maxWidth: '100%',
-      //data: { accion: "agregar" },
-      disableClose: false,
-      autoFocus: true,
-    });
-
-    this.dialogRef.afterClosed().subscribe(result => {
-      this.dialogRef = null;
-    });
-  }
-
-  addHistory() {
     const id = this.authService.getIdAdmin();
+  
+    if (!id) return;
+  
     this.isLoadingCobranza = true;
-    this.cdr.detectChanges(); // Fuerza el spinner a mostrarse
-
-    
-
+    this.cdr.detectChanges();
+  
+    this.subscriptions.add(
+      this.cobranzaService.getHistory(id).subscribe({
+        next: (data) => {
+          this.historyCierres = data ?? [];
+          this.isLoadingCobranza = false;
+          this.cdr.detectChanges();
+  
+          // abro modal con datos cargados
+          this.dialogRef = this.dialog.open(HistorialClientsComponent, {
+            maxWidth: '100%',
+            data: this.historyCierres,
+            disableClose: false,
+            autoFocus: true,
+          });
+  
+          this.dialogRef.afterClosed().subscribe(() => {
+            this.dialogRef = null;
+          });
+        },
+        error: (error) => {
+          this.isLoadingCobranza = false;
+          this.cdr.detectChanges();
+        }
+      })
+    );
   }
-
+  
   getTotal(cliente: any): number {
     let suma = 0;
     suma += Number(cliente.efectivo);

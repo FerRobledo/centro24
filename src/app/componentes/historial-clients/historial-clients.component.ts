@@ -11,9 +11,10 @@ export class HistorialClientsComponent {
 
   constructor(
     public dialogRef: MatDialogRef<HistorialClientsComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    
   ) {
-    this.historial = data?.historial || [];
+    this.historial = data;
   }
 
   cerrar(): void {

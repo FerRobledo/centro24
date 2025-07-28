@@ -36,10 +36,30 @@ module.exports = async (req, res) => {
 
                 const total = result.rows[0].total ?? 0;
 
-                return res.status(200).json({ total });
+                const existe = await pool.query(`
+                SELECT 1 FROM historial_cierres
+                WHERE fecha = CURRENT_DATE AND user_admin = $1
+              `, [id]);
+              
+              if (existe.rowCount === 0) {
+                await pool.query(`
+                  INSERT INTO historial_cierres (fecha, user_admin, monto)
+                  VALUES (CURRENT_DATE, $1, $2)
+                `, [id, total]);
+              }
+        
+            return res.status(200).json({ total });
+            }
+            if (action === 'history') {
+                const result = await pool.query('SELECT fecha, monto ' +
+                                                'FROM public.historial_cierres WHERE user_admin = $1;', [id]);
+
+            console.log(result);
+            return res.status(200).json(result.rows);
             }
             const { rows } = await pool.query('SELECT * FROM caja WHERE user_admin = $1 ORDER BY fecha DESC, id DESC', [id]);
             return res.status(200).json(rows);
+
         } catch (error) {
             console.log(error);
             return res.status(500).json({ error: 'Error no se pudo obtener los clientes del dia', details: error.message });

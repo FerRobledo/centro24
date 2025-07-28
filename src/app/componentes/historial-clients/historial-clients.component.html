@@ -16,13 +16,13 @@
 				</tr>
 			</thead>
 			<tbody class="divide-y divide-green-200 bg-white">
-				<tr class="hover:bg-green-50">
+				<tr *ngFor="let item of historial" class="hover:bg-green-50">
 					<td class="p-3">
-						01 Feb 2022<br>
-						<span class="text-xs text-green-600">Martes</span>
+					  {{ item.fecha | date: 'dd MMM yyyy' }}<br />
+					  <span class="text-xs text-green-600">{{ item.fecha | date: 'EEEE' }}</span>
 					</td>
-					<td class="p-3 text-right">$15,792</td>
-				</tr>
+					<td class="p-3 text-right">${{ item.monto }}</td>
+				  </tr>
 			</tbody>
 		</table>
 	</div>
