@@ -54,7 +54,6 @@ module.exports = async (req, res) => {
                 const result = await pool.query('SELECT fecha, monto ' +
                                                 'FROM public.historial_cierres WHERE user_admin = $1;', [id]);
 
-            console.log(result);
             return res.status(200).json(result.rows);
             }
             const { rows } = await pool.query('SELECT * FROM caja WHERE user_admin = $1 ORDER BY fecha DESC, id DESC', [id]);
