@@ -22,7 +22,6 @@ export class CobranzaComponent implements OnInit, OnDestroy {
 
   constructor(
     private cobranzaService: CobranzaService,
-    private historialComponent: HistorialClientsComponent,
     private authService: AuthService,
     public dialog: MatDialog,
     private cdr: ChangeDetectorRef //inyecta ChangeDetectorRef
@@ -49,7 +48,6 @@ export class CobranzaComponent implements OnInit, OnDestroy {
         this.cobranzaService.closeClientsOfDay(id).subscribe({
           next: (data) => {
             this.collectionDay = data.total;
-            this.historialComponent
             if(data === 0){
               this.collectionDay = 0;
             }
@@ -75,12 +73,12 @@ export class CobranzaComponent implements OnInit, OnDestroy {
             console.log("Datos recargados en Cobranza:", data);
             this.clientsOfDay = data;
             this.isLoadingCobranza = false;
-            this.cdr.detectChanges(); 
+            this.cdr.detectChanges();
           },
           error: (error) => {
             console.log("Error en el pedido de clientes del dia: ", error);
             this.isLoadingCobranza = false;
-            this.cdr.detectChanges(); 
+            this.cdr.detectChanges();
           },
         })
       );
@@ -103,7 +101,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
         this.cobranzaService.deleteClient(idAdmin, idClient).subscribe({
           next: () => {
             this.loadClientsDaily();
-            this.cdr.detectChanges(); 
+            this.cdr.detectChanges();
           },
           error: (error) => {
             console.log("Error en la eliminacion del cliente: ", error);
@@ -122,7 +120,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
 
     this.dialogRef.afterClosed().subscribe(result => {
       this.dialogRef = null;
-      if(result == 'submit'){
+      if (result == 'submit') {
         this.resetComponent();
       }
     });
@@ -133,7 +131,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     this.clientEdit = null;
     this.collectionDay = -1;
     this.loadClientsDaily();
-    this.cdr.detectChanges(); 
+    this.cdr.detectChanges();
   }
 
   openHistorial() {
@@ -148,4 +146,25 @@ export class CobranzaComponent implements OnInit, OnDestroy {
       this.dialogRef = null;
     });
   }
+
+  addHistory() {
+    const id = this.authService.getIdAdmin();
+    this.isLoadingCobranza = true;
+    this.cdr.detectChanges(); // Fuerza el spinner a mostrarse
+
+    
+
+  }
+
+  getTotal(cliente: any): number {
+    let suma = 0;
+    suma += Number(cliente.efectivo);
+    suma += Number(cliente.debito);
+    suma += Number(cliente.credito);
+    suma += Number(cliente.transferencia);
+    suma += Number(cliente.cheque);
+    suma -= Number(cliente.gasto);
+    return suma;
+  }
+
 }

@@ -37,7 +37,7 @@ export class RegisterClienteComponent implements OnInit {
     }
 
     const camposNumericos: string[] = [
-      'efectivo', 'debito', 'credito', 'transferencia', 'cheque', 'retiro', 'gasto'
+      'efectivo', 'debito', 'credito', 'transferencia', 'cheque', 'gasto'
     ];
 
     camposNumericos.forEach((campo: string) => {
@@ -75,7 +75,6 @@ export class RegisterClienteComponent implements OnInit {
       credito: [],
       transferencia: [],
       cheque: [],
-      retiro: [],
       observacion: [''],
       gasto: [],
     });
@@ -88,7 +87,6 @@ export class RegisterClienteComponent implements OnInit {
         credito: this.data.client.credito,
         transferencia: this.data.client.transferencia,
         cheque: this.data.client.cheque,
-        retiro: this.data.client.retiro,
         observacion: this.data.client.observacion,
         gasto: this.data.client.gasto,
       })

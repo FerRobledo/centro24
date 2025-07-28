@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
               ), 0)
               +
               COALESCE((
-                SELECT SUM(efectivo + debito + transferencia + cheque + gasto + retiro)
+                SELECT SUM(efectivo + debito + transferencia + cheque + gasto)
                 FROM caja
                 WHERE fecha >= date_trunc('month', CURRENT_DATE - INTERVAL '1 month')
                   AND fecha < date_trunc('month', CURRENT_DATE)
@@ -58,7 +58,7 @@ module.exports = async (req, res) => {
               ), 0)
               +
               COALESCE((
-                SELECT SUM(efectivo + debito + transferencia + cheque + gasto + retiro)
+                SELECT SUM(efectivo + debito + transferencia + cheque + gasto)
                 FROM caja
                 WHERE fecha >= date_trunc('month', CURRENT_DATE)
                   AND fecha < date_trunc('month', CURRENT_DATE + INTERVAL '1 month')
@@ -99,7 +99,7 @@ module.exports = async (req, res) => {
               ), 0)
               +
               COALESCE((
-                SELECT SUM(efectivo + debito + transferencia + cheque + gasto + retiro)
+                SELECT SUM(efectivo + debito + transferencia + cheque + gasto)
                 FROM caja
                 WHERE fecha >= date_trunc('day', CURRENT_DATE - INTERVAL '1 day')
                   AND fecha < date_trunc('day', CURRENT_DATE)

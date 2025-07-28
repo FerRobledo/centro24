@@ -12,7 +12,7 @@
       </div>
 
       <div class="flex justify-center items-center mt-[0.12rem] gap-5 w-full">
-        <button (click)="closeDay()"
+        <button (click)="closeDay()" (click)="addHistory()"
           class="flex select-none items-center gap-2 whitespace-nowrap w-fit rounded bg-green-600 py-2 px-3 text-xs font-semibold text-white"
           type="button">
           <i class="fa-solid fa-lock"></i>
@@ -84,59 +84,142 @@
                   class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                   Debito
 
+              </p>
+            </th>
+            <th
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+                Efectivo
+
+              </p>
+            </th>
+            <th
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+                Debito
+
+              </p>
+            </th>
+            <th
+              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+                Credito
+              </p>
+            </th>
+            <th
+              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                Transferencia
+              </p>
+            </th>
+            <th
+              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                Cheque
+              </p>
+            </th>
+            <th
+              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                Gasto
+              </p>
+            </th>
+            <th
+              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                Total
+              </p>
+            </th>
+            <th
+              class="p-1 w-20 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                Observacion
+              </p>
+            </th>
+            <th
+              class="p-2 w-5 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p
+                class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+                Modificar
+              </p>
+            </th>
+          </tr>
+        </thead>
+        <tbody *ngIf="clientsOfDay.length > 0">
+          <tr *ngFor="let cliente of clientsOfDay">
+            <td class="p-4 border-b border-slate-200">
+              <p class="text-sm text-slate-500">
+                {{cliente.fecha | date: 'yyyy-MM-dd'}}
+              </p>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <div class="flex flex-col">
+                <p class="text-sm font-semibold text-slate-700">
+                  {{cliente.detalle}}
                 </p>
-              </th>
-              <th
-                class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-                <p
-                  class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                  Credito
+              </div>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <div class="flex flex-col">
+                <p class="text-sm font-semibold text-slate-500">
+                  {{cliente.efectivo | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
-              </th>
-              <th
-                class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-                <p
-                  class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                  Transferencia
+              </div>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <div class="flex flex-col">
+                <p class="text-sm font-semibold text-slate-500">
+                  {{cliente.debito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
-              </th>
-              <th
-                class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-                <p
-                  class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                  Cheque
+              </div>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <div class="flex flex-col">
+                <p class="text-sm font-semibold text-slate-500">
+                  {{cliente.credito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
-              </th>
-              <th
-                class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-                <p
-                  class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                  Gasto
+              </div>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <div class="flex flex-col">
+                <p class="text-sm font-semibold text-slate-500">
+                  {{cliente.transferencia | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
-              </th>
-              <th
-                class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-                <p
-                  class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                  Retiro
+              </div>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <div class="flex flex-col">
+                <p class="text-sm font-semibold text-slate-500">
+                  {{cliente.cheque | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
-              </th>
-              <th
-                class="p-1 w-20 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-                <p
-                  class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                  Observacion
+              </div>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <div class="flex flex-col">
+                <p class="text-sm font-semibold text-slate-500">
+                  {{cliente.gasto | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
-              </th>
-              <th
-                class="p-2 w-5 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-                <p
-                  class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                  Modificar
+              </div>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <div class="flex flex-col">
+                <p class="text-sm font-semibold text-slate-500">
+                  {{getTotal(cliente) | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
-              </th>
+              </div>
+              </td>
+              
             </tr>
-          </thead>
+          </tbody>
+         
           <tbody *ngIf="clientsOfDay.length > 0">
             <tr *ngFor="let cliente of clientsOfDay">
               <td class="p-4 border-b border-slate-200">

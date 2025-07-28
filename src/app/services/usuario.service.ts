@@ -13,7 +13,6 @@ export class UsuarioService {
   private origin = window.location.origin;
 
   getUsuarios(id: number): Observable<any> {
-    console.log("Servicio usuarios llamando a la api")
     return this.http.get<any>(`${this.origin}/api/usuario/${id}`);
   }
 

@@ -2,8 +2,6 @@ import { Component, OnInit, EventEmitter, Output, Input, Inject } from '@angular
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
-import { ClientesComponent } from '../clientes.component';
-import { OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AbstractControl } from '@angular/forms';
@@ -19,7 +17,7 @@ export class InsertarClienteComponent implements OnInit {
   @Input() clientEdit: any;
   accion: string = '';
   form!: FormGroup;
-  client: any = { tipo: '', cliente: '', mensual: '', bonificacion: '', monto: '' };
+  client: any = { tipo: '', cliente: '', mensual: ''};
   meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   formMeses = new FormGroup({});
   cargando: boolean = false;
@@ -45,7 +43,7 @@ export class InsertarClienteComponent implements OnInit {
     //cuando hago sumbit lleno el meses pagados con los true
 
     const camposNumericos: string[] = [
-      'mensual', 'bonificacion', 'monto'
+      'mensual',
     ];
 
     camposNumericos.forEach((campo: string) => {
@@ -90,8 +88,6 @@ export class InsertarClienteComponent implements OnInit {
       tipo: ['', Validators.required],
       cliente: ['', Validators.required],
       mensual: [],
-      bonificacion: [],
-      monto: []
     });
     this.meses.forEach(mes => {
       this.formMeses.addControl(mes, new FormControl(false)); /*const nombre = new FormControl('Matías');
@@ -105,8 +101,6 @@ export class InsertarClienteComponent implements OnInit {
         tipo: this.data.client.tipo,
         cliente: this.data.client.cliente,
         mensual: this.data.client.mensual,
-        bonificacion: this.data.client.bonificacion,
-        monto: this.data.client.monto
       })
     }
   }
