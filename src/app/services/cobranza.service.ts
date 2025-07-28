@@ -31,4 +31,8 @@ export class CobranzaService {
     const body = { idClient };
     return this.http.delete(this.origin + '/api/cobranza/' + idAdmin, { body });
   }
+
+  public getHistory(id: number): Observable<any> {
+    return this.http.get(this.origin + '/api/cobranza/' + id + '?action=history')
+  }
 }

@@ -4,6 +4,7 @@ import { CobranzaService } from 'src/app/services/cobranza.service';
 import { RegisterClienteComponent } from 'src/app/componentes/cobranza/registerCliente/registerCliente.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
+import { HistorialClientsComponent } from '../historial-clients/historial-clients.component';
 
 @Component({
   selector: 'app-cobranza',
@@ -13,10 +14,11 @@ import { Subscription } from 'rxjs';
 export class CobranzaComponent implements OnInit, OnDestroy {
   public clientEdit: any = null;
   clientsOfDay: any[] = [];
+  historyCierres: any[] = [];
   collectionDay = -1;
   today: Date = new Date();
   isLoadingCobranza: boolean = false;
-  private dialogRef: MatDialogRef<RegisterClienteComponent> | null = null;
+  dialogRef: MatDialogRef<any> | null = null;
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -47,7 +49,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
         this.cobranzaService.closeClientsOfDay(id).subscribe({
           next: (data) => {
             this.collectionDay = data.total;
-            if (data === 0) {
+            if(data === 0){
               this.collectionDay = 0;
             }
             this.cdr.detectChanges(); //revisá este componente ya mismo por si hay algo que cambió y actualizá el HTML.
@@ -133,6 +135,41 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  openHistorial() {
+    const id = this.authService.getIdAdmin();
+  
+    if (!id) return;
+  
+    this.isLoadingCobranza = true;
+    this.cdr.detectChanges();
+  
+    this.subscriptions.add(
+      this.cobranzaService.getHistory(id).subscribe({
+        next: (data) => {
+          this.historyCierres = data ?? [];
+          this.isLoadingCobranza = false;
+          this.cdr.detectChanges();
+  
+          // abro modal con datos cargados
+          this.dialogRef = this.dialog.open(HistorialClientsComponent, {
+            maxWidth: '100%',
+            data: this.historyCierres,
+            disableClose: false,
+            autoFocus: true,
+          });
+  
+          this.dialogRef.afterClosed().subscribe(() => {
+            this.dialogRef = null;
+          });
+        },
+        error: (error) => {
+          this.isLoadingCobranza = false;
+          this.cdr.detectChanges();
+        }
+      })
+    );
+  }
+  
   getTotal(cliente: any): number {
     let suma = 0;
     suma += Number(cliente.efectivo);

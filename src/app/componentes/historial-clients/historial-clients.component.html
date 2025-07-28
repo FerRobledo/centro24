@@ -1,0 +1,29 @@
+<div class="p-10 mx-auto w-full max-w-xl text-gray-800">
+	<h2 class="mb-4 text-2xl font-semibold text-green-700">Auditoría de caja</h2>
+
+	<div class="overflow-x-auto rounded-lg border border-green-300 shadow-md">
+		<table class="w-full text-sm table-auto">
+			<colgroup>
+				<col>
+				<col>
+				<col>
+				<col>
+			</colgroup>
+			<thead class="bg-green-100 text-green-800 uppercase text-xs font-semibold">
+				<tr class="text-left">
+					<th class="p-3">Fecha de cierres</th>
+					<th class="p-3 text-right">Monto</th>
+				</tr>
+			</thead>
+			<tbody class="divide-y divide-green-200 bg-white">
+				<tr *ngFor="let item of historial" class="hover:bg-green-50">
+					<td class="p-3">
+					  {{ item.fecha | date: 'dd MMM yyyy' }}<br />
+					  <span class="text-xs text-green-600">{{ item.fecha | date: 'EEEE' }}</span>
+					</td>
+					<td class="p-3 text-right">${{ item.monto }}</td>
+				  </tr>
+			</tbody>
+		</table>
+	</div>
+</div>
