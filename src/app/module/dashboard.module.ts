@@ -36,7 +36,6 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
 import { LogsComponent } from '../componentes/logs/logs.component';
 import { ConfirmarDeleteComponent } from '../componentes/productos/confirmar-delete/confirmar-delete.component';
-import { ProductFormComponent } from '../componentes/productos/product-form/product-form.component';
 import { MatOptionModule, MatNativeDateModule, NativeDateAdapter, DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -85,7 +84,6 @@ export const MONTH_YEAR_FORMATS = {
     SelectorClientesComponent,
     LogsComponent,
     ConfirmarDeleteComponent,
-    ProductFormComponent,
     HistorialClientsComponent,
     FiltroProductosPipe,
     ProductFormDialogComponent
