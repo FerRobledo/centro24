@@ -42,6 +42,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
 import { HistorialClientsComponent } from '../componentes/historial-clients/historial-clients.component';
+import { FiltroProductosPipe } from '../pipes/filtro-productos.pipe';
 
 export const MONTH_YEAR_FORMATS = {
   parse: {
@@ -81,7 +82,8 @@ export const MONTH_YEAR_FORMATS = {
     LogsComponent,
     ConfirmarDeleteComponent,
     ProductFormComponent,
-    HistorialClientsComponent
+    HistorialClientsComponent,
+    FiltroProductosPipe
   ],
   imports: [
     CommonModule,
