@@ -19,16 +19,12 @@
         <div class="flex items-end space-x-4">
           
           <!-- Filtro general -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Filtrar</label>
-           <input 
-            [(ngModel)]="filtroTexto" 
-            matInput 
-            name="filtro" 
-            class="rounded border p-2 w-72" 
-            (keyup)="detectChanges()"
-            placeholder="Buscar ID, descripcion o categoría" 
-          />
+          <div class="flex-grow max-w-md mx-auto w-full">
+            <div class="flex items-center border border-gray-300 rounded px-3 bg-white">
+              <i class="fa fa-search text-gray-500 mr-2"></i>
+              <input type="text" class="flex-1 h-9 outline-none py-1 bg-transparent text-sm"
+                placeholder="ID, Descripción o Categoría" [(ngModel)]="filtroTexto" (keyup)="detectChanges()"/>
+            </div>
           </div>
           
           <!-- Toggle Switch -->
@@ -203,17 +199,6 @@
 
 </div>
 
-<!-- Form para agregar/editar producto -->
-<app-product-form 
-  [mostrarFormulario]="mostrarFormulario" 
-  [modoEdicion]="modoEdicion" 
-  [producto]="nuevoProducto"
-  [cargando]="cargandoProducto" 
-  [mensaje]="mensaje" 
-  [esAdmin]="esAdmin()" 
-  (guardar)="onFormGuardar($event)"
-  (cancelar)="onFormCancelar()">
-</app-product-form>
 
 <!-- Cartel de confirmacion cuando se elimina un producto -->
 <app-confirmar-delete 

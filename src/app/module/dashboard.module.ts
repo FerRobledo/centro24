@@ -43,6 +43,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
 import { HistorialClientsComponent } from '../componentes/historial-clients/historial-clients.component';
 import { FiltroProductosPipe } from '../pipes/filtro-productos.pipe';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ProductFormDialogComponent } from '../componentes/productos/product-form-dialog/product-form-dialog.component';
+
 
 export const MONTH_YEAR_FORMATS = {
   parse: {
@@ -83,7 +87,8 @@ export const MONTH_YEAR_FORMATS = {
     ConfirmarDeleteComponent,
     ProductFormComponent,
     HistorialClientsComponent,
-    FiltroProductosPipe
+    FiltroProductosPipe,
+    ProductFormDialogComponent
   ],
   imports: [
     CommonModule,
@@ -105,6 +110,8 @@ export const MONTH_YEAR_FORMATS = {
     MatButtonModule,
     MatCardModule,
     MatRadioModule,
+    MatFormFieldModule,
+    MatProgressSpinnerModule,
   ],
   providers: [
     provideAnimationsAsync(),
