@@ -5,6 +5,8 @@ import { Producto, ProductoDTO } from 'src/assets/dto/producto';
 import { LogsService } from 'src/app/services/logs.service';
 import { Log } from 'src/assets/dto/log';
 import { Subscription } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { ProductFormDialogComponent } from './product-form-dialog/product-form-dialog.component';
 
 interface AddProductoResponse {
   message: string;
@@ -26,14 +28,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   mostrarSoloStock: boolean = false;
 
-  // Estados del formulario
-  mostrarFormulario: boolean = false;
-  modoEdicion: boolean = false;
-  productoEditando: ProductoDTO | null = null;
-
   // Estados del diálogo de confirmación
   mostrarConfirmacion: boolean = false;
   productoAEliminar: ProductoDTO | null = null;
+
+  productoEditando: ProductoDTO | null = null;
 
   // Estados generales
   cargandoProducto: boolean = false;
@@ -46,8 +45,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private logsService: LogsService,
     private cdr: ChangeDetectorRef,
-  ) {
-  }
+    public dialog: MatDialog
+  ) {}
 
   ngOnInit() {
     const idAdmin = this.authService.getIdAdmin();
@@ -91,36 +90,42 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   // === MÉTODOS DE FORMULARIO ===
   abrirFormularioAgregar() {
-    this.modoEdicion = false;
-    this.productoEditando = null;
-    this.nuevoProducto = new ProductoDTO();
-    this.mostrarFormulario = true;
-    this.mensaje = '';
+    const dialogRef = this.dialog.open(ProductFormDialogComponent, {
+      width: '500px',
+      disableClose: true,
+      data: {
+        producto: new ProductoDTO(),
+        modoEdicion: false,
+        esAdmin: this.esAdmin()
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.action === 'guardar') {
+        this.nuevoProducto = result.producto;
+        this.addProducto();
+      }
+    });
   }
 
   editarProducto(producto: ProductoDTO) {
-    this.modoEdicion = true;
-    this.productoEditando = new ProductoDTO(producto);
-    this.nuevoProducto = new ProductoDTO(producto);
-    this.mostrarFormulario = true;
-    this.mensaje = '';
-  }
+    const dialogRef = this.dialog.open(ProductFormDialogComponent, {
+      width: '500px',
+      disableClose: true,
+      data: {
+        producto: producto,
+        modoEdicion: true,
+        esAdmin: this.esAdmin()
+      }
+    });
 
-  onFormGuardar(producto: ProductoDTO) {
-    this.nuevoProducto = producto;
-    this.guardarProducto();
-  }
-
-  onFormCancelar() {
-    this.cancelar();
-  }
-
-  guardarProducto() {
-    if (this.modoEdicion) {
-      this.actualizarProducto();
-    } else {
-      this.addProducto();
-    }
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.action === 'guardar') {
+        this.nuevoProducto = result.producto;
+        this.productoEditando = new ProductoDTO(producto); // Necesario para actualizarProducto()
+        this.actualizarProducto();
+      }
+    });
   }
 
   addProducto() {
@@ -226,9 +231,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   cancelar() {
-    this.mostrarFormulario = false;
-    this.modoEdicion = false;
-    this.productoEditando = null;
     this.nuevoProducto = new ProductoDTO();
     this.mensaje = '';
     this.cargandoProducto = false;
