@@ -21,10 +21,9 @@ interface AddProductoResponse {
 
 export class ProductosComponent implements OnInit, OnDestroy {
   productos: ProductoDTO[] = [];
-  productosFiltrados: ProductoDTO[] = [];
   categoriasUnicas: string[] = [];
   filtroTexto: string = '';
-  filtroStockActivo: boolean = false;
+
   mostrarSoloStock: boolean = false;
 
   // Estados del formulario
@@ -69,7 +68,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this.productosService.getProductos(idAdmin).subscribe({
         next: (data: Producto[]) => {
           this.productos = data.map((producto: Producto) => new ProductoDTO(producto));
-          this.productosFiltrados = [...this.productos];
           this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           this.cargandoProducto = false;
           this.cdr.detectChanges(); 
@@ -85,71 +83,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   // === MÉTODOS DE FILTRADO ===
 
-  // Filtro por texto
-  applyFilter() {
-    this.aplicarTodosLosFiltros();
-    this.cdr.detectChanges();
-  }
-
-  aplicarTodosLosFiltros() {
-    let resultado = [...this.productos];
-    console.log('Productos iniciales:', resultado.length);
-    console.log('Filtro stock activo:', this.filtroStockActivo);
-
-    // 1. Filtrar por stock si está activado
-    if (this.filtroStockActivo) {
-      const productosConStock = resultado.filter(p => p.stock > 0);
-      console.log('Productos con stock > 0:', productosConStock.length);
-      console.log('Stocks encontrados:', resultado.map(p => ({ id: p.id, stock: p.stock })));
-      resultado = productosConStock;
-    }
-
-    // 2. Filtrar por texto si hay búsqueda
-    if (this.filtroTexto.trim()) {
-      const filtroLower = this.filtroTexto.toLowerCase();
-      const esNumerico = /^[0-9]+$/.test(filtroLower);
-
-      if (esNumerico) {
-        resultado = resultado.filter(p => p.id.toString() === filtroLower);
-      } else {
-        resultado = resultado.filter(p =>
-          p.id.toLowerCase().includes(filtroLower) ||
-          (p.descripcion?.toLowerCase() || '').includes(filtroLower) ||
-          p.categoria.toLowerCase().includes(filtroLower)
-        );
-      }
-    }
-
-    this.productosFiltrados = resultado;
-    console.log('Productos filtrados finales:', this.productosFiltrados.length);
-  }
-
-  aplicarFiltros(filtrarStock: boolean = false) {
-    // Resetear toggle a "Todos" cuando se aplican filtros después de operaciones CRUD
-    this.filtroStockActivo = filtrarStock;
-    this.mostrarSoloStock = filtrarStock;
-    this.aplicarTodosLosFiltros();
-  }
-
-  filtrarStockMayorCero() {
-    this.filtroStockActivo = true;
-    this.mostrarSoloStock = true;
-    this.aplicarTodosLosFiltros();
-  }
-
-  mostrarTodos() {
-    this.filtroStockActivo = false;
-    this.mostrarSoloStock = false;
-    this.aplicarTodosLosFiltros();
-  }
-
   // Método para el toggle switch
   toggleFiltroStock(checked: boolean) {
-    console.log('Toggle activado:', checked); // Para debug
     this.mostrarSoloStock = checked;
-    this.filtroStockActivo = checked;
-    this.aplicarTodosLosFiltros();
-    console.log('Productos filtrados:', this.productosFiltrados.length); // Para debug
   }
 
 
@@ -222,7 +158,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.cargandoProducto = false;
           if (respuesta.producto) {
             this.productos.push(new ProductoDTO(respuesta.producto));
-            this.aplicarFiltros();
             this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           }
           this.cdr.detectChanges();
@@ -274,7 +209,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
           const index = this.productos.findIndex(p => p.id === updatedProducto.id);
           if (index !== -1) {
             this.productos[index] = new ProductoDTO(updatedProducto);
-            this.aplicarFiltros();
             this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           }
 
@@ -315,7 +249,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this.productosService.eliminarProducto(this.productoAEliminar).subscribe({
         next: (response: any) => {
           this.productos = this.productos.filter(p => p.id !== this.productoAEliminar!.id);
-          this.aplicarFiltros();
           this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           this.crearLog(this.productoAEliminar!.id, 'eliminacion');
           this.cancelarEliminar();
@@ -366,6 +299,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
   onCargaIniciada() {
     this.cargandoProducto = true;
     this.mensaje = 'Procesando productos esto puede tardar unos segundos...';
+  }
+
+  detectChanges() {
+    this.cdr.detectChanges();
   }
 
 }
