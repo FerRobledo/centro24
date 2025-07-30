@@ -7,6 +7,7 @@ import { Log } from 'src/assets/dto/log';
 import { Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ProductFormDialogComponent } from './product-form-dialog/product-form-dialog.component';
+import { LogsComponent } from '../logs/logs.component';
 
 interface AddProductoResponse {
   message: string;
@@ -270,6 +271,18 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.cargandoProducto = false;
   }
 
+
+  // === LOGS ===
+  abrirLogs() {
+    const dialogRef = this.dialog.open(LogsComponent, {
+      width: '90vw',
+      maxWidth: '1200px',
+      height: '80vh',
+      data: {
+        titulo: 'Logs de Productos'
+      }
+    })
+  }
 
   // === MÉTODOS DE UTILIDAD ===
   esAdmin(): boolean {
