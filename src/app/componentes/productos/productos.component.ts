@@ -92,7 +92,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   abrirFormularioAgregar() {
     const dialogRef = this.dialog.open(ProductFormDialogComponent, {
       width: '500px',
-      disableClose: true,
+      disableClose: false,
       data: {
         producto: new ProductoDTO(),
         modoEdicion: false,
@@ -111,7 +111,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   editarProducto(producto: ProductoDTO) {
     const dialogRef = this.dialog.open(ProductFormDialogComponent, {
       width: '500px',
-      disableClose: true,
+      disableClose: false,
       data: {
         producto: producto,
         modoEdicion: true,
