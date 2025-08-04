@@ -44,9 +44,12 @@ export class CobranzaComponent implements OnInit, OnDestroy {
 
   public closeDay() {
     const id = this.authService.getIdAdmin();
+    const nameUser = this.authService.getUserName();
+    console.log('nombre del user ' + nameUser);
+    
     if (id) {
       this.subscriptions.add(
-        this.cobranzaService.closeClientsOfDay(id).subscribe({
+        this.cobranzaService.closeClientsOfDay(id, nameUser).subscribe({
           next: (data) => {
             this.collectionDay = data.total;
             if(data === 0){

@@ -14,8 +14,8 @@ export class CobranzaService {
     return this.http.get(this.origin + '/api/cobranza/' + id)
   }
   
-  public closeClientsOfDay(id: number): Observable<any> {
-    return this.http.get(this.origin + '/api/cobranza/' + id + '?action=close');
+  public closeClientsOfDay(id: number, nameUser: string): Observable<any> {
+    return this.http.get(this.origin + '/api/cobranza/' + id + '?action=close&nameUser=' + nameUser);
   }
 
   public postClientDaily(payload: any, idAdmin: number): Observable<any> {

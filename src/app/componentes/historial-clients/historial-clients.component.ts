@@ -15,6 +15,7 @@ export class HistorialClientsComponent {
     
   ) {
     this.historial = data;
+    console.log(this.historial);
   }
 
   cerrar(): void {
@@ -24,10 +25,4 @@ export class HistorialClientsComponent {
   insertDate(data: any){
     this.historial.push(data);
   }
-  /*
-  loadHistory(){ 
-    for() {
-
-    }
-  }*/
 }

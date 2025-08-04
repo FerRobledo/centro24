@@ -11,12 +11,14 @@
 			</colgroup>
 			<thead class="bg-green-100 text-green-800 uppercase text-xs font-semibold">
 				<tr class="text-left">
+					<th class="p-3 text-right">Nombre usuario</th>
 					<th class="p-3">Fecha de cierres</th>
 					<th class="p-3 text-right">Monto</th>
 				</tr>
 			</thead>
 			<tbody class="divide-y divide-green-200 bg-white">
 				<tr *ngFor="let item of historial" class="hover:bg-green-50">
+					<td class="p-3 text-left size-2">{{ item.nombre_usuario }}</td>
 					<td class="p-3">
 					  {{ item.fecha | date: 'short' }}<br />
 					  <span class="text-xs text-green-600">{{ item.fecha | date: 'EEEE' }}</span>

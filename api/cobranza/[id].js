@@ -21,8 +21,7 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'GET') {
-        const { id, action } = req.query;
-    
+        const { id, action, nameUser } = req.query;
         if (!id) {
             return res.status(400).json({ error: 'Error falta id para obtener los clientes del dia' });
         }
@@ -44,9 +43,10 @@ module.exports = async (req, res) => {
                 const total = (result1.rows[0].total_caja ?? 0) + (result2.rows[0].total_pagos ?? 0);
                 if(total > 0){
                     await pool.query(`
-                        INSERT INTO historial_cierres (fecha, user_admin, monto)
-                        VALUES (CURRENT_TIMESTAMP, $1, $2)
-                    `, [id, total]);
+                        INSERT INTO historial_cierres (fecha, user_admin, monto, nombre_usuario)
+                        VALUES (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires', $1, $2, $3)
+                        `, [id, total, nameUser.trim()]);
+
         
                     await pool.query(`
                         UPDATE caja
@@ -65,7 +65,7 @@ module.exports = async (req, res) => {
     
             if (action === 'history') {
                 const result = await pool.query(`
-                    SELECT fecha, monto
+                    SELECT fecha, monto, nombre_usuario
                     FROM public.historial_cierres
                     WHERE user_admin = $1;
                 `, [id]);
