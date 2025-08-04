@@ -5,6 +5,9 @@ import { Producto, ProductoDTO } from 'src/assets/dto/producto';
 import { LogsService } from 'src/app/services/logs.service';
 import { Log } from 'src/assets/dto/log';
 import { Subscription } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { ProductFormDialogComponent } from './product-form-dialog/product-form-dialog.component';
+import { LogsComponent } from '../logs/logs.component';
 
 interface AddProductoResponse {
   message: string;
@@ -21,20 +24,16 @@ interface AddProductoResponse {
 
 export class ProductosComponent implements OnInit, OnDestroy {
   productos: ProductoDTO[] = [];
-  productosFiltrados: ProductoDTO[] = [];
   categoriasUnicas: string[] = [];
   filtroTexto: string = '';
-  filtroStockActivo: boolean = false;
-  mostrarSoloStock: boolean = false;
 
-  // Estados del formulario
-  mostrarFormulario: boolean = false;
-  modoEdicion: boolean = false;
-  productoEditando: ProductoDTO | null = null;
+  mostrarSoloStock: boolean = false;
 
   // Estados del diálogo de confirmación
   mostrarConfirmacion: boolean = false;
   productoAEliminar: ProductoDTO | null = null;
+
+  productoEditando: ProductoDTO | null = null;
 
   // Estados generales
   cargandoProducto: boolean = false;
@@ -47,8 +46,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private logsService: LogsService,
     private cdr: ChangeDetectorRef,
-  ) {
-  }
+    public dialog: MatDialog
+  ) {}
 
   ngOnInit() {
     const idAdmin = this.authService.getIdAdmin();
@@ -69,7 +68,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this.productosService.getProductos(idAdmin).subscribe({
         next: (data: Producto[]) => {
           this.productos = data.map((producto: Producto) => new ProductoDTO(producto));
-          this.productosFiltrados = [...this.productos];
           this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           this.cargandoProducto = false;
           this.cdr.detectChanges(); 
@@ -85,106 +83,50 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   // === MÉTODOS DE FILTRADO ===
 
-  // Filtro por texto
-  applyFilter() {
-    this.aplicarTodosLosFiltros();
-    this.cdr.detectChanges();
-  }
-
-  aplicarTodosLosFiltros() {
-    let resultado = [...this.productos];
-    console.log('Productos iniciales:', resultado.length);
-    console.log('Filtro stock activo:', this.filtroStockActivo);
-
-    // 1. Filtrar por stock si está activado
-    if (this.filtroStockActivo) {
-      const productosConStock = resultado.filter(p => p.stock > 0);
-      console.log('Productos con stock > 0:', productosConStock.length);
-      console.log('Stocks encontrados:', resultado.map(p => ({ id: p.id, stock: p.stock })));
-      resultado = productosConStock;
-    }
-
-    // 2. Filtrar por texto si hay búsqueda
-    if (this.filtroTexto.trim()) {
-      const filtroLower = this.filtroTexto.toLowerCase();
-      const esNumerico = /^[0-9]+$/.test(filtroLower);
-
-      if (esNumerico) {
-        resultado = resultado.filter(p => p.id.toString() === filtroLower);
-      } else {
-        resultado = resultado.filter(p =>
-          p.id.toLowerCase().includes(filtroLower) ||
-          (p.descripcion?.toLowerCase() || '').includes(filtroLower) ||
-          p.categoria.toLowerCase().includes(filtroLower)
-        );
-      }
-    }
-
-    this.productosFiltrados = resultado;
-    console.log('Productos filtrados finales:', this.productosFiltrados.length);
-  }
-
-  aplicarFiltros(filtrarStock: boolean = false) {
-    // Resetear toggle a "Todos" cuando se aplican filtros después de operaciones CRUD
-    this.filtroStockActivo = filtrarStock;
-    this.mostrarSoloStock = filtrarStock;
-    this.aplicarTodosLosFiltros();
-  }
-
-  filtrarStockMayorCero() {
-    this.filtroStockActivo = true;
-    this.mostrarSoloStock = true;
-    this.aplicarTodosLosFiltros();
-  }
-
-  mostrarTodos() {
-    this.filtroStockActivo = false;
-    this.mostrarSoloStock = false;
-    this.aplicarTodosLosFiltros();
-  }
-
   // Método para el toggle switch
   toggleFiltroStock(checked: boolean) {
-    console.log('Toggle activado:', checked); // Para debug
     this.mostrarSoloStock = checked;
-    this.filtroStockActivo = checked;
-    this.aplicarTodosLosFiltros();
-    console.log('Productos filtrados:', this.productosFiltrados.length); // Para debug
   }
 
 
   // === MÉTODOS DE FORMULARIO ===
   abrirFormularioAgregar() {
-    this.modoEdicion = false;
-    this.productoEditando = null;
-    this.nuevoProducto = new ProductoDTO();
-    this.mostrarFormulario = true;
-    this.mensaje = '';
+    const dialogRef = this.dialog.open(ProductFormDialogComponent, {
+      width: '500px',
+      disableClose: false,
+      data: {
+        producto: new ProductoDTO(),
+        modoEdicion: false,
+        esAdmin: this.esAdmin()
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.action === 'guardar') {
+        this.nuevoProducto = result.producto;
+        this.addProducto();
+      }
+    });
   }
 
   editarProducto(producto: ProductoDTO) {
-    this.modoEdicion = true;
-    this.productoEditando = new ProductoDTO(producto);
-    this.nuevoProducto = new ProductoDTO(producto);
-    this.mostrarFormulario = true;
-    this.mensaje = '';
-  }
+    const dialogRef = this.dialog.open(ProductFormDialogComponent, {
+      width: '500px',
+      disableClose: false,
+      data: {
+        producto: producto,
+        modoEdicion: true,
+        esAdmin: this.esAdmin()
+      }
+    });
 
-  onFormGuardar(producto: ProductoDTO) {
-    this.nuevoProducto = producto;
-    this.guardarProducto();
-  }
-
-  onFormCancelar() {
-    this.cancelar();
-  }
-
-  guardarProducto() {
-    if (this.modoEdicion) {
-      this.actualizarProducto();
-    } else {
-      this.addProducto();
-    }
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.action === 'guardar') {
+        this.nuevoProducto = result.producto;
+        this.productoEditando = new ProductoDTO(producto); // Necesario para actualizarProducto()
+        this.actualizarProducto();
+      }
+    });
   }
 
   addProducto() {
@@ -222,7 +164,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.cargandoProducto = false;
           if (respuesta.producto) {
             this.productos.push(new ProductoDTO(respuesta.producto));
-            this.aplicarFiltros();
             this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           }
           this.cdr.detectChanges();
@@ -274,7 +215,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
           const index = this.productos.findIndex(p => p.id === updatedProducto.id);
           if (index !== -1) {
             this.productos[index] = new ProductoDTO(updatedProducto);
-            this.aplicarFiltros();
             this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           }
 
@@ -292,9 +232,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   cancelar() {
-    this.mostrarFormulario = false;
-    this.modoEdicion = false;
-    this.productoEditando = null;
     this.nuevoProducto = new ProductoDTO();
     this.mensaje = '';
     this.cargandoProducto = false;
@@ -315,7 +252,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this.productosService.eliminarProducto(this.productoAEliminar).subscribe({
         next: (response: any) => {
           this.productos = this.productos.filter(p => p.id !== this.productoAEliminar!.id);
-          this.aplicarFiltros();
           this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           this.crearLog(this.productoAEliminar!.id, 'eliminacion');
           this.cancelarEliminar();
@@ -335,6 +271,18 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.cargandoProducto = false;
   }
 
+
+  // === LOGS ===
+  abrirLogs() {
+    const dialogRef = this.dialog.open(LogsComponent, {
+      width: '90vw',
+      maxWidth: '1200px',
+      height: '80vh',
+      data: {
+        titulo: 'Logs de Productos'
+      }
+    })
+  }
 
   // === MÉTODOS DE UTILIDAD ===
   esAdmin(): boolean {
@@ -366,6 +314,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
   onCargaIniciada() {
     this.cargandoProducto = true;
     this.mensaje = 'Procesando productos esto puede tardar unos segundos...';
+  }
+
+  detectChanges() {
+    this.cdr.detectChanges();
   }
 
 }
