@@ -20,50 +20,71 @@ module.exports = async (req, res) => {
         return res.status(200).end();
     }
 
-    //GET
     if (req.method === 'GET') {
-        //leer el id desde la query
         const { id, action } = req.query;
-
+    
         if (!id) {
-            return res.status(400).json({ error: 'Error falta id para obtener los clientes del dia', details: error.message });
+            return res.status(400).json({ error: 'Error falta id para obtener los clientes del dia' });
         }
+    
         try {
             if (action === 'close') {
-                const result = await pool.query('SELECT SUM '
-                    + '(efectivo + debito + credito + transferencia + cheque + gasto) AS total'
-                    + ' FROM caja WHERE fecha = CURRENT_DATE AND user_admin = $1', [id]);
-
-                const total = result.rows[0].total ?? 0;
-
-                const existe = await pool.query(`
-                SELECT 1 FROM historial_cierres
-                WHERE fecha = CURRENT_DATE AND user_admin = $1
-              `, [id]);
-              
-              if (existe.rowCount === 0) {
-                await pool.query(`
-                  INSERT INTO historial_cierres (fecha, user_admin, monto)
-                  VALUES (CURRENT_DATE, $1, $2)
-                `, [id, total]);
-              }
+                const result1 = await pool.query(`
+                    SELECT SUM(efectivo + debito + credito + transferencia + cheque + gasto) AS total_caja
+                    FROM caja
+                    WHERE user_admin = $1 AND estado = $2
+                `, [id, 'false']);
+    
+                const result2 = await pool.query(`
+                    SELECT SUM(monto) AS total_pagos
+                    FROM pagos_mensuales
+                    WHERE id_admin = $1 AND estado = $2
+                `, [id, 'false']);
+    
+                const total = (result1.rows[0].total_caja ?? 0) + (result2.rows[0].total_pagos ?? 0);
+                if(total > 0){
+                    await pool.query(`
+                        INSERT INTO historial_cierres (fecha, user_admin, monto)
+                        VALUES (CURRENT_TIMESTAMP, $1, $2)
+                    `, [id, total]);
         
-            return res.status(200).json({ total });
+                    await pool.query(`
+                        UPDATE caja
+                        SET estado = true
+                        WHERE user_admin = $1 AND estado = false
+                    `, [id]);
+        
+                    await pool.query(`
+                        UPDATE pagos_mensuales
+                        SET estado = true
+                        WHERE id_admin = $1 AND estado = false
+                    `, [id]);
+                }
+                return res.status(200).json({ total });
             }
+    
             if (action === 'history') {
-                const result = await pool.query('SELECT fecha, monto ' +
-                                                'FROM public.historial_cierres WHERE user_admin = $1;', [id]);
-
-            return res.status(200).json(result.rows);
+                const result = await pool.query(`
+                    SELECT fecha, monto
+                    FROM public.historial_cierres
+                    WHERE user_admin = $1;
+                `, [id]);
+    
+                return res.status(200).json(result.rows);
             }
-            const { rows } = await pool.query('SELECT * FROM caja WHERE user_admin = $1 ORDER BY fecha DESC, id DESC', [id]);
+    
+            const { rows } = await pool.query(`
+                SELECT * FROM caja WHERE user_admin = $1 ORDER BY fecha DESC, id DESC
+            `, [id]);
+    
             return res.status(200).json(rows);
-
+    
         } catch (error) {
             console.log(error);
             return res.status(500).json({ error: 'Error no se pudo obtener los clientes del dia', details: error.message });
         }
     }
+    
 
     //POST
     if (req.method === 'POST') {
@@ -71,7 +92,7 @@ module.exports = async (req, res) => {
         const { id } = req.query;
         const payload = req.body;
 
-        if(!id){
+        if (!id) {
             return res.status(500).json({ error: 'Error falta id para insertar usuario', details: 'No se recibió el ID en el cuerpo de la petición' });
 
         } try {

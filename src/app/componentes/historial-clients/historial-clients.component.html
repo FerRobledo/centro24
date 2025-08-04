@@ -18,7 +18,7 @@
 			<tbody class="divide-y divide-green-200 bg-white">
 				<tr *ngFor="let item of historial" class="hover:bg-green-50">
 					<td class="p-3">
-					  {{ item.fecha | date: 'dd MMM yyyy' }}<br />
+					  {{ item.fecha | date: 'short' }}<br />
 					  <span class="text-xs text-green-600">{{ item.fecha | date: 'EEEE' }}</span>
 					</td>
 					<td class="p-3 text-right">${{ item.monto }}</td>
