@@ -99,9 +99,9 @@ module.exports = async (req, res) => {
                 await pool.query(
                     `
                     INSERT INTO pagos_mensuales
-                    (id_client, fecha_pago, monto, periodo_desde, periodo_hasta, id_admin)
-                    VALUES ($1, now(), $2, $3, $4, $5)
-                    `, [infoPago.client.id_client, infoPago.monto, infoPago.fechaDesde, infoPago.fechaHasta, id]
+                    (id_client, fecha_pago, monto, periodo_desde, periodo_hasta, id_admin, estado)
+                    VALUES ($1, now(), $2, $3, $4, $5, $6)
+                    `, [infoPago.client.id_client, infoPago.monto, infoPago.fechaDesde, infoPago.fechaHasta, id, 'false']
                 );
                 return res.status(201).json({ success: true });
             } catch (error) {
@@ -130,9 +130,12 @@ module.exports = async (req, res) => {
     }
 
   if (req.method === 'PUT') {
-    const { accion, porcentaje, ...payload } = req.body;
-    const idAdmin = req.query.id;
-    const idClient = req.query.idClient;
+    const { accion, idAdmin, porcentaje, ...payload } = req.body;
+    const idClient = req.query.id;
+
+    console.log('ID del admin:', idAdmin);
+    console.log('ID del cliente:', idClient);
+    console.log('Payload recibido:', payload);
 
     if (!idAdmin) {
     return res.status(400).json({ error: 'Error falta id ' });
@@ -159,14 +162,14 @@ module.exports = async (req, res) => {
         }
         try {
             const { rows } = await pool.query(
-            `UPDATE public.clientes_mensuales
-            SET tipo = $1,
-                cliente = $2,
-                mensual = $3,
-            WHERE id_client = $4 AND user_admin = $5
-            RETURNING *;`,
-            [payload.tipo, payload.cliente, payload.mensual, idClient, idAdmin]
-            );
+                `UPDATE public.clientes_mensuales
+                 SET tipo = $1,
+                     cliente = $2,
+                     mensual = $3
+                 WHERE id_client = $4 AND user_admin = $5
+                 RETURNING *;`,
+                [payload.tipo, payload.cliente, payload.mensual, idClient, idAdmin]
+              );
 
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'Cliente no encontrado o no autorizado' });
@@ -184,6 +187,7 @@ module.exports = async (req, res) => {
     if (req.method === 'DELETE') {
         const idAdmin = req.query.id;
         const { accion, idClient, pago } = req.body;
+        console.log('que sucede aca ' + idAdmin, accion, idClient, pago);
 
         if (accion === 'deletePago') {
             if (!pago) {

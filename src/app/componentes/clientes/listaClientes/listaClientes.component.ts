@@ -72,13 +72,16 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     this.eliminandoClienteId = client.id_client;
     const idClient = client.id_client;
     const idAdmin = this.authService.getIdAdmin();
+    this.cdr.detectChanges();
     if (idAdmin) {
       this.clientesService.deleteClient(idAdmin, idClient).subscribe({
         next: () => {
+          this.cdr.detectChanges();
           this.eliminandoClienteId = null;
           this.loadClientsMonthly.emit();
         },
         error: (error) => {
+          this.cdr.detectChanges();
           this.eliminandoClienteId = null;
           console.log("Error en la eliminacion del cliente: ", error)
         },
