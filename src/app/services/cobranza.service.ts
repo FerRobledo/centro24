@@ -7,9 +7,9 @@ import { Observable } from 'rxjs';
 })
 export class CobranzaService {
   private origin = window.location.origin;
-
+  
   constructor(private http: HttpClient) { }
-
+  
   public getClientsOfDay(id: number): Observable<any> {
     return this.http.get(this.origin + '/api/cobranza/' + id)
   }
@@ -34,5 +34,9 @@ export class CobranzaService {
 
   public getHistory(id: number): Observable<any> {
     return this.http.get(this.origin + '/api/cobranza/' + id + '?action=history')
+  }
+  
+  public getDetailsId(id: number, idCierre: number): Observable<any> {
+    return this.http.get(this.origin + '/api/cobranza/' + id + '?action=details&idCierre=' + idCierre)
   }
 }

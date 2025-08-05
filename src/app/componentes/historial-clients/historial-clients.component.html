@@ -1,5 +1,5 @@
 <div class="p-10 mx-auto w-full max-w-xl text-gray-800">
-	<h2 class="mb-4 text-2xl font-semibold text-green-700">Auditoría de caja</h2>
+	<h2 class="mb-4 text-2xl text-center font-semibold text-green-700">Auditoría de caja</h2>
 
 	<div class="overflow-x-auto rounded-lg border border-green-300 shadow-md">
 		<table class="w-full text-sm table-auto">
@@ -14,6 +14,7 @@
 					<th class="p-3 text-right">Nombre usuario</th>
 					<th class="p-3">Fecha de cierres</th>
 					<th class="p-3 text-right">Monto</th>
+					<th class="p-3 text-center">Detalle</th>
 				</tr>
 			</thead>
 			<tbody class="divide-y divide-green-200 bg-white">
@@ -23,8 +24,11 @@
 					  {{ item.fecha | date: 'short' }}<br />
 					  <span class="text-xs text-green-600">{{ item.fecha | date: 'EEEE' }}</span>
 					</td>
-					<td class="p-3 text-right">${{ item.monto }}</td>
-				  </tr>
+					<td class="p-3 text-center">${{ item.monto }}</td>
+					<td class="p-5 text-center">
+						<button class="text-blue-500 hover:underline" (click)="openDetails(item.id)">Ver detalle</button>
+					  </td>
+				</tr>
 			</tbody>
 		</table>
 	</div>

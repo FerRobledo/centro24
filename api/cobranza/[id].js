@@ -21,12 +21,12 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'GET') {
-        const { id, action, nameUser } = req.query;
-        console.log('cual es el name?: ' + nameUser);
+        const { id, action, nameUser, idCierre } = req.query;
+
         if (!id) {
             return res.status(400).json({ error: 'Error falta id para obtener los clientes del dia' });
         }
-    
+
         try {
             if (action === 'close') {
                 try {
@@ -35,37 +35,37 @@ module.exports = async (req, res) => {
                         FROM caja
                         WHERE user_admin = $1 AND estado = false
                     `, [id]);
-            
+
                     const result2 = await pool.query(`
                         SELECT SUM(monto) AS total_pagos
                         FROM pagos_mensuales
                         WHERE id_admin = $1 AND estado = false
                     `, [id]);
-            
+
                     const totalCaja = parseFloat(result1.rows[0]?.total_caja ?? 0);
                     const totalPagos = parseFloat(result2.rows[0]?.total_pagos ?? 0);
                     const total = totalCaja + totalPagos;
-            
+
                     console.log('Total calculado:', total);
-            
+
                     if (total > 0) {
                         const cierreInsert = await pool.query(`
                             INSERT INTO historial_cierres (fecha, user_admin, monto, nombre_usuario)
                             VALUES (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires', $1, $2, $3)
                             RETURNING id
                         `, [id, total, (nameUser || '').trim()]);
-            
+
                         const idCierre = cierreInsert.rows[0]?.id;
 
                         if (!idCierre) throw new Error('no se pudo obtener el id del cierre');
-            
+
                         //selecciono todos los detalles de la caja con estado=false y lo agrego a la intermedia
                         const cajaDetalle = await pool.query(`
                             SELECT id, (efectivo + debito + credito + transferencia + cheque + gasto) AS monto
                             FROM caja
                             WHERE user_admin = $1 AND estado = false
                         `, [id]);
-            
+
                         for (const row of cajaDetalle.rows) {
                             if (row.id == null || row.monto == null) {
                                 console.warn('fila incompleta en caja:', row);
@@ -76,13 +76,13 @@ module.exports = async (req, res) => {
                                 VALUES ($1, 'caja', $2, $3)
                             `, [idCierre, row.id, row.monto]);
                         }
-            
+
                         //selecciono detalles de los pagos mensuales con estado=false y lo agrego a la intermedia
                         const pagosDetalle = await pool.query(`
                             SELECT id, monto FROM pagos_mensuales
                             WHERE id_admin = $1 AND estado = false
                         `, [id]);
-            
+
                         for (const row of pagosDetalle.rows) {
                             if (row.id == null || row.monto == null) {
                                 console.warn('fila incompleta en pagos_mensuales:', row);
@@ -96,7 +96,7 @@ module.exports = async (req, res) => {
                         //marco las tuplas que tengan false como true
                         await pool.query(`UPDATE caja SET estado = true WHERE user_admin = $1 AND estado = false`, [id]);
                         await pool.query(`UPDATE pagos_mensuales SET estado = true WHERE id_admin = $1 AND estado = false`, [id]);
-            
+
                         return res.status(200).json({ total });
                     } else {
                         return res.status(200).json({ total: 0 });
@@ -104,31 +104,42 @@ module.exports = async (req, res) => {
                 } catch (error) {
                     console.error('error al cerrar caja:', error);
                     return res.status(500).json({ error: 'Error no se pudo cerrar la caja', details: error.message });
-                }                
+                }
             }
-    
+
             if (action === 'history') {
                 const result = await pool.query(`
-                    SELECT fecha, monto, nombre_usuario
+                    SELECT id, fecha, monto, nombre_usuario
                     FROM public.historial_cierres
                     WHERE user_admin = $1;
                 `, [id]);
-    
+
                 return res.status(200).json(result.rows);
             }
-    
+
+            if (action === 'details') {
+
+                const result = await pool.query(`
+                    SELECT d.fuente, d.monto, h.fecha
+                    FROM public.detalle_cierre d JOIN historial_cierres h ON (d.id_cierre = h.id)
+                    WHERE h.user_admin = $1 AND d.id_cierre = $2;
+                `, [id, idCierre]);
+
+                return res.status(200).json(result.rows);
+            }
+
             const { rows } = await pool.query(`
                 SELECT * FROM caja WHERE user_admin = $1 ORDER BY fecha DESC, id DESC
             `, [id]);
-    
+
             return res.status(200).json(rows);
-    
+
         } catch (error) {
             console.log(error);
             return res.status(500).json({ error: 'Error no se pudo obtener los clientes del dia', details: error.message });
         }
     }
-    
+
 
     //POST
     if (req.method === 'POST') {
