@@ -45,6 +45,7 @@ import { FiltroProductosPipe } from '../pipes/filtro-productos.pipe';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ProductFormDialogComponent } from '../componentes/productos/product-form-dialog/product-form-dialog.component';
+import { DetailsHistorialComponent } from '../componentes/detailsHistorial/detailsHistorial.component';
 
 
 export const MONTH_YEAR_FORMATS = {
@@ -86,7 +87,8 @@ export const MONTH_YEAR_FORMATS = {
     ConfirmarDeleteComponent,
     HistorialClientsComponent,
     FiltroProductosPipe,
-    ProductFormDialogComponent
+    ProductFormDialogComponent,
+    DetailsHistorialComponent
   ],
   imports: [
     CommonModule,
