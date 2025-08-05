@@ -121,11 +121,23 @@ module.exports = async (req, res) => {
 
                 const result = await pool.query(`
                     SELECT d.fuente, d.monto, h.fecha
-                    FROM public.detalle_cierre d JOIN historial_cierres h ON (d.id_cierre = h.id)
+                    FROM public.detalle_cierre d 
+                    JOIN historial_cierres h ON (d.id_cierre = h.id)
                     WHERE h.user_admin = $1 AND d.id_cierre = $2;
                 `, [id, idCierre]);
 
-                return res.status(200).json(result.rows);
+                const result2 = await pool.query(`
+                    SELECT c.efectivo, c.debito, c.credito, c.transferencia, c.cheque
+                    FROM public.detalle_cierre d 
+                    JOIN historial_cierres h ON (d.id_cierre = h.id)
+                    JOIN caja c ON (c.id = d.id_origen)
+                    WHERE h.user_admin = $1 AND d.id_cierre = $2;
+                `, [id, idCierre]);
+
+                return res.status(200).json({
+                    detalle: result.rows,
+                    totales: result2.rows[0] 
+                  });
             }
 
             const { rows } = await pool.query(`
