@@ -28,13 +28,12 @@ export class DetailsHistorialComponent implements OnInit {
   getDetailsById() {
     const idAdmin = this.authService.getIdAdmin();
 
-    console.log('admin:', idAdmin, 'cierre:', this.idCierre);
+    //console.log('admin:', idAdmin, 'cierre:', this.idCierre);
     if(idAdmin){
       this.subscriptions.add(
         this.cobranzaService.getDetailsId(idAdmin, this.idCierre).subscribe({
           next: (data) => {
-            this.detailsCurrent = data;
-            console.log("la pegue a la primera? ", this.detailsCurrent); //siempre que quiera mostrar un OBJECT va con coma
+            this.detailsCurrent = data;//data tiene dos objetos y accedo con .detalles o .totales
           },
           error: (error) => {
             console.log("Error en el GET de details: ", error);

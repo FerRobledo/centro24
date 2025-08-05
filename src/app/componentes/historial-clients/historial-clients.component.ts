@@ -32,6 +32,8 @@ export class HistorialClientsComponent {
 
   openDetails(id: number) {
     this.dialogRef2 = this.dialog.open(DetailsHistorialComponent, {
+      width: '58vw',    
+      height: 'auto',
       maxWidth: '100%',
       data: id,//le paso el id del detalle seleccionado
       disableClose: false,
