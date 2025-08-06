@@ -24,7 +24,7 @@
 					  {{ item.fecha | date: 'short' }}<br />
 					  <span class="text-xs text-green-600">{{ item.fecha | date: 'EEEE' }}</span>
 					</td>
-					<td class="p-3 text-center">${{ item.monto }}</td>
+					<td class="p-3 text-center">{{ item.monto | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}</td>
 					<td class="p-5 text-center">
 						<button class="text-blue-500 hover:underline" (click)="openDetails(item.id)">Ver detalle</button>
 					  </td>
