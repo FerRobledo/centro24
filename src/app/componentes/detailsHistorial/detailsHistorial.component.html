@@ -24,14 +24,14 @@
 				<tr *ngFor="let item of detailsCurrent.detalle" class="hover:bg-green-50">
           			<!--si la condicion es true, se muestra el primero y sino el segundo-->
 					<td class="p-3 text-left whitespace-nowrap">{{ item.fuente === 'pagos_mensuales' ? 'Pagos mensuales:' : 'Caja diaria:' }}</td>
-          			<td class="p-3 text-left whitespace-nowrap">$ {{ item.monto }}</td>
+          			<td class="p-3 text-left whitespace-nowrap">{{ item.monto | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</td>
 
 					<!--aca pongo solo los td, si la fuente es caja diaria-->
-					<td class="p-3 text-left whitespace-nowrap">{{ item.fuente === 'caja' ? detailsCurrent.totales.efectivo : '-' }} </td>
-					<td class="p-3 text-left whitespace-nowrap">{{ item.fuente === 'caja' ? detailsCurrent.totales.debito : '-' }} </td>
-					<td class="p-3 text-left whitespace-nowrap">{{ item.fuente === 'caja' ? detailsCurrent.totales.credito : '-' }} </td>
-					<td class="p-3 text-left whitespace-nowrap">{{ item.fuente === 'caja' ? detailsCurrent.totales.transferencia : '-' }} </td>
-					<td class="p-3 text-left whitespace-nowrap">{{ item.fuente === 'caja' ? detailsCurrent.totales.cheque : '-' }} </td>
+					<td class="p-3 text-left whitespace-nowrap">{{ item.fuente === 'caja' ? (detailsCurrent.totales.efectivo | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}</td>
+					<td class="p-3 text-left whitespace-nowrap">{{ item.fuente === 'caja' ? (detailsCurrent.totales.debito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }} </td>
+					<td class="p-3 text-left whitespace-nowrap">{{ item.fuente === 'caja' ? (detailsCurrent.totales.credito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-'}} </td>
+					<td class="p-3 text-left whitespace-nowrap">{{ item.fuente === 'caja' ? (detailsCurrent.totales.transferencia | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }} </td>
+					<td class="p-3 text-left whitespace-nowrap">{{ item.fuente === 'caja' ? (detailsCurrent.totales.cheque | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }} </td>
 					
 				</tr>
 			</tbody>

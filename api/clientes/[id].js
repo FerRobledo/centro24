@@ -186,19 +186,16 @@ module.exports = async (req, res) => {
     // DELETE
     if (req.method === 'DELETE') {
         const idAdmin = req.query.id;
-        const { accion, idClient, pago } = req.body;
-        console.log('que sucede aca ' + idAdmin, accion, idClient, pago);
+        const { action, idClient, pago } = req.body;      
 
-        if (accion === 'deletePago') {
+        if (action === 'deletePago') {
             if (!pago) {
                 return res.status(400).json({ error: "Faltan datos para eliminar el pago" });
             }
             try {
-                await pool.query(
-                    `DELETE FROM pagos_mensuales WHERE id= $1 AND id_admin = $2`,
-                    [pago.id, pago.id_admin]
-                );
-                return res.status(200).json({ success: true });
+                await pool.query(`DELETE FROM pagos_mensuales WHERE id_client = $1 AND id_admin = $2`, [idClient, idAdmin]);
+
+                return res.status(200).json({ success: true }); 
             } catch (error) {
                 console.log(error);
                 return res.status(500).json({ error: 'Error no se pudo eliminar el pago', details: error.message });
@@ -208,10 +205,7 @@ module.exports = async (req, res) => {
                 return res.status(400).json({ error: 'Falta idAdmin o idClient' });
             }
             try {
-                const { rows } = await pool.query(
-                    'DELETE FROM public.clientes_mensuales WHERE id_client=$1 AND user_admin=$2 RETURNING id_client;',
-                    [idClient, idAdmin]
-                );
+                const { rows } = await pool.query(`DELETE FROM clientes_mensuales WHERE id_client = $1 AND user_admin = $2 RETURNING id_client;`, [idClient, idAdmin]);
 
                 if (rows.length > 0) {
                     return res.status(200).json({ success: true, deletedId: rows[0].id_client });
