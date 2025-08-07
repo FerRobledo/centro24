@@ -61,13 +61,11 @@ export class InsertarClienteComponent implements OnInit {
     this.cargando = true;
 
     if (this.accion == 'editar' && this.data.client?.id_client) {
-
       this.clientstService.updateClient(this.data.client.id_client, idAdmin, payload).subscribe({
         error: (err) => {
           console.error('Error al actualizar:', err);
         },
         complete: () => {
-          //console.log('llega en algun momento aca????');
           this.dialogRef.close("submit"); //cierro modal
           this.cargando = false;
         }
