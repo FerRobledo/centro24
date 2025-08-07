@@ -92,6 +92,26 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     }
   }
 
+  openDeleteConfirm(client: any){ 
+    console.log('Abriendo modal para:', client);
+    let titulo = 'Confirmar borrado';
+    let mensaje = '';
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: titulo,
+        message: mensaje
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteClient(client);
+      }
+    })
+  }
+
   abrirConfirmacion() {
     let titulo = 'Confirmar incremento';
     let mensaje = '';
