@@ -50,17 +50,22 @@ export class RegisterClienteComponent implements OnInit {
     const payload = this.form.value;
     const idAdmin = this.authService.getIdAdmin();
 
-    if (this.accion == 'editar' && this.data.client?.id_client) {
-      this.cobranzaService.updateClient(this.data.client.id_client, idAdmin, payload).subscribe({
+    if (this.accion == 'editar' && this.data.client?.id) {//si client existe, entonces dame su id_client
+      this.cobranzaService.updateClient(this.data.client.id, idAdmin, payload).subscribe({
         error: (err) => {
           console.error('Error al actualizar:', err);
+        },
+        complete: () => {
+          this.dialogRef.close("submit"); //cierro modal
         }
       });
-      this.dialogRef.close("submit"); //cierro modal
-    } else {
+      } else {
       this.cobranzaService.postClientDaily(payload, idAdmin).subscribe({
         error: (err) => {
           console.error('Error al registrar:', err);
+        },
+        complete: () => {
+          this.dialogRef.close("submit");
         }
       });
       this.dialogRef.close("submit"); //cierro modal
@@ -79,6 +84,7 @@ export class RegisterClienteComponent implements OnInit {
       gasto: [],
     });
     this.accion = this.data.accion;
+    
     if (this.data.client) {
       this.form.setValue({
         detalle: this.data.client.detalle,

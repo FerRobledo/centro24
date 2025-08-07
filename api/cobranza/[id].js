@@ -181,8 +181,6 @@ module.exports = async (req, res) => {
         const { idAdmin } = req.body; //el {} quiere decir del objeto req.body, extraeme la propiedad llamada idAdmin
         const payload = req.body; //sin {} porque es un objeto, los objetos se toman completos
 
-        console.log("El payload del update es: ", payload);
-
         if (!idClient) {
             return res.status(500).json({ error: 'Error falta id para actualizar usuario', details: 'No se recibió el ID en el cuerpo de la petición' });
         } try {
@@ -191,6 +189,7 @@ module.exports = async (req, res) => {
                 " SET detalle=$1, efectivo=$2, debito=$3, credito=$4, transferencia=$5, cheque=$6, observacion=$7, gasto=$8, user_admin=$9" +
                 " WHERE id=$10;", [payload.detalle, payload.efectivo, payload.debito, payload.credito, payload.transferencia, payload.cheque, payload.observacion, payload.gasto, idAdmin, idClient]
             );
+            
             return res.status(200).json(rows);
         } catch (error) {
             console.log(error);

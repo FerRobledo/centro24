@@ -94,7 +94,17 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   }
 
   public updateClient(client: any) {
-    this.clientEdit = client;
+
+    const dialogRef = this.dialog.open(RegisterClienteComponent, {
+      maxWidth: '100%',
+      data: { client, accion: "editar" },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result == 'submit') {
+        this.loadClientsDaily();
+      }
+    });
   }
 
   public deleteClient(client: any) {

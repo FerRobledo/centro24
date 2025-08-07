@@ -22,7 +22,7 @@ export class CobranzaService {
     return this.http.post(this.origin + '/api/cobranza/' + idAdmin, payload);
   }
 
-  public updateClient(idClient: number, idAdmin: number, payload: any) {
+  public updateClient(idClient: number, idAdmin: number, payload: any) {  
     const body = { ...payload, idAdmin };
     return this.http.put(this.origin + '/api/cobranza/' + idClient, body);
   }
