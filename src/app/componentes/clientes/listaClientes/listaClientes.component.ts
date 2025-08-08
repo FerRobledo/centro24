@@ -80,7 +80,6 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
           this.eliminandoClienteId = null;
           this.loadClientsMonthly.emit();
-          console.log('llega aca??: ');
           
         },
         error: (error) => {
@@ -169,9 +168,9 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     this.clientsOfMonth = this.clientsOfMonth.map(client =>{
       let monto = 0;
       if(client.tipo == "Mensual"){
-        monto = client.mensual;
+        monto = client.monto;
       } else if(client.tipo == "Semestral") {
-        monto = client.mensual * 5;
+        monto = client.monto * 5;
       }
 
       return {
@@ -196,14 +195,15 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
         mesesVigente = this.calcularMesesDiferencia(hoy, periodoHasta);
       }
 
-      console.log(mesesVigente);
       return {
         ...client,
+        monto: Number(client.monto),
         mesesVigente: mesesVigente,
         periodoHasta: periodoHasta,
       }
     });
   }
+
   calcularMesesDiferencia(desde: Date, hasta: Date): number {
     const yearDiff = hasta.getFullYear() - desde.getFullYear();
     const monthDiff = hasta.getMonth() - desde.getMonth();

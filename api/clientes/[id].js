@@ -116,9 +116,9 @@ module.exports = async (req, res) => {
             try {
                 const { rows } = await pool.query(
                     `INSERT INTO public.clientes_mensuales
-                    (tipo, cliente, mensual, user_admin)
+                    (tipo, cliente, monto, user_admin)
                     VALUES ($2, $3, $4, $1) RETURNING *`,
-                    [id, payload.tipo, payload.cliente, payload.mensual]
+                    [id, payload.tipo, payload.cliente, payload.monto]
                 );
                 console.log(rows);
                 return res.status(201).json(rows[0]);
@@ -130,12 +130,13 @@ module.exports = async (req, res) => {
     }
 
   if (req.method === 'PUT') {
-    const { accion, idAdmin, porcentaje, ...payload } = req.body;
-    const idClient = req.query.id;
+    const { accion, porcentaje, idClient, ...payload } = req.body;
+    const idAdmin = req.query.id;
 
     console.log('ID del admin:', idAdmin);
     console.log('ID del cliente:', idClient);
     console.log('Payload recibido:', payload);
+    console.log('Porcentaje:', porcentaje);
 
     if (!idAdmin) {
     return res.status(400).json({ error: 'Error falta id ' });
@@ -145,7 +146,7 @@ module.exports = async (req, res) => {
         try {
             const { rows } = await pool.query(
             `UPDATE public.clientes_mensuales
-            SET mensual = ROUND(mensual + (mensual * $1 / 100), 2)
+            SET monto = ROUND(monto + (monto * $1 / 100), 2)
             WHERE user_admin = $2
             RETURNING *;`,
             [porcentaje, idAdmin]
@@ -165,10 +166,10 @@ module.exports = async (req, res) => {
                 `UPDATE public.clientes_mensuales
                  SET tipo = $1,
                      cliente = $2,
-                     mensual = $3
+                     monto = $3
                  WHERE id_client = $4 AND user_admin = $5
                  RETURNING *;`,
-                [payload.tipo, payload.cliente, payload.mensual, idClient, idAdmin]
+                [payload.tipo, payload.cliente, payload.monto, idClient, idAdmin]
               );
 
             if (rows.length === 0) {
