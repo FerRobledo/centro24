@@ -25,8 +25,8 @@ export class ClientesService {
   }
 
   public updateClient(idClient: number, idAdmin: number, payload: any) {
-    const body = { ...payload, idAdmin };
-    return this.http.put(this.origin + '/api/clientes/' + idClient, body);
+    const body = { ...payload, idClient };
+    return this.http.put(this.origin + '/api/clientes/' + idAdmin, body);
   }
 
   public getMontOfCurrentClient(monthSelected: string) {

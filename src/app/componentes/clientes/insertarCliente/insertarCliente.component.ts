@@ -17,7 +17,7 @@ export class InsertarClienteComponent implements OnInit {
   @Input() clientEdit: any;
   accion: string = '';
   form!: FormGroup;
-  client: any = { tipo: '', cliente: '', mensual: ''};
+  client: any = { tipo: '', cliente: '', monto: ''};
   meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   formMeses = new FormGroup({});
   cargando: boolean = false;
@@ -43,7 +43,7 @@ export class InsertarClienteComponent implements OnInit {
     //cuando hago sumbit lleno el meses pagados con los true
 
     const camposNumericos: string[] = [
-      'mensual',
+      'monto',
     ];
 
     camposNumericos.forEach((campo: string) => {
@@ -87,7 +87,7 @@ export class InsertarClienteComponent implements OnInit {
     this.form = this.fb.group({
       tipo: ['', Validators.required],
       cliente: ['', Validators.required],
-      mensual: [],
+      monto: [],
     });
     this.meses.forEach(mes => {
       this.formMeses.addControl(mes, new FormControl(false)); /*const nombre = new FormControl('Matías');
@@ -95,12 +95,12 @@ export class InsertarClienteComponent implements OnInit {
 
     });
     this.accion = this.data.accion;
-
+    console.log('que hay aca?: ', this.data)
     if (this.data.client) {
       this.form.setValue({
         tipo: this.data.client.tipo,
         cliente: this.data.client.cliente,
-        mensual: this.data.client.mensual,
+        monto: this.data.client.monto,
       })
     }
   }
