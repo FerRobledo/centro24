@@ -93,6 +93,10 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     }
   }
 
+  isAdmin() {
+    return this.authService.esAdmin();
+  }
+
   public updateClient(client: any) {
 
     const dialogRef = this.dialog.open(RegisterClienteComponent, {
