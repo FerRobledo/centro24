@@ -14,20 +14,23 @@ import { HistorialClientsComponent } from '../historial-clients/historial-client
 export class CobranzaComponent implements OnInit, OnDestroy {
   public clientEdit: any = null;
   clientsOfDay: any[] = [];
-  historyCierres: any[] = [];
+  historyCierres: any = [];
   collectionDay = -1;
   today: Date = new Date();
   isLoadingCobranza: boolean = false;
   dialogRef: MatDialogRef<any> | null = null;
+  selectedDate: string = '';
   private subscriptions: Subscription = new Subscription();
+  dias: number[] = [];
+  anios: number[] = [];
+  meses: any = []
 
   constructor(
     private cobranzaService: CobranzaService,
     private authService: AuthService,
     public dialog: MatDialog,
     private cdr: ChangeDetectorRef //inyecta ChangeDetectorRef
-  ) {
-  }
+  ) { }
 
   ngOnInit() {
     this.loadClientsDaily();
@@ -46,13 +49,13 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     const id = this.authService.getIdAdmin();
     const nameUser = this.authService.getUserName();
     console.log('nombre del user ' + nameUser);
-    
+
     if (id) {
       this.subscriptions.add(
         this.cobranzaService.closeClientsOfDay(id, nameUser).subscribe({
           next: (data) => {
             this.collectionDay = data.total;
-            if(data === 0){
+            if (data === 0) {
               this.collectionDay = 0;
             }
             this.cdr.detectChanges(); //revisá este componente ya mismo por si hay algo que cambió y actualizá el HTML.
@@ -150,19 +153,19 @@ export class CobranzaComponent implements OnInit, OnDestroy {
 
   openHistorial() {
     const id = this.authService.getIdAdmin();
-  
+
     if (!id) return;
-  
+
     this.isLoadingCobranza = true;
     this.cdr.detectChanges();
-  
+    
     this.subscriptions.add(
       this.cobranzaService.getHistory(id).subscribe({
         next: (data) => {
           this.historyCierres = data ?? [];
           this.isLoadingCobranza = false;
           this.cdr.detectChanges();
-  
+          
           // abro modal con datos cargados
           this.dialogRef = this.dialog.open(HistorialClientsComponent, {
             maxWidth: '100%',
@@ -170,7 +173,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
             disableClose: false,
             autoFocus: true,
           });
-  
+          
           this.dialogRef.afterClosed().subscribe(() => {
             this.dialogRef = null;
           });
@@ -192,6 +195,32 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     suma += Number(cliente.cheque);
     suma -= Number(cliente.gasto);
     return suma;
+  }
+  
+  fitrarFecha() {
+    this.isLoadingCobranza = true;
+    if (this.selectedDate == '') {
+      this.loadClientsDaily();
+    }
+    
+    const idAdmin = this.authService.getIdAdmin();
+    this.subscriptions.add(
+      this.cobranzaService.getClientsByDate(idAdmin, this.selectedDate).subscribe({
+        next: (data) => {
+          this.clientsOfDay = data;
+        },
+        error: (error) => {
+          console.log("Error en el pedido de clientes del dia: ", error);
+        },
+        complete: () => {
+          this.isLoadingCobranza = false;
+        }
+      })
+    )
+    this.cdr.detectChanges();
+  }
+
+  eliminarFiltroFecha() {
   }
 
 }

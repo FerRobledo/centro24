@@ -18,6 +18,10 @@ export class CobranzaService {
     return this.http.get(this.origin + '/api/cobranza/' + id + '?action=close&nameUser=' + nameUser);
   }
 
+  public getClientsByDate(idAdmin: number, date: string): Observable<any>{
+    return this.http.get(this.origin + '/api/cobranza/' + idAdmin + '?action=getClientsByDate&date=' +  date )
+  }
+
   public postClientDaily(payload: any, idAdmin: number): Observable<any> {
     return this.http.post(this.origin + '/api/cobranza/' + idAdmin, payload);
   }

@@ -2,7 +2,7 @@
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="container flex flex-col mx-auto space-y-12">
     <fieldset class="grid grid-cols-4 gap-6 p-6 rounded-md shadow-sm bg-white">
       <div class="space-y-2 col-span-full lg:col-span-1 justify-center ">
-        <div class="w-16 h-16 rounded-2xl bg-green-600 flex items-center justify-center">
+        <div class="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center">
           <i class="fa-solid fa-user-plus text-2xl text-white"></i>
         </div>
         <h6 class="text-lg font-bold text-gray-900">{{ accion=='editar' ? 'Edite cliente mensual' : 'Registre un nuevo cliente mensual' }}
@@ -64,7 +64,7 @@
             Cancelar
           </button>
           <button type="submit" 
-            class="w-28 rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">
+            class="w-28 rounded-md bg-emerald-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">
             {{ accion=='editar' ? 'Guardar cambios' : 'Crear usuario' }}
           </button>
         </div>
