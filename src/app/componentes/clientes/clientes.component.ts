@@ -69,6 +69,4 @@ export class ClientesComponent implements OnInit, OnDestroy {
   detectChanges() {
     this.cdr.detectChanges();
   }
-
-  
 }
