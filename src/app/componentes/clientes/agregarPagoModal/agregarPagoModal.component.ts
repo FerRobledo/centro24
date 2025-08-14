@@ -4,9 +4,11 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors,
 import { MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
-import { setMonth, setYear, parseISO, format, differenceInMonths, startOfMonth } from 'date-fns';
 
-const fechaFormateada = format(new Date(), 'MM/yyyy');
+const fechaFormateada = new Date().toLocaleDateString('es-AR', {
+  month: '2-digit',
+  year: 'numeric'
+});
 
 @Component({
   selector: 'app-agregarPagoModal',
@@ -77,13 +79,6 @@ export class AgregarPagoModalComponent implements OnInit {
     return fechaDesde <= fechaHasta ? null : { fechasInvalidas: true };
   }
 
-  formatearMesAnio(fecha: Date | string) {
-    const fechaObj = (fecha instanceof Date) ? fecha : new Date(fecha);
-    const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
-    const anio = fechaObj.getFullYear();
-    return `${anio}-${mes}-1`;
-  }
-
   crearPago() {
     if (this.pagoForm.invalid) {
       this.error = "Formulario inválido";
@@ -120,8 +115,12 @@ export class AgregarPagoModalComponent implements OnInit {
 
   chosenMonthHandler(normalizedMonth: Date, controlName: string, datepicker: any) {
     const ctrl = this.pagoForm.get(controlName);
-    const currentValue = ctrl?.value ? parseISO(ctrl.value) : new Date();
-    const updated = setMonth(setYear(currentValue, normalizedMonth.getFullYear()), normalizedMonth.getMonth());
+    const currentValue = ctrl?.value ? new Date(ctrl.value) : new Date();
+
+    const updated = new Date(currentValue);
+    updated.setFullYear(normalizedMonth.getFullYear());
+    updated.setMonth(normalizedMonth.getMonth());
+
     ctrl?.setValue(updated.toISOString());
     this.actualizarCantidadMeses();
     datepicker.close();
@@ -130,7 +129,8 @@ export class AgregarPagoModalComponent implements OnInit {
   chosenYearHandler(event: any, controlName: string) {
     const ctrl = this.pagoForm.get(controlName);
     if (event.value) {
-      const start = startOfMonth(new Date(event.value));
+      const date = new Date(event.value);
+      const start = new Date(date.getFullYear(), date.getMonth(), 1); // primer día del mes
       ctrl?.setValue(start.toISOString());
     }
   }
@@ -140,11 +140,13 @@ export class AgregarPagoModalComponent implements OnInit {
     const hasta = this.pagoForm.get('fechaHasta')?.value;
 
     if (desde && hasta) {
-      const fechaDesde = parseISO(desde);
-      const fechaHasta = parseISO(hasta);
+      const fechaDesde = new Date(desde);
+      const fechaHasta = new Date(hasta);
 
-      const diferenciaMeses = differenceInMonths(fechaHasta, fechaDesde);
-      this.cantidadMeses = diferenciaMeses + 1; // incluir ambos meses
+      let diff = (fechaHasta.getFullYear() - fechaDesde.getFullYear()) * 12;
+      diff += fechaHasta.getMonth() - fechaDesde.getMonth();
+
+      this.cantidadMeses = diff + 1; // incluir ambos meses
     } else if (desde && !hasta) {
       this.cantidadMeses = 1;
     } else {
@@ -152,6 +154,13 @@ export class AgregarPagoModalComponent implements OnInit {
     }
 
     this.actualizarMonto(this.pagoForm.get('client')?.value);
+  }
+
+  formatearMesAnio(fecha: Date | string) {
+    const fechaObj = (fecha instanceof Date) ? fecha : new Date(fecha);
+    const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
+    const anio = fechaObj.getFullYear();
+    return `${anio}-${mes}-1`;
   }
 
 
