@@ -5,6 +5,7 @@ import { RegisterClienteComponent } from 'src/app/componentes/cobranza/registerC
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { HistorialClientsComponent } from '../historial-clients/historial-clients.component';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-cobranza',
@@ -143,6 +144,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
       this.dialogRef = null;
       if (result == 'submit') {
         this.resetComponent();
+        this.loadClientsDaily();
       }
     });
   }
@@ -151,7 +153,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     this.clientsOfDay = [];
     this.clientEdit = null;
     this.collectionDay = -1;
-    this.loadClientsDaily();
+    //this.loadClientsDaily();
     this.cdr.detectChanges();
   }
 
@@ -224,7 +226,24 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  eliminarFiltroFecha() {
+  openDeleteConfirm(client: any){ 
+    console.log('Abriendo modal para:', client);
+    let titulo = 'Confirmar borrado';
+    let mensaje = '';
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: titulo,
+        message: mensaje
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteClient(client);
+      }
+    })
   }
 
 }
