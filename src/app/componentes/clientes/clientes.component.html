@@ -7,16 +7,8 @@
     </ng-container>
     <!-- SINO MUESTRA LAS LISTAS CLIENTES/PAGOS -->
     <ng-template #matTab>
-      <mat-tab-group (selectedTabChange)="detectChanges()" class="flex flex-col h-full">
-        <mat-tab label="Clientes" class="flex flex-col h-full">
           <app-listaClientes [clientsOfMonth]="clientsOfMonth" (loadClientsMonthly)="loadClientsMonthly()"
             class="flex-1"></app-listaClientes>
-        </mat-tab>
-        <mat-tab label="Pagos" class="flex flex-col h-full">
-          <app-listaPagos [clientes]="clientsOfMonth" (loadClientsMonthly)="loadClientsMonthly()"
-            class="flex-1"></app-listaPagos>
-        </mat-tab>
-      </mat-tab-group>
     </ng-template>
 
   </div>
