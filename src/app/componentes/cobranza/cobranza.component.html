@@ -210,7 +210,7 @@
                 <button (click)="updateClient(cliente)"  *ngIf="isAdmin()" class="text-slate-500 hover:text-blue-600" title="Editar">
                   <i class="fa-solid fa-pencil"></i>
                 </button>
-                <button (click)="deleteClient(cliente)" class="text-slate-500 hover:text-red-600" title="Eliminar">
+                <button (click)="openDeleteConfirm(cliente)" class="text-slate-500 hover:text-red-600" title="Eliminar">
                   <i class="fa-solid fa-trash"></i>
                 </button>
               </div>
