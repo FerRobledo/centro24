@@ -22,16 +22,13 @@ module.exports = async (req, res) => {
         const { id, monthSelected } = req.query;
 
         if (id) {
-            // Obtener clientes con pagos para admin dado
             try {
-                // Obtener clientes
-                const { rows: clientes } = await pool.query('SELECT * FROM clientes_mensuales WHERE user_admin = $1', [id]);
+                const { rows: clientes } = await pool.query(  "SELECT * FROM clientes_mensuales WHERE user_admin = $1 AND estado = 'Activo'", [id]);
 
                 // Extraer los ids de clientes para buscar sus pagos
                 const idsClientes = clientes.map(c => c.id_client);
 
                 if (idsClientes.length === 0) {
-                    // No hay clientes, responder vacío
                     return res.status(200).json([]);
                 }
 
@@ -69,7 +66,7 @@ module.exports = async (req, res) => {
                     FROM public.clientes_mensuales cm
                     JOIN public.pagos_mensuales pm 
                       ON cm.id_client = pm.id_client
-                    WHERE pm.mes = $1
+                    WHERE pm.mes = $1 AND cm.estado = 'Activo'
                     `,
                     [monthSelected]
                 );
@@ -206,27 +203,21 @@ module.exports = async (req, res) => {
                 return res.status(400).json({ error: 'Falta idAdmin o idClient' });
             }
             try {
-                const { rows } = await pool.query(`DELETE FROM clientes_mensuales WHERE id_client = $1 AND user_admin = $2 RETURNING id_client;`, [idClient, idAdmin]);
-
-                if (rows.length > 0) {
-                    return res.status(200).json({ success: true, deletedId: rows[0].id_client });
+                const result = await pool.query(
+                    `UPDATE public.clientes_mensuales 
+                     SET estado = 'Desactivo' 
+                     WHERE id_client = $1 AND user_admin = $2`,
+                    [idClient, idAdmin]
+                );
+            
+                if (result.rowCount > 0) {
+                    return res.status(200).json({ success: true });
                 } else {
-                    return res.status(404).json({ success: false, message: 'Cliente no encontrado o no autorizado' });
+                    return res.status(404).json({ success: false });
                 }
             } catch (error) {
                 console.error(error);
-
-                if (error.code === '23503') {
-                    return res.status(409).json({
-                        error: 'No se puede eliminar el cliente porque tiene pagos registrados.',
-                        detail: error.detail
-                    });
-                }
-
-                return res.status(500).json({
-                    error: 'Error en la eliminación',
-                    detail: error.message
-                });
+                return res.status(500).json({ success: false });
             }
         }
     }
