@@ -52,7 +52,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const idAdmin = this.authService.getIdAdmin();
     this.cargarProductos(idAdmin);
-    this.cdr.detectChanges();
+    ;
   }
 
   ngOnDestroy() {
@@ -62,7 +62,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   // === MÉTODOS DE CARGA ===
   cargarProductos(idAdmin: number) {
     this.cargandoProducto = true;
-    this.cdr.detectChanges();
+    ;
 
     this.subscriptions.add(
       this.productosService.getProductos(idAdmin).subscribe({
@@ -70,12 +70,12 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.productos = data.map((producto: Producto) => new ProductoDTO(producto));
           this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           this.cargandoProducto = false;
-          this.cdr.detectChanges(); 
+          ; 
         },
         error: (error) => {
           console.error('Error al obtener productos:', error);
           this.cargandoProducto = false;
-          this.cdr.detectChanges();
+          ;
         }
       })
     )
@@ -142,7 +142,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     if (error) {
       this.mensaje = error;
       this.cargandoProducto = false;
-      this.cdr.detectChanges();
+      ;
       return;
     }
 
@@ -166,7 +166,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
             this.productos.push(new ProductoDTO(respuesta.producto));
             this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           }
-          this.cdr.detectChanges();
+          ;
           this.cancelar();
         },
         error: (error: any) => {
@@ -220,7 +220,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
           this.crearLog(this.productoEditando!.id, 'actualizacion');
           this.cancelar();
-          this.cdr.detectChanges();
+          ;
         },
         error: (error: any) => {
           console.error('Error al actualizar producto:', error);
@@ -255,7 +255,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           this.crearLog(this.productoAEliminar!.id, 'eliminacion');
           this.cancelarEliminar();
-          this.cdr.detectChanges();
+          ;
         },
         error: (error: any) => {
           console.error('Error al eliminar producto:', error);
@@ -317,7 +317,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   detectChanges() {
-    this.cdr.detectChanges();
+    ;
   }
 
 }

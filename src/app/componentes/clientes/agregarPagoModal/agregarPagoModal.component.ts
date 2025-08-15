@@ -196,6 +196,6 @@ export class AgregarPagoModalComponent implements OnInit {
 
   onClienteSeleccionado(cliente: any) {
     this.pagoForm.get('client')?.setValue(cliente);
-    this.cdr.detectChanges();
+    ;
   }
 }

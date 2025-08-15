@@ -46,6 +46,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ProductFormDialogComponent } from '../componentes/productos/product-form-dialog/product-form-dialog.component';
 import { DetailsHistorialComponent } from '../componentes/detailsHistorial/detailsHistorial.component';
+import { CdkNoDataRow } from "@angular/cdk/table";
 
 
 export const MONTH_YEAR_FORMATS = {
@@ -112,7 +113,8 @@ export const MONTH_YEAR_FORMATS = {
     MatRadioModule,
     MatFormFieldModule,
     MatProgressSpinnerModule,
-  ],
+    CdkNoDataRow
+],
   providers: [
     provideAnimationsAsync(),
     { provide: DateAdapter, useClass: NativeDateAdapter },

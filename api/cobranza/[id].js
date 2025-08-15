@@ -45,8 +45,7 @@ module.exports = async (req, res) => {
                 const totalPagos = parseFloat(result2.rows[0]?.total_pagos ?? 0);
                 const total = totalCaja + totalPagos;
 
-                console.log('Total calculado:', total);
-
+                // Solo si el monto de cierre es mayor a 0
                 if (total > 0) {
                     const cierreInsert = await pool.query(`
                             INSERT INTO historial_cierres (fecha, user_admin, monto, nombre_usuario)
