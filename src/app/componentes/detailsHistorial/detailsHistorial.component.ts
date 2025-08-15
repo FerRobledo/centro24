@@ -23,12 +23,13 @@ export class DetailsHistorialComponent implements OnInit {
 
   ngOnInit() {
     this.getDetailsById();
+    console.log(this.data);
+    
   }
 
   getDetailsById() {
     const idAdmin = this.authService.getIdAdmin();
 
-    //console.log('admin:', idAdmin, 'cierre:', this.idCierre);
     if(idAdmin){
       this.subscriptions.add(
         this.cobranzaService.getDetailsId(idAdmin, this.idCierre).subscribe({
