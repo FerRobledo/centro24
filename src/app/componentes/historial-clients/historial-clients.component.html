@@ -1,4 +1,4 @@
-<div class="p-10 mx-auto w-full text-gray-800">
+<div class="p-10 mx-auto w-full text-gray-800 overflow-y-scroll">
 	<div class="relative flex items-center justify-center mb-3">
 		<div class="absolute left-0 flex items-center">
 			<input 
@@ -21,7 +21,7 @@
 					<col>
 					<col>
 				</colgroup>
-				<thead *ngIf="historial.length > 0" class="bg-green-100 text-green-800 uppercase text-xs font-semibold">
+				<thead class="bg-green-100 text-green-800 uppercase text-xs font-semibold">
 					<tr class="text-left">
 						<th class="p-3 text-left">Nombre usuario</th>
 						<th class="p-3 text-left">Fecha de cierres</th>
@@ -29,7 +29,7 @@
 						<th class="p-3 text-left">Detalle</th>
 					</tr>
 				</thead>
-				<tbody class="divide-y divide-green-200 bg-white">
+				<tbody class="divide-y divide-green-200 bg-white" *ngIf="!isLoading; else carga"> 
 					<tr *ngFor="let item of historial" class="hover:bg-green-50">
 						<td class="p-3 text-left size-2">{{ item.nombre_usuario }}</td>
 						<td class="p-3 text-left">
@@ -50,4 +50,15 @@
 			</table>
 		</div>
 	</div>
+	<ng-template #carga>
+		<tbody>
+		  <tr>
+			<td colspan="4" class="py-16">
+			  <div class="flex justify-center">
+				<div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
+			  </div>
+			</td>
+		  </tr>
+		</tbody>
+	</ng-template>
 </div>

@@ -1,5 +1,5 @@
 import { isNgTemplate } from '@angular/compiler';
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
@@ -12,11 +12,11 @@ import { DetailsHistorialComponent } from '../detailsHistorial/detailsHistorial.
   styleUrls: ['./historial-clients.component.css'],
 })
 export class HistorialClientsComponent {
-  historial: any[] = [];
-  //historialByDate: any[] = [];
+  isLoading = false;
   dialogRef2: MatDialogRef<any> | null = null;
   selectedDate: string = '';
   private subscriptions: Subscription = new Subscription();
+  historial: any[] = [];
 
 
   constructor(
@@ -35,7 +35,7 @@ export class HistorialClientsComponent {
   }
   
   private initHistorial(): void {
-    this.historial = this.data;
+    this.historial = Array.isArray(this.data) ? [...this.data] : [];//this.historial = [...this.data]; 
   }
 
   fitrarFecha() {
