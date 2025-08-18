@@ -20,6 +20,8 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   today: Date = new Date();
   isLoadingCobranza: boolean = false;
   dialogRef: MatDialogRef<any> | null = null;
+  dialogRef2!: MatDialogRef<HistorialClientsComponent>;
+
   selectedDate: string = '';
   private subscriptions: Subscription = new Subscription();
   dias: number[] = [];
@@ -159,36 +161,34 @@ export class CobranzaComponent implements OnInit, OnDestroy {
 
   openHistorial() {
     const id = this.authService.getIdAdmin();
-
     if (!id) return;
-
-    this.isLoadingCobranza = true;
-    ;
     
+    this.dialogRef2 = this.dialog.open(HistorialClientsComponent, {
+      width: '47vw',
+      maxWidth: '100vw',
+      data: {},             
+      disableClose: false,
+      autoFocus: true,
+    });
+  
+    this.dialogRef2.componentInstance.isLoading = true;
+  
+    this.dialogRef2.afterClosed().subscribe(() => {
+      this.dialogRef2 = null!;
+    });
+  
     this.subscriptions.add(
       this.cobranzaService.getHistory(id).subscribe({
         next: (data) => {
+          
           this.historyCierres = data ?? [];
-          this.isLoadingCobranza = false;
-          ;
-          
-          // abro modal con datos cargados
-          this.dialogRef = this.dialog.open(HistorialClientsComponent, {
-            width: '47vw',
-            maxWidth: '100vw',
-            data: this.historyCierres,
-            disableClose: false,
-            autoFocus: true,
-          });
-          
-          this.dialogRef.afterClosed().subscribe(() => {
-            this.dialogRef = null;
-          });
+
+          this.dialogRef2.componentInstance.isLoading = false;
+          this.dialogRef2.componentInstance.historial = data;
         },
         error: (error) => {
-          this.isLoadingCobranza = false;
-          ;
-        }
+          console.error(error);
+        },
       })
     );
   }
