@@ -39,19 +39,19 @@
   
 			<!-- totales solo si es caja -->
 			<td class="p-3 text-left whitespace-nowrap">
-			  {{ item?.fuente === 'caja' ? (detailsCurrent?.totales?.efectivo | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
+			  {{ item?.fuente === 'caja' ? (item?.efectivo | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
 			</td>
 			<td class="p-3 text-left whitespace-nowrap">
-			  {{ item?.fuente === 'caja' ? (detailsCurrent?.totales?.debito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
+			  {{ item?.fuente === 'caja' ? (item?.debito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
 			</td>
 			<td class="p-3 text-left whitespace-nowrap">
-			  {{ item?.fuente === 'caja' ? (detailsCurrent?.totales?.credito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
+			  {{ item?.fuente === 'caja' ? (item?.credito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
 			</td>
 			<td class="p-3 text-left whitespace-nowrap">
-			  {{ item?.fuente === 'caja' ? (detailsCurrent?.totales?.transferencia | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
+			  {{ item?.fuente === 'caja' ? (item?.transferencia | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
 			</td>
 			<td class="p-3 text-left whitespace-nowrap">
-			  {{ item?.fuente === 'caja' ? (detailsCurrent?.totales?.cheque | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
+			  {{ item?.fuente === 'caja' ? (item?.cheque | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
 			</td>
 		  </tr>
 		</tbody>

@@ -192,6 +192,25 @@ export class CobranzaComponent implements OnInit, OnDestroy {
       })
     );
   }
+
+  openModalCloseDay() {
+    let titulo = 'Confirmar cierre de caja';
+    let mensaje = '';
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: titulo,
+        message: mensaje
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.closeDay();
+      }
+    })
+  }
   
   getTotal(cliente: any): number {
     let suma = 0;
