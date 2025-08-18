@@ -59,7 +59,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
             if (data === 0) {
               this.collectionDay = 0;
             }
-            this.cdr.detectChanges(); //revisá este componente ya mismo por si hay algo que cambió y actualizá el HTML.
+            ; //revisá este componente ya mismo por si hay algo que cambió y actualizá el HTML.
           },
           error: (error) => {
             console.log("Error en el calculo de recaudacion: ", error);
@@ -72,7 +72,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   public loadClientsDaily() {
     const id = this.authService.getIdAdmin();
     this.isLoadingCobranza = true;
-    this.cdr.detectChanges(); // Fuerza el spinner a mostrarse
+    ; // Fuerza el spinner a mostrarse
 
     if (id) {
       this.subscriptions.add(
@@ -81,19 +81,19 @@ export class CobranzaComponent implements OnInit, OnDestroy {
             console.log("Datos recargados en Cobranza:", data);
             this.clientsOfDay = data;
             this.isLoadingCobranza = false;
-            this.cdr.detectChanges();
+            ;
           },
           error: (error) => {
             console.log("Error en el pedido de clientes del dia: ", error);
             this.isLoadingCobranza = false;
-            this.cdr.detectChanges();
+            ;
           },
         })
       );
     } else {
       this.clientsOfDay = [];
       this.isLoadingCobranza = false;
-      this.cdr.detectChanges();
+      ;
     }
   }
 
@@ -123,7 +123,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
         this.cobranzaService.deleteClient(idAdmin, idClient).subscribe({
           next: () => {
             this.loadClientsDaily();
-            this.cdr.detectChanges();
+            ;
           },
           error: (error) => {
             console.log("Error en la eliminacion del cliente: ", error);
@@ -154,7 +154,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     this.clientEdit = null;
     this.collectionDay = -1;
     //this.loadClientsDaily();
-    this.cdr.detectChanges();
+    ;
   }
 
   openHistorial() {
@@ -163,14 +163,14 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     if (!id) return;
 
     this.isLoadingCobranza = true;
-    this.cdr.detectChanges();
+    ;
     
     this.subscriptions.add(
       this.cobranzaService.getHistory(id).subscribe({
         next: (data) => {
           this.historyCierres = data ?? [];
           this.isLoadingCobranza = false;
-          this.cdr.detectChanges();
+          ;
           
           // abro modal con datos cargados
           this.dialogRef = this.dialog.open(HistorialClientsComponent, {
@@ -187,7 +187,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.isLoadingCobranza = false;
-          this.cdr.detectChanges();
+          ;
         }
       })
     );
@@ -243,7 +243,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
         }
       })
     )
-    this.cdr.detectChanges();
+    ;
   }
 
   openDeleteConfirm(client: any){ 

@@ -31,7 +31,7 @@ export class EstadisticasComponent implements OnInit {
     this.isLoading = true;
     const id = this.authService.getIdAdmin();
     if (id) {
-      this.cdr.detectChanges(); //revisá este componente ya mismo por si hay algo que cambió y actualizá el HTML.
+      ; //revisá este componente ya mismo por si hay algo que cambió y actualizá el HTML.
       this.estadisticasService.getStats(id).subscribe({ //llamo al servicio dependiendo el que me llegue
         next: (data) => {
           this.collectionPreviousMonth = data.previous;
@@ -41,15 +41,15 @@ export class EstadisticasComponent implements OnInit {
           this.cantUsersByAdmin = data.users;
           this.collectionYesterday = data.yesterday;
           console.log(this.data);
-          this.cdr.detectChanges();
+          ;
         },
         error: (error) => {
           console.log(error);
-          this.cdr.detectChanges();
+          ;
         },
         complete: () => {
           this.isLoading = false;
-          this.cdr.detectChanges();
+          ;
         }
       });
     }

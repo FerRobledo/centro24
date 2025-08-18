@@ -37,7 +37,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
 
   cargarUsuarios() {
     this.cargando = true;
-    this.cdr.detectChanges();
+    ;
     const userId = this.authService.getIdAdmin();
     if (userId) {
       this.subscriptions.add(
@@ -46,7 +46,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
             this.usuarios = data.usuarios;
           },
           error: error => { console.log(error) },
-          complete: () => { this.cargando = false; this.cdr.detectChanges(); },
+          complete: () => { this.cargando = false; ; },
         })
       );
     }
