@@ -44,7 +44,7 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
       this.isLoading = false;
       return;
     }
-    
+
     this.isLoading = true;
     this.clientesService.getClientsOfMonth(idAdmin).subscribe({
       next: (data) => {
@@ -197,8 +197,9 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     const hoy = new Date;
     this.clientsOfMonth = this.clientsOfMonth.map(client => {
 
-      const ultimoPago = client.pagos[client.pagos.length - 1];
-
+      let pagos = client.pagos;
+      pagos.sort((a: any, b: any) => new Date(a.periodo_hasta).getTime() - new Date(b.periodo_hasta).getTime());
+      const ultimoPago = pagos[pagos.length - 1];
       let mesesVigente = 0;
       let periodoHasta;
 
