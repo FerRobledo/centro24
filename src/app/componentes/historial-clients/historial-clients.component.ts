@@ -39,18 +39,20 @@ export class HistorialClientsComponent {
   }
 
   fitrarFecha() {
+    this.isLoading = true;
     if (this.selectedDate == '') {
       this.initHistorial();
     }
-    
     const idAdmin = this.authService.getIdAdmin();
     this.subscriptions.add(
       this.cobranzaService.getHistorialByDate(idAdmin, this.selectedDate).subscribe({
         next: (data) => {
           this.historial = data;
+          this.isLoading = false;
         },
         error: (error) => {
           console.log("Error en el pedido de historial por dia: ", error);
+          this.isLoading = false;
         },
       })
     )
