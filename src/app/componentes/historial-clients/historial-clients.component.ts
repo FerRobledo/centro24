@@ -1,6 +1,9 @@
 import { isNgTemplate } from '@angular/compiler';
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/services/auth.service';
+import { CobranzaService } from 'src/app/services/cobranza.service';
 import { DetailsHistorialComponent } from '../detailsHistorial/detailsHistorial.component';
 
 @Component({
@@ -10,16 +13,47 @@ import { DetailsHistorialComponent } from '../detailsHistorial/detailsHistorial.
 })
 export class HistorialClientsComponent {
   historial: any[] = [];
+  //historialByDate: any[] = [];
   dialogRef2: MatDialogRef<any> | null = null;
+  selectedDate: string = '';
+  private subscriptions: Subscription = new Subscription();
+
 
   constructor(
     public dialogRef: MatDialogRef<HistorialClientsComponent>,
+    private authService: AuthService,
     public dialog: MatDialog,
+    private cobranzaService: CobranzaService,
     @Inject(MAT_DIALOG_DATA) public data: any,
     
-  ) {
-    this.historial = data;
-    console.log(this.historial);
+  ) {  
+
+  }
+
+  ngOnInit(): void {
+    this.initHistorial();
+  }
+  
+  private initHistorial(): void {
+    this.historial = this.data;
+  }
+
+  fitrarFecha() {
+    if (this.selectedDate == '') {
+      this.initHistorial();
+    }
+    
+    const idAdmin = this.authService.getIdAdmin();
+    this.subscriptions.add(
+      this.cobranzaService.getHistorialByDate(idAdmin, this.selectedDate).subscribe({
+        next: (data) => {
+          this.historial = data;
+        },
+        error: (error) => {
+          console.log("Error en el pedido de historial por dia: ", error);
+        },
+      })
+    )
   }
 
   cerrar(): void {

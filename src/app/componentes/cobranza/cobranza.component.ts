@@ -174,7 +174,8 @@ export class CobranzaComponent implements OnInit, OnDestroy {
           
           // abro modal con datos cargados
           this.dialogRef = this.dialog.open(HistorialClientsComponent, {
-            maxWidth: '100%',
+            width: '47vw',
+            maxWidth: '100vw',
             data: this.historyCierres,
             disableClose: false,
             autoFocus: true,
@@ -245,5 +246,4 @@ export class CobranzaComponent implements OnInit, OnDestroy {
       }
     })
   }
-
 }

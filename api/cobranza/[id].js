@@ -147,7 +147,6 @@ module.exports = async (req, res) => {
             }
         } else if (action === 'getClientsByDate') {
             try {
-
                 const { id, date } = req.query;
                 console.log(date);
                 const { rows } = await pool.query(`
@@ -163,7 +162,25 @@ module.exports = async (req, res) => {
                 console.log(error);
                 return res.status(500).json({ error: 'Error al filtrar ventas por fecha', details: error.message })
             }
-        } else {
+        }else if (action === 'getHistorialByDate') {
+            try {
+                const { id, date } = req.query;
+                console.log(date);
+                const { rows } = await pool.query(`
+                    SELECT id, fecha, monto, nombre_usuario
+                    FROM public.historial_cierres
+                    WHERE user_admin = $1 
+                    AND DATE(fecha) = $2
+                    ORDER BY fecha DESC, id DESC
+                    `, [id, date]);
+
+                return res.status(200).json(rows);
+            } catch (error) {
+                console.log(error);
+                return res.status(500).json({ error: 'Error al filtrar ventas por fecha', details: error.message })
+            }
+        }
+        else {
 
             const { rows } = await pool.query(`
                 SELECT * FROM caja WHERE user_admin = $1 ORDER BY fecha DESC, id DESC
