@@ -46,27 +46,19 @@ export class ClientesComponent implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
-    this.cdr.detectChanges(); // para mostrar loader inmediatamente
+    this.clientesService.getClientsOfMonth(idAdmin).subscribe({
+      next: (data) => {
+        console.log("Datos recargados en Clientes:", data);
+        this.clientsOfMonth = data;
+      },
+      error: (error) => {
+        console.error("Error en el pedido de clientes del día: ", error);
+        this.clientsOfMonth = [];
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    })
+  }
 
-    this.subscriptions.add(
-      this.clientesService.getClientsOfMonth(idAdmin).subscribe({
-        next: (data) => {
-          console.log("Datos recargados en Clientes:", data);
-          this.clientsOfMonth = data;
-        },
-        error: (error) => {
-          console.error("Error en el pedido de clientes del día: ", error);
-          this.clientsOfMonth = [];
-        },
-        complete: () => {
-          this.isLoading = false;
-          this.cdr.detectChanges(); // actualiza UI al terminar o error
-        }
-      })
-    );
-  }
-  
-  detectChanges() {
-    this.cdr.detectChanges();
-  }
 }

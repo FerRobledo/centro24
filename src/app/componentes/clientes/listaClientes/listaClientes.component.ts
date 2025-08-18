@@ -19,25 +19,47 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     public clientesService: ClientesService,
     public dialog: MatDialog,
-    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit() {
-    this.mapearClientes();
+    this.loadClientsMonthly();
   }
 
   ngOnDestroy(): void {
     this.dialog.closeAll();
   }
 
-  @Output() loadClientsMonthly = new EventEmitter<void>();
-  @Input() clientsOfMonth: any[] = [];
+  clientsOfMonth: any[] = [];
   clicked: Boolean = false;
   clientEdit: any = null;
   eliminandoClienteId: number | null = null;
   filtroClients: string = '';
-  porcentaje: number | null = null; // enlazado al input
+  porcentaje: number = 0; // enlazado al input
+  isLoading: boolean = true;
 
+  loadClientsMonthly() {
+    const idAdmin = this.authService.getIdAdmin();
+    if (!idAdmin) {
+      this.clientsOfMonth = [];
+      this.isLoading = false;
+      return;
+    }
+    
+    this.isLoading = true;
+    this.clientesService.getClientsOfMonth(idAdmin).subscribe({
+      next: (data) => {
+        this.clientsOfMonth = data;
+      },
+      error: (error) => {
+        console.error("Error en el pedido de clientes del día: ", error);
+        this.clientsOfMonth = [];
+      },
+      complete: () => {
+        this.isLoading = false;
+        this.mapearClientes();
+      }
+    })
+  }
 
   public updateClient(client: any) {
     const dialogRef = this.dialog.open(InsertarClienteComponent, {
@@ -47,7 +69,7 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result == 'submit') {
-        this.loadClientsMonthly.emit();
+        this.loadClientsMonthly();
       }
     });
   }
@@ -62,7 +84,7 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
 
     this.dialogRef.afterClosed().subscribe(result => {
       if (result == 'submit') {
-        this.loadClientsMonthly.emit();
+        this.loadClientsMonthly();
       }
       this.dialogRef = null;
     });
@@ -72,18 +94,18 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     this.eliminandoClienteId = client.id_client;
     const idClient = client.id_client;
     const idAdmin = this.authService.getIdAdmin();
-    
-    this.cdr.detectChanges();
+
+    ;
     if (idAdmin) {
       this.clientesService.deleteClient(idAdmin, idClient).subscribe({
         next: () => {
-          this.cdr.detectChanges();
+          ;
           this.eliminandoClienteId = null;
-          this.loadClientsMonthly.emit();
-          
+          this.loadClientsMonthly();
+
         },
         error: (error) => {
-          this.cdr.detectChanges();
+          ;
           this.eliminandoClienteId = null;
           console.log("Error en la eliminacion del cliente: ", error)
         },
@@ -91,7 +113,7 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     }
   }
 
-  openDeleteConfirm(client: any){ 
+  openDeleteConfirm(client: any) {
     console.log('Abriendo modal para:', client);
     let titulo = 'Confirmar borrado';
     let mensaje = '';
@@ -134,23 +156,14 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
       if (result) {
 
         const idAdmin = this.authService.getIdAdmin();
-        this.cdr.detectChanges();
-
         if (idAdmin && this.porcentaje !== null) {
           this.subscriptions.add(
             this.clientesService.incrementClient(idAdmin, this.porcentaje).subscribe({
-              next: (data) => {
-                this.cdr.detectChanges();
-                this.loadClientsMonthly.emit();
-              },
               error: (error) => {
                 console.error(error);
-                this.cdr.detectChanges();
-                this.loadClientsMonthly.emit();
               },
               complete: () => {
-                this.cdr.detectChanges();
-                this.loadClientsMonthly.emit();
+                this.loadClientsMonthly();
               }
             })
           );
@@ -164,12 +177,12 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     this.mapearMontos();
   }
 
-  mapearMontos(){
-    this.clientsOfMonth = this.clientsOfMonth.map(client =>{
+  mapearMontos() {
+    this.clientsOfMonth = this.clientsOfMonth.map(client => {
       let monto = 0;
-      if(client.tipo == "Mensual"){
+      if (client.tipo == "Mensual") {
         monto = client.monto;
-      } else if(client.tipo == "Semestral") {
+      } else if (client.tipo == "Semestral") {
         monto = client.monto * 5;
       }
 
@@ -221,12 +234,8 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     this.dialogRef.afterClosed().subscribe(result => {
       this.dialogRef = null;
       if (result?.evento == 'pagoCreado') {
-        this.loadClientsMonthly.emit();
+        this.loadClientsMonthly();
       }
     });
-  }
-
-  detectChanges() {
-    this.cdr.detectChanges();
   }
 }

@@ -6,6 +6,8 @@ import { CobranzaComponent } from '../componentes/cobranza/cobranza.component';
 import { ProductosComponent } from '../componentes/productos/productos.component';
 import { UsuariosComponent } from '../componentes/usuarios/usuarios/usuarios.component';
 import { ClientesComponent } from '../componentes/clientes/clientes.component';
+import { ListaClientesComponent } from '../componentes/clientes/listaClientes/listaClientes.component';
+import { ListaPagosComponent } from '../componentes/clientes/listaPagos/listaPagos.component';
 
 const routes: Routes = [
   {
@@ -30,7 +32,17 @@ const routes: Routes = [
       },
       {
         path: 'clientes',
-        component: ClientesComponent
+        component: ClientesComponent,
+        children: [
+          {
+            path: '',
+            component: ListaClientesComponent,
+          },
+          {
+            path: 'listaPagos',
+            component: ListaPagosComponent,
+          },
+        ]
       },
     ],
   },

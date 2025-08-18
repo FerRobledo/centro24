@@ -27,7 +27,7 @@ export class UsuarioCardComponent implements OnInit {
 
   onTogglePermiso(rol: Rol, event: boolean) {
     this.cargandoCardUsuario = true;
-    this.cdr.detectChanges();
+    ;
     if (event) {
       const yaTieneRol = this.usuario.roles.some(r => r.id === rol.id);
       if (!yaTieneRol) {
@@ -41,7 +41,7 @@ export class UsuarioCardComponent implements OnInit {
       error: error => console.log(error),
       complete: () => this.cargandoCardUsuario = false,
     });
-    this.cdr.detectChanges();
+    ;
   }
 
   esRolAsignado(rol: Rol): boolean {
