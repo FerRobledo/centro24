@@ -72,7 +72,7 @@ module.exports = async (req, res) => {
     // Se calculo la hora a mano para Argentina porque no andaba
     const query = `
         SELECT u.nombre, l.id_user, l.accion, l.id_producto, 
-            TO_CHAR(l.date AT TIME ZONE 'America/Argentina/Buenos_Aires', 'DD/MM/YYYY HH24:MI') AS fecha_y_hora
+            TO_CHAR(l.date, 'DD/MM/YYYY HH24:MI') AS fecha_y_hora
         FROM logs l 
         JOIN users u ON l.id_user = u.id
         WHERE l.user_admin = $1
