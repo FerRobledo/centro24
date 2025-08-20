@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
       
       const query = `
         INSERT INTO logs (id_producto, id_user, accion, date, user_admin)
-        VALUES ($1, $2, $3, now(), $4)
+        VALUES ($1, $2, $3, now() AT TIME ZONE 'America/Argentina/Buenos_Aires', $4)
         RETURNING *
       `;
       
@@ -66,8 +66,7 @@ module.exports = async (req, res) => {
     }
     // Se calculo la hora a mano para Argentina porque no andaba
     const query = `
-        SELECT u.nombre, l.id_user, l.accion, l.id_producto, 
-                (l.date - INTERVAL '3 hours') AS fecha_y_hora
+        SELECT u.nombre, l.id_user, l.accion, l.id_producto, l.date AS fecha_y_hora
         FROM logs l 
         JOIN users u ON l.id_user = u.id
         WHERE l.user_admin = $1
