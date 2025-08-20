@@ -135,69 +135,69 @@
         <tbody *ngIf="clientsOfDay.length > 0 else noData">
           <tr *ngFor="let cliente of clientsOfDay">
             <td class="p-4 border-b border-slate-200">
-              <p class="text-sm text-slate-500">
+              <p class="text-xs text-slate-500">
                 {{cliente.fecha | date: 'dd-MM-yyyy'}}
               </p>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-700">
+                <p class="text-xs font-semibold text-slate-700">
                   {{cliente.detalle}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
+                <p class="text-xs font-semibold text-slate-500">
                   {{cliente.efectivo | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
+                <p class="text-xs font-semibold text-slate-500">
                   {{cliente.debito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
+                <p class="text-xs font-semibold text-slate-500">
                   {{cliente.credito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
+                <p class="text-xs font-semibold text-slate-500">
                   {{cliente.transferencia | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
+                <p class="text-xs font-semibold text-slate-500">
                   {{cliente.cheque | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
+                <p class="text-xs font-semibold text-slate-500">
                   {{cliente.gasto | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
+                <p class="text-xs font-semibold text-slate-500">
                   {{getTotal(cliente) | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
                 </p>
               </div>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex flex-col">
-                <p class="text-sm font-semibold text-slate-500">
+                <p class="text-xs font-semibold text-slate-500">
                   {{cliente.observacion}}
                 </p>
               </div>
@@ -205,7 +205,8 @@
             <td class="p-4 border-b border-slate-200">
               <div class="flex gap-2">
                 <!--cliente viene del for-->
-                <button (click)="updateClient(cliente)"  *ngIf="isAdmin()" class="text-slate-500 hover:text-blue-600" title="Editar">
+                <button (click)="updateClient(cliente)" *ngIf="isAdmin()" class="text-slate-500 hover:text-blue-600"
+                  title="Editar">
                   <i class="fa-solid fa-pencil"></i>
                 </button>
                 <button (click)="openDeleteConfirm(cliente)" class="text-slate-500 hover:text-red-600" title="Eliminar">
@@ -215,6 +216,8 @@
             </td>
           </tr>
         </tbody>
+
+
 
         <ng-template #noData>
           <tbody>
