@@ -1,7 +1,7 @@
 <div class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl bg-clip-border">
   <div class="relative mx-4 mt-4 text-slate-700 bg-white rounded-none bg-clip-border">
 
-    <div class="flex gap-5 items-start w-full">
+    <div class="flex gap-4 items-start w-full">
       <div class="flex w-1/4 justify-start space-y-1">
         <div>
           <h3 class="text-lg font-semibold text-slate-800">
@@ -11,43 +11,45 @@
         </div>
       </div>
 
-
-      <div class="flex w-3/4 justify-around items-center">
-        <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700">Filtrar por fecha:</label>
-          <div
-            class="flex items-center px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200">
-            <i class="fa-solid fa-calendar text-slate-500 mr-2"></i>
-            <input type="date" [(ngModel)]="selectedDate" (ngModelChange)="fitrarFecha()"
-              class="w-full bg-transparent focus:outline-none text-slate-700">
+      <div class="flex w-3/4 justify-between items-center mt-1">
+        <div class="flex items-center gap-2">        
+          <label class="text-sm font-semibold text-gray-500 whitespace-nowrap">
+            Filtrar por fecha:
+          </label>
+          <div class="w-36">
+            <div
+              class="flex items-center gap-2 px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200">
+              <input type="date" [(ngModel)]="selectedDate" (ngModelChange)="fitrarFecha()"
+                class="w-full bg-transparent focus:outline-none text-slate-700 text-sm leading-tight">
+            </div>
           </div>
-        </div>
-
-        <button (click)="nuevaCobranza()" class="flex select-none justify-center items-center gap-2 rounded h-10 w-36 bg-emerald-500 py-2 px-4 text-xs font-semibold text-white 
-         transition-all duration-200 ease-in-out hover:bg-emerald-600" type="button">
-          <i class="fa-solid fa-user-plus"></i>
-          Agregar venta
-        </button>
-
-        <button (click)="closeDay()" class="flex justify-center items-center gap-2 rounded h-10 w-36 bg-red-500 py-2 px-3 text-xs font-semibold text-white
-         transition-all duration-200 ease-in-out hover:bg-red-600 hover:scale-105" type="button">
+        </div>        
+             
+        <div class="flex gap-8">
+        <button (click)="openModalCloseDay()" class="flex items-center gap-1 rounded bg-red-500 py-2 px-4 text-xs font-semibold text-white w-[105px]
+          transition-all duration-200 ease-in-out hover:bg-red-600 hover:scale-105" type="button">
           <i class="fa-solid fa-lock"></i>
           Cerrar caja
         </button>
-
-        <button (click)="openHistorial()" class="flex select-none justify-center items-center gap-1 h-10 w-36 rounded bg-blue-500 py-2 px-3 text-xs font-semibold text-white
-         transition-all duration-200 ease-in-out hover:bg-blue-600 hover:scale-105" type="button">
+        
+        <button (click)="openHistorial()" class="flex items-center gap-1 rounded bg-emerald-500 py-2 px-4 text-xs font-semibold text-white w-[103px]
+          transition-all duration-200 ease-in-out hover:bg-emerald-600 hover:scale-105" type="button">
           <i class="fa-solid fa-clock-rotate-left"></i>
           Historial
         </button>
 
-
+        <button (click)="nuevaCobranza()" class="flex items-center gap-1 rounded bg-emerald-500 py-2 px-4 text-xs font-semibold text-white w-[129px]
+        transition-all duration-200 ease-in-out hover:bg-emerald-600 hover:scale-105" type="button">
+          <i class="fa-solid fa-user-plus"></i>
+          Agregar venta
+        </button>
+        </div>
       </div>
     </div>
   </div>
   <ng-container *ngIf="!isLoadingCobranza else carga">
 
-    <div class="p-0 overflow-y-scroll ">
+    <div class="p-0 overflow-y-scroll">
       <table class="w-full mt-4 text-left table-auto min-w-max">
         <thead>
           <tr>
@@ -56,7 +58,6 @@
               <p
                 class="flex items-center justify-between gap-1 font-sans text-sm font-normal leading-none text-slate-500">
                 Fecha
-
               </p>
             </th>
             <th
@@ -64,7 +65,6 @@
               <p
                 class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                 Detalle
-
               </p>
             </th>
             <th
@@ -72,7 +72,6 @@
               <p
                 class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                 Efectivo
-
               </p>
             </th>
             <th
@@ -80,7 +79,6 @@
               <p
                 class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                 Debito
-
               </p>
             </th>
             <th
@@ -235,7 +233,7 @@
     </div>
   </ng-container>
   <ng-template #carga>
-    <div class="flex justify-center items-center h-96">
+    <div class="flex justify-center items-center h-full">
       <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
     </div>
   </ng-template>

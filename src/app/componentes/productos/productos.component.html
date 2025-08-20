@@ -41,38 +41,40 @@
         </div>
       </div>
 
-      <!-- Lado derecho: Botón azul a la izquierda, botones verdes a la derecha -->
-      <div class="flex items-end space-x-4 pb-1 flex-shrink-0">
-        
-        <!-- Botón azul (Logs) -->
-        <button 
+      <div class="flex items-center gap-3 mb-2.5 pb-1 flex-shrink-0">
+
+        <!-- Logs -->
+        <button *ngIf="esAdmin()"
           (click)="abrirLogs()"
-          class="flex select-none items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 py-2 px-4 text-xs font-semibold text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 ease-in-out"
-          type="button"
-          title="Ver logs del sistema">
+          class="inline-flex items-center justify-center h-9 px-4 gap-2 rounded-lg bg-blue-600 hover:bg-blue-700
+                 text-xs font-semibold text-white shadow-md hover:shadow-lg transition-all duration-200"
+          type="button" title="Ver logs del sistema">
           <i class="fa-solid fa-file-lines"></i>
           Logs
         </button>
-        
-        <!-- Botones verdes en fila -->
-        <div class="flex space-x-2">
-          
-          <!-- Boton para agregar producto -->
-          <button *ngIf="esAdmin()" 
-                  (click)="abrirFormularioAgregar()"
-                  class="flex select-none items-center justify-center gap-2 rounded bg-emerald-500 py-2 px-4 text-xs font-semibold text-white min-w-[160px]"
-                  type="button">
-            <i class="fa-solid fa-bag-shopping"></i>
-            Agregar producto
-          </button>
-
-          <div class="min-w-[160px]">
-            <app-cargaProductos (cargaIniciada)="onCargaIniciada()" (cargaFinalizada)="onCargaCompleta()">
-            </app-cargaProductos>
-          </div>
+      
+        <!-- Agregar producto -->
+        <button *ngIf="esAdmin()"
+          (click)="abrirFormularioAgregar()"
+          class="inline-flex items-center justify-center h-9 px-4 gap-2 rounded bg-emerald-500
+                 text-xs font-semibold text-white min-w-[160px]"
+          type="button">
+          <i class="fa-solid fa-bag-shopping"></i>
+          Agregar producto
+        </button>
+      
+        <!-- Actualizar productos (componente) -->
+        <div class="min-w-[160px] h-9 flex items-center self-center">
+          <app-cargaProductos
+            class="h-full inline-flex items-center"
+            (cargaIniciada)="onCargaIniciada()"
+            (cargaFinalizada)="onCargaCompleta()">
+          </app-cargaProductos>
         </div>
+      
       </div>
-    </div>
+      
+          </div>
   </div>
 
   <!-- SI ESTA cargandoProductoProducto MUESTRA EL ESTADO DE CARGA -->

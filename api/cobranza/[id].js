@@ -45,7 +45,6 @@ module.exports = async (req, res) => {
                 const totalPagos = parseFloat(result2.rows[0]?.total_pagos ?? 0);
                 const total = totalCaja + totalPagos;
 
-                // Solo si el monto de cierre es mayor a 0
                 if (total > 0) {
                     const cierreInsert = await pool.query(`
                             INSERT INTO historial_cierres (fecha, user_admin, monto, nombre_usuario)
@@ -121,26 +120,16 @@ module.exports = async (req, res) => {
             }
         } else if (action === 'details') {
             try {
-
                 const result = await pool.query(`
-                    SELECT d.fuente, d.monto, h.fecha
-                    FROM public.detalle_cierre d 
-                    JOIN historial_cierres h ON (d.id_cierre = h.id)
-                    WHERE h.user_admin = $1 AND d.id_cierre = $2;
-                    `, [id, idCierre]);
+                SELECT d.fuente, d.monto, d.id_origen, h.fecha, c.efectivo, c.debito, c.credito, c.transferencia, c.cheque
+                    FROM public.detalle_cierre d
+                    JOIN historial_cierres h ON d.id_cierre = h.id
+                        LEFT JOIN caja c ON c.id = d.id_origen AND d.fuente = 'caja'
+                        WHERE h.user_admin = $1 AND d.id_cierre = $2
+                        ORDER BY d.id;
+                `, [id, idCierre]);
 
-                const result2 = await pool.query(`
-                        SELECT c.efectivo, c.debito, c.credito, c.transferencia, c.cheque
-                        FROM public.detalle_cierre d 
-                        JOIN historial_cierres h ON (d.id_cierre = h.id)
-                    JOIN caja c ON (c.id = d.id_origen)
-                    WHERE h.user_admin = $1 AND d.id_cierre = $2;
-                    `, [id, idCierre]);
-
-                return res.status(200).json({
-                    detalle: result.rows,
-                    totales: result2.rows[0]
-                });
+                return res.status(200).json({ detalle: result.rows });
             } catch (error) {
                 console.log(error);
                 return res.status(500).json({ error: 'Error no se pudo obtener detalles', details: error.message });
