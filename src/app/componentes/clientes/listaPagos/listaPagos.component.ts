@@ -22,10 +22,34 @@ export class ListaPagosComponent implements OnInit {
   @Output() loadClientsMonthly = new EventEmitter<void>();
   eliminandoPagoId: number | null = null; // guarda el id del pago que está siendo eliminado
   filtroPago: string = '';
+  isLoading: boolean = true;
 
   ngOnInit() {
-    this.generarListaPagos();
-    console.log(this.listaPagos);
+    this.loadData();
+  }
+
+  loadData() {
+    const idAdmin = this.authService.getIdAdmin();
+    if (!idAdmin) {
+      this.clientes = [];
+      this.isLoading = false;
+      return;
+    }
+
+    this.isLoading = true;
+    this.clienteService.getClientsOfMonth(idAdmin).subscribe({
+      next: (data) => {
+        this.clientes = data;
+      },
+      error: (error) => {
+        console.error("Error en el pedido de clientes del día: ", error);
+        this.clientes = [];
+      },
+      complete: () => {
+        this.isLoading = false;
+        this.generarListaPagos();
+      }
+    })
   }
 
   generarListaPagos() {
