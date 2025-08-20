@@ -80,8 +80,14 @@ export class CobranzaComponent implements OnInit, OnDestroy {
       this.subscriptions.add(
         this.cobranzaService.getClientsOfDay(id).subscribe({
           next: (data) => {
-            console.log("Datos recargados en Cobranza:", data);
             this.clientsOfDay = data;
+            this.clientsOfDay = this.clientsOfDay.map(client => {
+              return {
+                ...client,
+                fecha: client.fecha.replace('T', ' ').replace('Z', '')
+              };
+            });
+            console.log("Datos recargados en Cobranza:", this.clientsOfDay);
             this.isLoadingCobranza = false;
             ;
           },
@@ -162,25 +168,25 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   openHistorial() {
     const id = this.authService.getIdAdmin();
     if (!id) return;
-    
+
     this.dialogRef2 = this.dialog.open(HistorialClientsComponent, {
       width: '47vw',
       maxWidth: '100vw',
-      data: {},             
+      data: {},
       disableClose: false,
       autoFocus: true,
     });
-  
+
     this.dialogRef2.componentInstance.isLoading = true;
-  
+
     this.dialogRef2.afterClosed().subscribe(() => {
       this.dialogRef2 = null!;
     });
-  
+
     this.subscriptions.add(
       this.cobranzaService.getHistory(id).subscribe({
         next: (data) => {
-          
+
           this.historyCierres = data ?? [];
 
           this.dialogRef2.componentInstance.isLoading = false;
@@ -211,7 +217,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
       }
     })
   }
-  
+
   getTotal(cliente: any): number {
     let suma = 0;
     suma += Number(cliente.efectivo);
@@ -222,13 +228,13 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     suma -= Number(cliente.gasto);
     return suma;
   }
-  
+
   fitrarFecha() {
     this.isLoadingCobranza = true;
     if (this.selectedDate == '') {
       this.loadClientsDaily();
     }
-    
+
     const idAdmin = this.authService.getIdAdmin();
     this.subscriptions.add(
       this.cobranzaService.getClientsByDate(idAdmin, this.selectedDate).subscribe({
@@ -243,10 +249,10 @@ export class CobranzaComponent implements OnInit, OnDestroy {
         }
       })
     )
-    ;
+      ;
   }
 
-  openDeleteConfirm(client: any){ 
+  openDeleteConfirm(client: any) {
     console.log('Abriendo modal para:', client);
     let titulo = 'Confirmar borrado';
     let mensaje = '';
