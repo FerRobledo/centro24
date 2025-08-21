@@ -73,9 +73,10 @@ export class LogsComponent implements OnInit {
         if (fechaString) {
           // Convertir la fecha del log a formato YYYY-MM-DD
           const fechaLog = new Date(fechaString);
-          const fechaLogFormatted = fechaLog.getFullYear() + '-' + 
-                                   String(fechaLog.getMonth() + 1).padStart(2, '0') + '-' + 
-                                   String(fechaLog.getDate()).padStart(2, '0');
+          // Extraer solo la parte de la fecha y convertirla a formato YYYY-MM-DD
+          const fechaParts = fechaString.split(' ')[0]; // "DD/MM/YYYY"
+          const [dia, mes, año] = fechaParts.split('/');
+          const fechaLogFormatted = `${año}-${mes}-${dia}`;
           cumpleFiltros = cumpleFiltros && fechaLogFormatted === this.filtroFecha;
         }
       }
