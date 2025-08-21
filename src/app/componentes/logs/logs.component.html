@@ -82,7 +82,7 @@
             <i class="fa-solid fa-info-circle mr-1"></i>
             {{ log.accion.toUpperCase() }}
           </span>
-          <span class="text-xs text-gray-500 font-mono">{{ log.fecha_y_hora | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+          <span class="text-xs text-gray-500 font-mono">{{ log.fecha_y_hora }}</span>
         </div>
         <p class="text-sm text-gray-800 font-medium">{{ log.accion }} del producto: "{{ log.id_producto }}"</p>
         <p class="text-xs text-gray-600 mt-1">Usuario: {{ log.nombre || 'N/A' }} (ID: {{ log.id_user }})</p>
