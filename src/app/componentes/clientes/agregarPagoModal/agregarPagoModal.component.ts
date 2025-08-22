@@ -168,8 +168,6 @@ export class AgregarPagoModalComponent implements OnInit {
     }
   }
 
-
-
   get valorMensual() {
     const client = this.pagoForm.value.client;
     if (client) {

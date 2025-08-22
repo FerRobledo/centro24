@@ -95,7 +95,8 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     const idClient = client.id_client;
     const idAdmin = this.authService.getIdAdmin();
 
-    ;
+    console.log("que id es? :" + idClient);
+    
     if (idAdmin) {
       this.clientesService.deleteClient(idAdmin, idClient).subscribe({
         next: () => {
