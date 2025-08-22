@@ -85,22 +85,17 @@ export class AgregarPagoModalComponent implements OnInit {
       return;
     }
 
-    // Si usás Moment, obtené la fecha Date con ._d
-    const fechaDesdeDate: Date = this.pagoForm.value.fechaDesde._d || this.pagoForm.value.fechaDesde;
-    const fechaHastaDate: Date = this.pagoForm.value.fechaHasta._d || this.pagoForm.value.fechaHasta;
+    let fechaDesde = this.pagoForm.get('fechaDesde')?.value;
+    let fechaHasta = this.pagoForm.get('fechaHasta')?.value;
 
-    // Formatear fechas
-    const fechaDesdeStr = this.formatearMesAnio(fechaDesdeDate);
-    let fechaHastaStr = fechaDesdeStr;
-    if (fechaHastaDate) {
-      fechaHastaStr = this.formatearMesAnio(fechaHastaDate);
+    if(fechaHasta == ''){
+      fechaHasta = fechaDesde;
     }
-
     // Armá el objeto a enviar con fechas formateadas
     const pagoData = {
-      ...this.pagoForm.value,
-      fechaDesde: fechaDesdeStr,
-      fechaHasta: fechaHastaStr,
+      client: this.pagoForm.get('client')?.value.id_client,
+      fechaDesde: fechaDesde,
+      fechaHasta: fechaHasta,
       monto: this.monto,
     };
 
@@ -113,26 +108,16 @@ export class AgregarPagoModalComponent implements OnInit {
     this.dialogRef.close({ evento: 'pagoCreado', data: pagoData });
   }
 
-  chosenMonthHandler(normalizedMonth: Date, controlName: string, datepicker: any) {
-    const ctrl = this.pagoForm.get(controlName);
-    const currentValue = ctrl?.value ? new Date(ctrl.value) : new Date();
+  chosenMonthHandler(event: any, controlName: string) {
+    let value = event.target.value;
 
-    const updated = new Date(currentValue);
-    updated.setFullYear(normalizedMonth.getFullYear());
-    updated.setMonth(normalizedMonth.getMonth());
-
-    ctrl?.setValue(updated.toISOString());
-    this.actualizarCantidadMeses();
-    datepicker.close();
-  }
-
-  chosenYearHandler(event: any, controlName: string) {
-    const ctrl = this.pagoForm.get(controlName);
-    if (event.value) {
-      const date = new Date(event.value);
-      const start = new Date(date.getFullYear(), date.getMonth(), 1); // primer día del mes
-      ctrl?.setValue(start.toISOString());
+    // Si viene con formato completo (ej: 2025-08-01T00:00:00.000Z)
+    if (value.includes("T")) {
+      value = value.substring(0, 7); // 👉 "2025-08"
     }
+
+    this.pagoForm.get(controlName)?.setValue(value);
+    this.actualizarCantidadMeses();
   }
 
   actualizarCantidadMeses() {

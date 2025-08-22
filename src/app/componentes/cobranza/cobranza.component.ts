@@ -51,7 +51,6 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   public closeDay() {
     const id = this.authService.getIdAdmin();
     const nameUser = this.authService.getUserName();
-    console.log('nombre del user ' + nameUser);
 
     if (id) {
       this.subscriptions.add(
@@ -87,7 +86,6 @@ export class CobranzaComponent implements OnInit, OnDestroy {
                 fecha: client.fecha.replace('T', ' ').replace('Z', '')
               };
             });
-            console.log("Datos recargados en Cobranza:", this.clientsOfDay);
             this.isLoadingCobranza = false;
             ;
           },
@@ -253,7 +251,6 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   }
 
   openDeleteConfirm(client: any) {
-    console.log('Abriendo modal para:', client);
     let titulo = 'Confirmar borrado';
     let mensaje = '';
 

@@ -114,7 +114,6 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
   }
 
   openDeleteConfirm(client: any) {
-    console.log('Abriendo modal para:', client);
     let titulo = 'Confirmar borrado';
     let mensaje = '';
 
@@ -202,10 +201,10 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
       const ultimoPago = pagos[pagos.length - 1];
       let mesesVigente = 0;
       let periodoHasta;
-
       // Si tiene pagos hacer el calculo de cuantos meses le quedan
       if (ultimoPago) {
-        periodoHasta = new Date(ultimoPago.periodo_hasta);
+        const [anio, mes] = ultimoPago.periodo_hasta.split('-').map(Number);
+        const periodoHasta: { anio: number, mes: number } = { anio, mes };
         mesesVigente = this.calcularMesesDiferencia(hoy, periodoHasta);
       }
 
@@ -218,9 +217,9 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     });
   }
 
-  calcularMesesDiferencia(desde: Date, hasta: Date): number {
-    const yearDiff = hasta.getFullYear() - desde.getFullYear();
-    const monthDiff = hasta.getMonth() - desde.getMonth();
+  calcularMesesDiferencia(desde: Date, hasta: { anio: number, mes: number }): number {
+    const yearDiff = hasta.anio - desde.getFullYear();
+    const monthDiff = hasta.mes - (desde.getMonth() + 1);
     return yearDiff * 12 + monthDiff + 1;
   }
 

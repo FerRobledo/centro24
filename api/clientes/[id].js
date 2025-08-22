@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
 
         if (id) {
             try {
-                const { rows: clientes } = await pool.query(  "SELECT * FROM clientes_mensuales WHERE user_admin = $1 AND estado = 'Activo'", [id]);
+                const { rows: clientes } = await pool.query("SELECT * FROM clientes_mensuales WHERE user_admin = $1 AND estado = 'Activo'", [id]);
 
                 // Extraer los ids de clientes para buscar sus pagos
                 const idsClientes = clientes.map(c => c.id_client);
@@ -39,6 +39,8 @@ module.exports = async (req, res) => {
                     ORDER BY fecha_pago DESC
                     `, [idsClientes, id]);
 
+                console.log("pagos:");
+                console.log(pagos);
                 // Asociar pagos a cada cliente
                 const pagosPorCliente = pagos.reduce((acc, pago) => {
                     if (!acc[pago.id_client]) acc[pago.id_client] = [];
@@ -51,6 +53,7 @@ module.exports = async (req, res) => {
                     cliente.pagos = pagosPorCliente[cliente.id_client] || [];
                 });
 
+                console.log(clientes);
                 return res.status(200).json(clientes);
 
             } catch (error) {
@@ -91,14 +94,13 @@ module.exports = async (req, res) => {
 
         if (accion === 'addPago') {
             const { infoPago } = req.body;
-            console.log(infoPago);
             try {
                 await pool.query(
                     `
                     INSERT INTO pagos_mensuales
                     (id_client, fecha_pago, monto, periodo_desde, periodo_hasta, id_admin, estado)
                     VALUES ($1, now(), $2, $3, $4, $5, $6)
-                    `, [infoPago.client.id_client, infoPago.monto, infoPago.fechaDesde, infoPago.fechaHasta, id, 'false']
+                    `, [infoPago.client, infoPago.monto, infoPago.fechaDesde, infoPago.fechaHasta, id, 'false']
                 );
                 return res.status(201).json({ success: true });
             } catch (error) {
@@ -126,65 +128,65 @@ module.exports = async (req, res) => {
         }
     }
 
-  if (req.method === 'PUT') {
-    const { accion, porcentaje, idClient, ...payload } = req.body;
-    const idAdmin = req.query.id;
+    if (req.method === 'PUT') {
+        const { accion, porcentaje, idClient, ...payload } = req.body;
+        const idAdmin = req.query.id;
 
-    console.log('ID del admin:', idAdmin);
-    console.log('ID del cliente:', idClient);
-    console.log('Payload recibido:', payload);
-    console.log('Porcentaje:', porcentaje);
+        console.log('ID del admin:', idAdmin);
+        console.log('ID del cliente:', idClient);
+        console.log('Payload recibido:', payload);
+        console.log('Porcentaje:', porcentaje);
 
-    if (!idAdmin) {
-    return res.status(400).json({ error: 'Error falta id ' });
-    }
+        if (!idAdmin) {
+            return res.status(400).json({ error: 'Error falta id ' });
+        }
 
-    if (accion === 'incrementar') {
-        try {
-            const { rows } = await pool.query(
-            `UPDATE public.clientes_mensuales
+        if (accion === 'incrementar') {
+            try {
+                const { rows } = await pool.query(
+                    `UPDATE public.clientes_mensuales
             SET monto = ROUND(monto + (monto * $1 / 100), 2)
             WHERE user_admin = $2
             RETURNING *;`,
-            [porcentaje, idAdmin]
-            );
-            return res.status(200).json(rows);
+                    [porcentaje, idAdmin]
+                );
+                return res.status(200).json(rows);
 
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ error: 'Error al incrementar monto mensual', details: error.message });
-        }
-    } else {
-        if (!idClient) {
-            return res.status(400).json({ error: 'Falta id del cliente para actualizar' });
-        }
-        try {
-            const { rows } = await pool.query(
-                `UPDATE public.clientes_mensuales
+            } catch (error) {
+                console.error(error);
+                return res.status(500).json({ error: 'Error al incrementar monto mensual', details: error.message });
+            }
+        } else {
+            if (!idClient) {
+                return res.status(400).json({ error: 'Falta id del cliente para actualizar' });
+            }
+            try {
+                const { rows } = await pool.query(
+                    `UPDATE public.clientes_mensuales
                  SET tipo = $1,
                      cliente = $2,
                      monto = $3
                  WHERE id_client = $4 AND user_admin = $5
                  RETURNING *;`,
-                [payload.tipo, payload.cliente, payload.monto, idClient, idAdmin]
-              );
+                    [payload.tipo, payload.cliente, payload.monto, idClient, idAdmin]
+                );
 
-            if (rows.length === 0) {
-                return res.status(404).json({ error: 'Cliente no encontrado o no autorizado' });
+                if (rows.length === 0) {
+                    return res.status(404).json({ error: 'Cliente no encontrado o no autorizado' });
+                }
+
+                return res.status(200).json(rows[0]);
+            } catch (error) {
+                console.log(error);
+                return res.status(500).json({ error: 'Error al actualizar cliente', details: error.message });
             }
-
-            return res.status(200).json(rows[0]);
-        } catch (error) {
-            console.log(error);
-            return res.status(500).json({ error: 'Error al actualizar cliente', details: error.message });
         }
-        }
-    } 
+    }
 
     // DELETE
     if (req.method === 'DELETE') {
         const idAdmin = req.query.id;
-        const { action, idClient, pago } = req.body;      
+        const { action, idClient, pago } = req.body;
 
         if (action === 'deletePago') {
             if (!pago) {
@@ -193,7 +195,7 @@ module.exports = async (req, res) => {
             try {
                 await pool.query(`DELETE FROM pagos_mensuales WHERE id_client = $1 AND id_admin = $2`, [idClient, idAdmin]);
 
-                return res.status(200).json({ success: true }); 
+                return res.status(200).json({ success: true });
             } catch (error) {
                 console.log(error);
                 return res.status(500).json({ error: 'Error no se pudo eliminar el pago', details: error.message });
@@ -209,7 +211,7 @@ module.exports = async (req, res) => {
                      WHERE id_client = $1 AND user_admin = $2`,
                     [idClient, idAdmin]
                 );
-            
+
                 if (result.rowCount > 0) {
                     return res.status(200).json({ success: true });
                 } else {

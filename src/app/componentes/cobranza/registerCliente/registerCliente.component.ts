@@ -32,7 +32,6 @@ export class RegisterClienteComponent implements OnInit {
 
   onSubmit() {
     if (this.form.invalid) {
-      console.log("Formulario inválido");
       return;
     }
 
