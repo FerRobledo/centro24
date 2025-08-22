@@ -10,6 +10,7 @@ export class SelectorClientesComponent implements OnInit {
 
   @Input() clientes: any[] = [];
   @Input() control!: FormControl<any>;
+  @Input() cliente!: any;
 
   clientesFiltrados: any[] = [];
   mostrarOpciones: boolean = false;
@@ -19,6 +20,14 @@ export class SelectorClientesComponent implements OnInit {
   ngOnInit() {
     // Inicializamos filtrados
     this.clientesFiltrados = [...this.clientes];
+
+    // Si tenés un cliente recibido por @Input
+    if (this.cliente) {
+      this.busqueda = this.mostrarCliente(this.cliente);
+      if (this.control) {
+        this.control.setValue(this.cliente, { emitEvent: false });
+      }
+    }
 
     // Si querés seguir usando FormControl
     if (this.control) {
