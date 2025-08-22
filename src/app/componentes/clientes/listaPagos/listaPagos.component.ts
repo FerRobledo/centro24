@@ -20,7 +20,6 @@ export class ListaPagosComponent implements OnInit {
 
   @Input() clientes: any = [];
   listaPagos: any[] = [];
-  @Output() loadClientsMonthly = new EventEmitter<void>();
   eliminandoPagoId: number | null = null; // guarda el id del pago que está siendo eliminado
   filtroPago: string = '';
   isLoading: boolean = true;
@@ -94,7 +93,6 @@ export class ListaPagosComponent implements OnInit {
     this.dialogRef.afterClosed().subscribe(result => {
       this.dialogRef = null;
       if (result?.evento == 'pagoCreado') {
-        this.loadClientsMonthly.emit();
         this.loadData();
       }
     });
