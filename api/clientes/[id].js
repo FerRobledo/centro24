@@ -186,7 +186,7 @@ module.exports = async (req, res) => {
     // DELETE
     if (req.method === 'DELETE') {
         const idAdmin = req.query.id;
-        const { action, id } = req.body;
+        const { action, id, idClient } = req.body;
 
         if (action === 'deletePago') {
             if (!id) {
