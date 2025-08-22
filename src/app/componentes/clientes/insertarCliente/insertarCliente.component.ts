@@ -32,7 +32,6 @@ export class InsertarClienteComponent implements OnInit {
 
   onSubmit() {
     if (this.form.invalid) {
-      console.log("Formulario inválido");
       return;
     }
 
@@ -95,7 +94,6 @@ export class InsertarClienteComponent implements OnInit {
 
     });
     this.accion = this.data.accion;
-    console.log('que hay aca?: ', this.data)
     if (this.data.client) {
       this.form.setValue({
         tipo: this.data.client.tipo,

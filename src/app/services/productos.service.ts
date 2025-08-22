@@ -46,7 +46,6 @@ export class ProductosService {
       ...producto,
       id_admin
     }));
-    console.log(nuevosProductos.length);
     return this.http.post<any>(`${this.origin}/api/productos/${id_admin}`, {accion: 'addAll', productos: nuevosProductos})
   }
 }
