@@ -53,7 +53,6 @@ export class LogsComponent implements OnInit {
         this.logs = logs;
         this.logsFiltrados = logs;
         this.cargando = false;
-        console.log('Logs cargados:', logs); // Para debug
       },
       error: (error: any) => {
         console.error('Error al cargar logs:', error);

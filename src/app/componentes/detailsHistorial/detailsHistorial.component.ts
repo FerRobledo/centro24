@@ -23,9 +23,7 @@ export class DetailsHistorialComponent implements OnInit {
     }
 
   ngOnInit() {
-    this.getDetailsById();
-    console.log(this.data);
-    
+    this.getDetailsById()    
   }
 
   getDetailsById() {

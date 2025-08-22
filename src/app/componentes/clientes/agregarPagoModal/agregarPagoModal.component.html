@@ -4,7 +4,7 @@
 
     <div class="py-2">
       <p class="text-lg font-bold m-0">Agregar un nuevo pago</p>
-      <p class="text-zinc-700 text-base">Selecciona el cliente y configura el período de pago</p>
+      <p class="text-zinc-700 text-base">Selecciona el cliente y el período de pago</p>
     </div>
 
     <form class="flex flex-col md:flex-row gap-6 w-full" [formGroup]="pagoForm" (ngSubmit)="crearPago()">
@@ -16,26 +16,19 @@
           (clienteSeleccionadoChange)="onClienteSeleccionado($event)">
         </app-selectorClientes>
 
-        <div class="flex flex-col sm:flex-row gap-4 w-full">
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Desde</mat-label>
-            <input matInput [matDatepicker]="pickerDesde" formControlName="fechaDesde" placeholder="MM/YYYY"
-              (dateChange)="chosenYearHandler($event, 'fechaDesde')">
-            <mat-datepicker-toggle matSuffix [for]="pickerDesde"></mat-datepicker-toggle>
-            <mat-datepicker #pickerDesde startView="multi-year"
-              (monthSelected)="chosenMonthHandler($event, 'fechaDesde', pickerDesde)"
-              panelClass="month-picker"></mat-datepicker>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Hasta</mat-label>
-            <input matInput [matDatepicker]="pickerHasta" formControlName="fechaHasta" placeholder="MM/YYYY"
-              (dateChange)="chosenYearHandler($event, 'fechaHasta')">
-            <mat-datepicker-toggle matSuffix [for]="pickerHasta"></mat-datepicker-toggle>
-            <mat-datepicker #pickerHasta startView="multi-year"
-              (monthSelected)="chosenMonthHandler($event, 'fechaHasta', pickerHasta)"
-              panelClass="month-picker"></mat-datepicker>
-          </mat-form-field>
+        <div class="flex flex-col gap-2 w-full">
+          <label for="fechaDesde">Desde</label>
+          <div
+            class="flex items-center gap-2 px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200">
+            <input name="fechaDesde" type="month" formControlName="fechaDesde" (change)="chosenMonthHandler($event, 'fechaDesde')"
+              class="w-full bg-transparent focus:outline-none text-slate-700 text-sm leading-tight">
+          </div>
+          <label for="fechaDesde">Hasta</label>
+          <div
+            class="flex items-center gap-2 px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200">
+            <input name="fechaHasta" type="month" formControlName="fechaHasta" (change)="chosenMonthHandler($event, 'fechaHasta')"
+              class="w-full bg-transparent focus:outline-none text-slate-700 text-sm leading-tight">
+          </div>
         </div>
 
         <div class="rounded flex gap-2 items-center w-full text-blue-700 bg-blue-50 p-3 text-sm">

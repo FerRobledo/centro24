@@ -40,7 +40,6 @@ export class EstadisticasComponent implements OnInit {
           this.newClients = data.newClients;
           this.cantUsersByAdmin = data.users;
           this.collectionYesterday = data.yesterday;
-          console.log(this.data);
           ;
         },
         error: (error) => {

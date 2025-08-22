@@ -48,7 +48,6 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.clientesService.getClientsOfMonth(idAdmin).subscribe({
       next: (data) => {
-        console.log("Datos recargados en Clientes:", data);
         this.clientsOfMonth = data;
       },
       error: (error) => {

@@ -299,7 +299,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
     };
 
     this.logsService.crearLog(nuevoLog).subscribe({
-      next: (logCreado) => console.log('Log creado:', logCreado),
       error: (errorLog) => console.error('Error al crear log:', errorLog)
     });
   }
