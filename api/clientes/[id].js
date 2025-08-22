@@ -39,8 +39,6 @@ module.exports = async (req, res) => {
                     ORDER BY fecha_pago DESC
                     `, [idsClientes, id]);
 
-                console.log("pagos:");
-                console.log(pagos);
                 // Asociar pagos a cada cliente
                 const pagosPorCliente = pagos.reduce((acc, pago) => {
                     if (!acc[pago.id_client]) acc[pago.id_client] = [];
@@ -53,7 +51,6 @@ module.exports = async (req, res) => {
                     cliente.pagos = pagosPorCliente[cliente.id_client] || [];
                 });
 
-                console.log(clientes);
                 return res.status(200).json(clientes);
 
             } catch (error) {
@@ -119,7 +116,6 @@ module.exports = async (req, res) => {
                     VALUES ($2, $3, $4, $1) RETURNING *`,
                     [id, payload.tipo, payload.cliente, payload.monto]
                 );
-                console.log(rows);
                 return res.status(201).json(rows[0]);
             } catch (error) {
                 console.log(error);
@@ -131,11 +127,6 @@ module.exports = async (req, res) => {
     if (req.method === 'PUT') {
         const { accion, porcentaje, idClient, ...payload } = req.body;
         const idAdmin = req.query.id;
-
-        console.log('ID del admin:', idAdmin);
-        console.log('ID del cliente:', idClient);
-        console.log('Payload recibido:', payload);
-        console.log('Porcentaje:', porcentaje);
 
         if (!idAdmin) {
             return res.status(400).json({ error: 'Error falta id ' });

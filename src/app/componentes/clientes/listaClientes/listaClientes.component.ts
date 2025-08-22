@@ -201,11 +201,11 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
       pagos.sort((a: any, b: any) => new Date(a.periodo_hasta).getTime() - new Date(b.periodo_hasta).getTime());
       const ultimoPago = pagos[pagos.length - 1];
       let mesesVigente = 0;
-      let periodoHasta;
+      let periodoHasta: { anio: number, mes: number } = { anio: 0, mes: 0 };
       // Si tiene pagos hacer el calculo de cuantos meses le quedan
       if (ultimoPago) {
         const [anio, mes] = ultimoPago.periodo_hasta.split('-').map(Number);
-        const periodoHasta: { anio: number, mes: number } = { anio, mes };
+        periodoHasta = { anio, mes };
         mesesVigente = this.calcularMesesDiferencia(hoy, periodoHasta);
       }
 
@@ -218,6 +218,10 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     });
   }
 
+  getPeriodoHasta(client: any): Date {
+    return new Date(client.periodoHasta.anio, client.periodoHasta.mes - 1, 1);
+  }
+  
   calcularMesesDiferencia(desde: Date, hasta: { anio: number, mes: number }): number {
     const yearDiff = hasta.anio - desde.getFullYear();
     const monthDiff = hasta.mes - (desde.getMonth() + 1);
