@@ -186,15 +186,14 @@ module.exports = async (req, res) => {
     // DELETE
     if (req.method === 'DELETE') {
         const idAdmin = req.query.id;
-        const { action, idClient, pago } = req.body;
+        const { action, id } = req.body;
 
         if (action === 'deletePago') {
-            if (!pago) {
+            if (!id) {
                 return res.status(400).json({ error: "Faltan datos para eliminar el pago" });
             }
             try {
-                await pool.query(`DELETE FROM pagos_mensuales WHERE id_client = $1 AND id_admin = $2`, [idClient, idAdmin]);
-
+                await pool.query(`DELETE FROM pagos_mensuales WHERE id = $1 AND id_admin = $2`, [id, idAdmin]);
                 return res.status(200).json({ success: true });
             } catch (error) {
                 console.log(error);

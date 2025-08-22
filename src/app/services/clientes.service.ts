@@ -44,8 +44,8 @@ export class ClientesService {
     return this.http.put(this.origin + '/api/clientes/' + idAdmin, body);
   }
   
-  public deletePago(idAdmin: number, pago: any): Observable<any>{
-    const body = {pago, action:'deletePago'};
+  public deletePago(idAdmin: number, id: number): Observable<any>{
+    const body = {action:'deletePago', id};
     return this.http.delete(this.origin + '/api/clientes/' + idAdmin, { body });
   }
 }
