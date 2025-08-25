@@ -185,7 +185,7 @@ module.exports = async (req, res) => {
     if (req.method === 'POST') {
         const { id } = req.query;
         const payload = req.body;
-
+        
         if (!id) {
             return res.status(400).json({
                 error: 'Falta id para insertar usuario',
@@ -201,6 +201,7 @@ module.exports = async (req, res) => {
                 Credito: "credito",
                 Transferencia: "transferencia",
                 Cheque: "cheque",
+                Gasto: "gasto",
             };
 
             // 2. Inicializo todas en 0
@@ -220,7 +221,7 @@ module.exports = async (req, res) => {
             // 4. Query con todas las columnas
             const query = `
                 INSERT INTO public.caja
-                    (fecha, detalle, efectivo, debito, credito, transferencia, cheque, observacion, gasto, user_admin)
+                    (fecha, detalle, efectivo, debito, credito, transferencia, cheque, gasto, observacion, user_admin)
                 VALUES
                     (CURRENT_DATE, $1, $2, $3, $4, $5, $6, $7, $8, $9)
                 RETURNING *;
@@ -234,11 +235,11 @@ module.exports = async (req, res) => {
                 valoresPagos.credito,
                 valoresPagos.transferencia,
                 valoresPagos.cheque,
+                valoresPagos.gasto,
                 payload.observacion || null,
-                payload.gasto || 0,
                 id,
             ];
-
+            console.log(values);
             const { rows } = await pool.query(query, values);
             return res.status(201).json(rows[0]);
         } catch (error) {

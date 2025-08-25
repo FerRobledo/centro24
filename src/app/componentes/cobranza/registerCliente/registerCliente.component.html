@@ -3,11 +3,11 @@
 
     <!-- Encabezado -->
     <div class="flex justify-center items-center gap-4 mb-6">
-      <div class="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-md">
+      <div [ngClass]="accion == 'gasto' ? 'bg-red-500' : 'bg-emerald-500'" class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-md">
         <i class="fa-solid fa-user-plus text-2xl text-white"></i>
       </div>
       <h6 class="text-xl font-bold text-gray-900">
-        {{ accion=='editar' ? 'Edite venta' : 'Registrar venta' }}
+        {{ accion=='gasto' ? 'Registrar gasto' : 'Registrar venta' }}
       </h6>
     </div>
 
@@ -17,7 +17,8 @@
       <!-- Input Detalle -->
       <div class="flex flex-col gap-2">
         <p class="font-semibold text-gray-800">Detalle</p>
-        <input type="text" name="detalle" id="detalle" required [(ngModel)]="detalle" placeholder="Ej: Venta producto X" class="w-full rounded-xl bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
+        <input type="text" name="detalle" id="detalle" required [(ngModel)]="detalle" placeholder="Ej: Venta producto X"
+          class="w-full rounded-xl bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
                  placeholder:text-gray-400 shadow-inner
                  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
       </div>
@@ -32,19 +33,23 @@
             </app-selectorDePagos>
           </div>
 
-          <!-- Botón para agregar nuevo pago -->
-          <select *ngIf="tiposDePagoSeleccionables.length >= 1" [(ngModel)]="pagoSeleccionado" (change)="agregarPago()"
-            name="pagoSeleccionado"
-            class="w-full py-2 rounded-xl border border-slate-400 text-slate-600 text-sm font-medium focus:ring-2 focus:ring-emerald-500 transition">
-            <option [ngValue]="null" disabled>+ Seleccionar tipo de pago</option>
-            <option *ngFor="let tipo of tiposDePagoSeleccionables" [ngValue]="tipo">
-              {{ tipo }}
-            </option>
-          </select>
+          <div *ngIf="accion == 'venta'">
+
+            <!-- Botón para agregar nuevo pago -->
+            <select *ngIf="tiposDePagoSeleccionables.length >= 1" [(ngModel)]="pagoSeleccionado"
+              (change)="agregarPago()" name="pagoSeleccionado"
+              class="w-full py-2 rounded-xl border border-slate-400 text-slate-600 text-sm font-medium focus:ring-2 focus:ring-emerald-500 transition">
+              <option [ngValue]="null" disabled>+ Seleccionar tipo de pago</option>
+              <option *ngFor="let tipo of tiposDePagoSeleccionables" [ngValue]="tipo">
+                {{ tipo }}
+              </option>
+            </select>
+          </div>
 
           <div class="flex flex-col gap-2 border-t border-slate-200 pt-4">
             <p class="font-semibold text-slate-700 text-sm">Observación</p>
-            <textarea [(ngModel)]="descripcion" name="observacion" id="observacion" placeholder="Notas adicionales sobre la venta..." rows="2"
+            <textarea [(ngModel)]="descripcion" name="observacion" id="observacion"
+              placeholder="Notas adicionales sobre la venta o gasto..." rows="2"
               class="w-full rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700 border border-slate-300 
                          placeholder:text-slate-400 shadow-inner resize-none
                          focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 transition"></textarea>
@@ -54,8 +59,8 @@
           <!-- Resumen monto total -->
           <div class="flex justify-between items-center border-t border-slate-200 pt-4">
             <p class="text-sm font-medium text-slate-600">Monto total:</p>
-            <p class="text-lg font-bold" [ngClass]="montoTotal < 0 ? 'text-red-600' : 'text-green-600'">
-              {{ montoTotal < 0 ? '-' : '+' }} ${{ montoTotal || 0 }} </p>
+            <p class="text-lg font-bold" [ngClass]="accion == 'gasto' ? 'text-red-600' : 'text-green-600'">
+              {{ accion == 'gasto' ? '-' : '+' }} ${{ montoTotal || 0 }} </p>
           </div>
 
           <!-- Botón Confirmar -->

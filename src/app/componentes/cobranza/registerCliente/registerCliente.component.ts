@@ -43,7 +43,7 @@ export class RegisterClienteComponent implements OnInit {
 
     const payload = { detalle: this.detalle, descripcion: this.descripcion, pagos: this.pagos };
     const idAdmin = this.authService.getIdAdmin();
-    
+
     this.cobranzaService.postClientDaily(payload, idAdmin).subscribe({
       error: (err) => {
         console.error('Error al registrar:', err);
@@ -57,10 +57,11 @@ export class RegisterClienteComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.accion) {
+    if(this.data && this.data.accion){
       this.accion = this.data.accion;
-
-      if (this.data.client) {
+      
+      if(this.accion == 'gasto'){
+        this.pagos.push({ tipo:'Gasto', monto: 0 });
       }
     }
   }

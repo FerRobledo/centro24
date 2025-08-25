@@ -12,7 +12,7 @@
       </div>
 
       <div class="flex w-3/4 justify-between items-center mt-1">
-        <div class="flex items-center gap-2">        
+        <div class="flex items-center gap-2">
           <label class="text-sm font-semibold text-gray-500 whitespace-nowrap">
             Filtrar por fecha:
           </label>
@@ -23,26 +23,35 @@
                 class="w-full bg-transparent focus:outline-none text-slate-700 text-sm leading-tight">
             </div>
           </div>
-        </div>        
-             
-        <div class="flex gap-8">
-        <button (click)="openModalCloseDay()" class="flex items-center gap-1 rounded bg-red-500 py-2 px-4 text-xs font-semibold text-white w-[105px]
-          transition-all duration-200 ease-in-out hover:bg-red-600 hover:scale-105" type="button">
-          <i class="fa-solid fa-lock"></i>
-          Cerrar caja
-        </button>
-        
-        <button (click)="openHistorial()" class="flex items-center gap-1 rounded bg-emerald-500 py-2 px-4 text-xs font-semibold text-white w-[103px]
-          transition-all duration-200 ease-in-out hover:bg-emerald-600 hover:scale-105" type="button">
-          <i class="fa-solid fa-clock-rotate-left"></i>
-          Historial de cierres
-        </button>
+        </div>
 
-        <button (click)="nuevaCobranza()" class="flex items-center gap-1 rounded bg-emerald-500 py-2 px-4 text-xs font-semibold text-white w-[129px]
+        <div class="flex gap-8">
+          <button (click)="openModalCloseDay()" class="flex items-center gap-1 rounded bg-red-500 py-2 px-4 text-xs font-semibold text-white w-[105px]
+          transition-all duration-200 ease-in-out hover:bg-red-600 hover:scale-105" type="button">
+            <i class="fa-solid fa-lock"></i>
+            Cerrar caja
+          </button>
+
+          <button (click)="openHistorial()" class="flex items-center gap-1 rounded bg-emerald-500 py-2 px-4 text-xs font-semibold text-white w-[103px]
+          transition-all duration-200 ease-in-out hover:bg-emerald-600 hover:scale-105" type="button">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            Historial de cierres
+          </button>
+
+          <div class="flex flex-col gap-4">
+            <button (click)="nuevaCobranza('venta')" class="flex items-center gap-1 rounded bg-emerald-500 py-2 px-4 text-xs font-semibold text-white w-[129px]
         transition-all duration-200 ease-in-out hover:bg-emerald-600 hover:scale-105" type="button">
-          <i class="fa-solid fa-user-plus"></i>
-          Agregar venta
-        </button>
+              <i class="fa-solid fa-user-plus"></i>
+              Agregar venta
+            </button>
+
+            <button (click)="nuevaCobranza('gasto')" class="flex items-center gap-1 rounded bg-red-500 py-2 px-4 text-xs font-semibold text-white w-[129px]
+          transition-all duration-200 ease-in-out hover:bg-red-600 hover:scale-105" type="button">
+              <i class="fa-solid fa-user-plus"></i>
+              Agregar gasto
+
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -133,7 +142,7 @@
           </tr>
         </thead>
         <tbody *ngIf="clientsOfDay.length > 0 else noData">
-          <tr *ngFor="let cliente of clientsOfDay">
+          <tr *ngFor="let cliente of clientsOfDay" [ngClass]="getTotal(cliente) < 0 ? 'bg-red-50' : 'bg-green-50'">
             <td class="p-4 border-b border-slate-200">
               <p class="text-xs text-slate-500">
                 {{cliente.fecha | date: 'dd-MM-yyyy'}}
@@ -205,7 +214,7 @@
             <td class="p-4 border-b border-slate-200">
               <div class="flex gap-2">
                 <!--cliente viene del for-->
-                <button (click)="updateClient(cliente)" *ngIf="isAdmin()" class="text-slate-500 hover:text-blue-600"
+                <button (click)="nuevaCobranza('update', cliente)" *ngIf="isAdmin()" class="text-slate-500 hover:text-blue-600"
                   title="Editar">
                   <i class="fa-solid fa-pencil"></i>
                 </button>
