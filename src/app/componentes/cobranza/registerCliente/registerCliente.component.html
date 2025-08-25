@@ -1,74 +1,70 @@
-<div class="flex w-[75vw] h-[90vh] mt-6 mb-7 overflow-y-auto">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="container flex flex-col mx-auto space-y-12">
-    <fieldset class="grid grid-cols-4 gap-6 p-6 rounded-md shadow-sm bg-white">
-      <div class="space-y-2 col-span-full lg:col-span-1 justify-center ">
-        <div class="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center">
-          <i class="fa-solid fa-user-plus text-2xl text-white"></i>
-        </div>
-        <h6 class="text-lg font-bold text-gray-900">{{ accion=='editar' ? 'Edite cliente mensual' : 'Registre un nuevo cliente mensual' }}
-        </h6>
+<div class="flex w-max h-[90vh] p-6 overflow-y-auto">
+  <form class="container flex flex-col h-full">
+
+    <!-- Encabezado -->
+    <div class="flex justify-center items-center gap-4 mb-6">
+      <div class="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-md">
+        <i class="fa-solid fa-user-plus text-2xl text-white"></i>
+      </div>
+      <h6 class="text-xl font-bold text-gray-900">
+        {{ accion=='editar' ? 'Edite venta' : 'Registrar venta' }}
+      </h6>
+    </div>
+
+    <!-- Contenedor principal -->
+    <div class="flex flex-col m-2 bg-zinc-100 p-6 gap-6 rounded-2xl shadow-sm">
+
+      <!-- Input Detalle -->
+      <div class="flex flex-col gap-2">
+        <p class="font-semibold text-gray-800">Detalle</p>
+        <input type="text" name="detalle" id="detalle" required [(ngModel)]="detalle" placeholder="Ej: Venta producto X" class="w-full rounded-xl bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
+                 placeholder:text-gray-400 shadow-inner
+                 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
       </div>
 
-      <div class="grid grid-cols-6 gap-4 col-span-full lg:col-span-3">
-        <div class="col-span-full sm:col-span-3">
-          <label for="username" class="text-sm font-medium text-gray-900">Detalle</label>
-          <input type="text" name="username" id="username" formControlName="detalle" autocomplete="username" required placeholder="Nombre del cliente"
-            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
-        </div>
+      <div class="flex flex-col w-[32rem] gap-6 bg-white border border-slate-300 shadow-sm p-6 rounded-2xl">
 
-        <div class="col-span-full sm:col-span-3">
-          <label for="efectivo" class="text-sm font-medium text-gray-900">Efectivo</label>
-          <input type="number" name="efectivo" id="efectivo" formControlName="efectivo" placeholder="$0.00"
-            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
-        </div>
+        <!-- Lista de selectores de pagos -->
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-2">
+            <app-selectorDePagos (deleteSelectorPago)="onDeleteSelector(i)" (cambioMonto)="actualizarMonto(i, $event)"
+              *ngFor="let pago of pagos; let i = index" [tipoDePago]="pagos[i].tipo">
+            </app-selectorDePagos>
+          </div>
 
-        <div class="col-span-full sm:col-span-3">
-          <label for="debito" class="text-sm font-medium text-gray-900">Débito</label>
-          <input type="number" name="debito" id="debito" formControlName="debito" placeholder="$0.00"
-            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
-        </div>
+          <!-- Botón para agregar nuevo pago -->
+          <select *ngIf="tiposDePagoSeleccionables.length >= 1" [(ngModel)]="pagoSeleccionado" (change)="agregarPago()"
+            name="pagoSeleccionado"
+            class="w-full py-2 rounded-xl border border-slate-400 text-slate-600 text-sm font-medium focus:ring-2 focus:ring-emerald-500 transition">
+            <option [ngValue]="null" disabled>+ Seleccionar tipo de pago</option>
+            <option *ngFor="let tipo of tiposDePagoSeleccionables" [ngValue]="tipo">
+              {{ tipo }}
+            </option>
+          </select>
 
-        <div class="col-span-full sm:col-span-3">
-          <label for="credito" class="text-sm font-medium text-gray-900">Crédito</label>
-          <input type="number" name="credito" id="credito" formControlName="credito" placeholder="$0.00"
-            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
-        </div>
+          <div class="flex flex-col gap-2 border-t border-slate-200 pt-4">
+            <p class="font-semibold text-slate-700 text-sm">Observación</p>
+            <textarea [(ngModel)]="descripcion" name="observacion" id="observacion" placeholder="Notas adicionales sobre la venta..." rows="2"
+              class="w-full rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700 border border-slate-300 
+                         placeholder:text-slate-400 shadow-inner resize-none
+                         focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 transition"></textarea>
 
-        <div class="col-span-full sm:col-span-3">
-          <label for="transferencia" class="text-sm font-medium text-gray-900">Transferencia</label>
-          <input type="number" name="transferencia" id="transferencia" formControlName="transferencia" placeholder="$0.00"
-            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
-        </div>
+          </div>
 
-        <div class="col-span-full sm:col-span-3">
-          <label for="cheque" class="text-sm font-medium text-gray-900">Cheque</label>
-          <input type="number" name="cheque" id="cheque" formControlName="cheque"  placeholder="$0.00"
-            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
-        </div>
+          <!-- Resumen monto total -->
+          <div class="flex justify-between items-center border-t border-slate-200 pt-4">
+            <p class="text-sm font-medium text-slate-600">Monto total:</p>
+            <p class="text-lg font-bold" [ngClass]="montoTotal < 0 ? 'text-red-600' : 'text-green-600'">
+              {{ montoTotal < 0 ? '-' : '+' }} ${{ montoTotal || 0 }} </p>
+          </div>
 
-        <div class="col-span-full sm:col-span-3">
-          <label for="observacion" class="text-sm font-medium text-gray-900">Observación</label>
-          <input type="text" name="observacion" id="observacion" formControlName="observacion"
-            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
-        </div>
-
-        <div class="col-span-full sm:col-span-3">
-          <label for="gasto" class="text-sm font-medium text-gray-900">Gasto</label>
-          <input type="number" name="gasto" id="gasto" formControlName="gasto"  placeholder="$0.00"
-            class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 focus:ring focus:ring-indigo-500">
-        </div>
-
-        <div class="col-span-full flex gap-4 mt-4">
-          <button type="button" (click)="onCancel()"
-            class="w-20 rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">
-            Cancelar
-          </button>
-          <button type="submit" 
-            class="w-28 rounded-md bg-emerald-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900">
-            {{ accion=='editar' ? 'Guardar cambios' : 'Crear usuario' }}
+          <!-- Botón Confirmar -->
+          <button (click)="agregarVenta()"
+            class="w-full py-2.5 rounded-xl bg-emerald-500 text-white font-semibold text-sm shadow-md hover:bg-emerald-600 transition">
+            Confirmar
           </button>
         </div>
       </div>
-    </fieldset>
+    </div>
   </form>
 </div>
