@@ -139,11 +139,12 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     }
   }
 
-  nuevaCobranza() {
+  nuevaCobranza(accion: string, data: any = null) {
     this.dialogRef = this.dialog.open(RegisterClienteComponent, {
       maxWidth: '100%',
       disableClose: false,
       autoFocus: true,
+      data: {accion, data},
     });
 
     this.dialogRef.afterClosed().subscribe(result => {
@@ -153,6 +154,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
         this.loadClientsDaily();
       }
     });
+
   }
 
   private resetComponent() {
@@ -164,6 +166,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   }
 
   openHistorial() {
+
     const id = this.authService.getIdAdmin();
     if (!id) return;
 
@@ -195,6 +198,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
         },
       })
     );
+
   }
 
   openModalCloseDay() {

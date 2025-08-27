@@ -151,7 +151,7 @@ module.exports = async (req, res) => {
                 console.log(error);
                 return res.status(500).json({ error: 'Error al filtrar ventas por fecha', details: error.message })
             }
-        }else if (action === 'getHistorialByDate') {
+        } else if (action === 'getHistorialByDate') {
             try {
                 const { id, date } = req.query;
                 console.log(date);
@@ -183,26 +183,72 @@ module.exports = async (req, res) => {
 
     //POST
     if (req.method === 'POST') {
-        //leer el id desde el body
         const { id } = req.query;
         const payload = req.body;
-
+        
         if (!id) {
-            return res.status(500).json({ error: 'Error falta id para insertar usuario', details: 'No se recibió el ID en el cuerpo de la petición' });
+            return res.status(400).json({
+                error: 'Falta id para insertar usuario',
+                details: 'No se recibió el ID en la petición',
+            });
+        }
 
-        } try {
-            const { rows } = await pool.query(
-                "INSERT INTO public.caja" +
-                " (fecha, detalle, efectivo, debito, credito, transferencia, cheque, observacion, gasto, user_admin)" +
-                " VALUES (CURRENT_DATE, $2, $3, $4, $5, $6, $7, $8, $9, $1)", [id, payload.detalle, payload.efectivo, payload.debito, payload.credito, payload.transferencia, payload.cheque, payload.observacion, payload.gasto]
-            );
-            return res.status(200).json(rows);
+        try {
+            // 1. Defino mapping de tipos → columnas
+            const columnasPagos = {
+                Efectivo: "efectivo",
+                Debito: "debito",
+                Credito: "credito",
+                Transferencia: "transferencia",
+                Cheque: "cheque",
+                Gasto: "gasto",
+            };
+
+            // 2. Inicializo todas en 0
+            const valoresPagos = {};
+            Object.values(columnasPagos).forEach((col) => (valoresPagos[col] = 0));
+
+            // 3. Cargo lo que vino en payload.pagos
+            if (Array.isArray(payload.pagos)) {
+                payload.pagos.forEach((p) => {
+                    const columna = columnasPagos[p.tipo];
+                    if (columna) {
+                        valoresPagos[columna] = p.monto;
+                    }
+                });
+            }
+
+            // 4. Query con todas las columnas
+            const query = `
+                INSERT INTO public.caja
+                    (fecha, detalle, observacion, efectivo, debito, credito, transferencia, cheque, gasto, user_admin)
+                VALUES
+                    (CURRENT_DATE, $1, $2, $3, $4, $5, $6, $7, $8, $9)
+                RETURNING *;
+                `;
+
+            // 5. Armado de parámetros
+            const values = [
+                payload.detalle || null,
+                payload.observacion || null,
+                valoresPagos.efectivo,
+                valoresPagos.debito,
+                valoresPagos.credito,
+                valoresPagos.transferencia,
+                valoresPagos.cheque,
+                valoresPagos.gasto,
+                id,
+            ];
+            const { rows } = await pool.query(query, values);
+            return res.status(201).json(rows[0]);
         } catch (error) {
-            console.log(error);
-            return res.status(500).json({ error: 'Error no se pudo insertar el cliente', details: error.message });
+            console.error(error);
+            return res.status(500).json({
+                error: "Error al insertar en caja",
+                details: error.message,
+            });
         }
     }
-
     //PUT
     if (req.method === 'PUT') {
         const idClient = req.query.id;

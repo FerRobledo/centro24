@@ -1,5 +1,5 @@
-<div class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl bg-clip-border">
-  <div class="relative mx-4 mt-4 text-slate-700 bg-white rounded-none bg-clip-border">
+<div class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl overflow-hidden bg-clip-border">
+  <div class="relative p-4 text-slate-700 bg-white bg-clip-border">
 
     <div class="flex gap-4 items-start w-full">
       <div class="flex w-1/4 justify-start space-y-1">
@@ -7,12 +7,12 @@
           <h3 class="text-lg font-semibold text-slate-800">
             <i class="fa-solid fa-cash-register"></i> Caja de cobranza
           </h3>
-          <p class="text-slate-500">Listar clientes diarios</p>
+          <p class="text-slate-500">Lista de movimientos diarios</p>
         </div>
       </div>
 
       <div class="flex w-3/4 justify-between items-center mt-1">
-        <div class="flex items-center gap-2">        
+        <div class="flex items-center gap-2">
           <label class="text-sm font-semibold text-gray-500 whitespace-nowrap">
             Filtrar por fecha:
           </label>
@@ -23,190 +23,139 @@
                 class="w-full bg-transparent focus:outline-none text-slate-700 text-sm leading-tight">
             </div>
           </div>
-        </div>        
-             
-        <div class="flex gap-8">
-        <button (click)="openModalCloseDay()" class="flex items-center gap-1 rounded bg-red-500 py-2 px-4 text-xs font-semibold text-white w-[105px]
-          transition-all duration-200 ease-in-out hover:bg-red-600 hover:scale-105" type="button">
-          <i class="fa-solid fa-lock"></i>
-          Cerrar caja
-        </button>
-        
-        <button (click)="openHistorial()" class="flex items-center gap-1 rounded bg-emerald-500 py-2 px-4 text-xs font-semibold text-white w-[103px]
-          transition-all duration-200 ease-in-out hover:bg-emerald-600 hover:scale-105" type="button">
-          <i class="fa-solid fa-clock-rotate-left"></i>
-          Historial
-        </button>
+        </div>
 
-        <button (click)="nuevaCobranza()" class="flex items-center gap-1 rounded bg-emerald-500 py-2 px-4 text-xs font-semibold text-white w-[129px]
+        <div class="flex gap-8">
+          <button (click)="openModalCloseDay()" class="flex items-center gap-1 rounded bg-red-500 py-2 px-4 text-xs font-semibold text-white w-[105px]
+          transition-all duration-200 ease-in-out hover:bg-red-600 hover:scale-105" type="button">
+            <i class="fa-solid fa-lock"></i>
+            Cerrar caja
+          </button>
+
+          <button (click)="openHistorial()" class="flex items-center gap-1 rounded bg-emerald-500 py-2 px-4 text-xs font-semibold text-white w-[103px]
+          transition-all duration-200 ease-in-out hover:bg-emerald-600 hover:scale-105" type="button">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            Historial de cierres
+          </button>
+
+          <div class="flex flex-col gap-4">
+            <button (click)="nuevaCobranza('venta')" class="flex items-center gap-1 rounded bg-emerald-500 py-2 px-4 text-xs font-semibold text-white w-[129px]
         transition-all duration-200 ease-in-out hover:bg-emerald-600 hover:scale-105" type="button">
-          <i class="fa-solid fa-user-plus"></i>
-          Agregar venta
-        </button>
+              <i class="fa-solid fa-user-plus"></i>
+              Agregar venta
+            </button>
+
+            <button (click)="nuevaCobranza('gasto')" class="flex items-center gap-1 rounded bg-red-500 py-2 px-4 text-xs font-semibold text-white w-[129px]
+          transition-all duration-200 ease-in-out hover:bg-red-600 hover:scale-105" type="button">
+              <i class="fa-solid fa-user-plus"></i>
+              Agregar gasto
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
   <ng-container *ngIf="!isLoadingCobranza else carga">
 
-    <div class="p-0 overflow-y-scroll">
-      <table class="w-full mt-4 text-left table-auto min-w-max">
+    <!-- sin rounded aquí -->
+    <div class="overflow-y-auto h-full rounded-scroll border-t border-gray-300">
+      <table class="w-full text-left table-auto min-w-max rounded-t-2xl">
         <thead>
           <tr>
-            <th
-              class="p-4 w-28 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-1 font-sans text-sm font-normal leading-none text-slate-500">
+            <th class="p-4 w-28 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-1 text-sm font-normal leading-none text-slate-500">
                 Fecha
               </p>
             </th>
-            <th
-              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+            <th class="p-4 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
                 Detalle
               </p>
             </th>
-            <th
-              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
+            <th class="p-4 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
                 Efectivo
               </p>
             </th>
-            <th
-              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Debito
+            <th class="p-4 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
+                Débito
               </p>
             </th>
-            <th
-              class="p-4 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                Credito
+            <th class="p-4 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
+                Crédito
               </p>
             </th>
-            <th
-              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+            <th class="p-2 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
                 Transferencia
               </p>
             </th>
-            <th
-              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+            <th class="p-2 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
                 Cheque
               </p>
             </th>
-            <th
-              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+            <th class="p-2 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
                 Gasto
               </p>
             </th>
-            <th
-              class="p-2 w-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+            <th class="p-2 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
                 Total
               </p>
             </th>
-            <th
-              class="p-1 w-20 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
-                Observacion
+            <th class="p-1 w-20 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex justify-center items-center gap-2 text-sm font-normal leading-none text-slate-500">
+                Observación
               </p>
             </th>
-            <th
-              class="p-2 w-5 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
-              <p
-                class="flex justify-center items-center gap-2 font-sans text-sm  font-normal leading-none text-slate-500">
+            <th class="p-2 w-5 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex justify-center items-center gap-2 text-sm font-normal leading-none text-slate-500">
                 Modificar
               </p>
             </th>
           </tr>
         </thead>
+
         <tbody *ngIf="clientsOfDay.length > 0 else noData">
-          <tr *ngFor="let cliente of clientsOfDay">
+          <tr *ngFor="let cliente of clientsOfDay" [ngClass]="getTotal(cliente) < 0 ? 'bg-red-50' : 'bg-green-50'">
             <td class="p-4 border-b border-slate-200">
-              <p class="text-xs text-slate-500">
-                {{cliente.fecha | date: 'dd-MM-yyyy'}}
-              </p>
+              <p class="text-xs text-slate-500">{{cliente.fecha | date: 'dd-MM-yyyy'}}</p>
             </td>
             <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-xs font-semibold text-slate-700">
-                  {{cliente.detalle}}
-                </p>
-              </div>
+              <p class="text-xs font-semibold text-slate-700">{{cliente.detalle}}</p>
             </td>
             <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-xs font-semibold text-slate-500">
-                  {{cliente.efectivo | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
-                </p>
-              </div>
+              <p class="text-xs font-semibold text-slate-500">{{cliente.efectivo | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
             </td>
             <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-xs font-semibold text-slate-500">
-                  {{cliente.debito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
-                </p>
-              </div>
+              <p class="text-xs font-semibold text-slate-500">{{cliente.debito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
             </td>
             <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-xs font-semibold text-slate-500">
-                  {{cliente.credito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
-                </p>
-              </div>
+              <p class="text-xs font-semibold text-slate-500">{{cliente.credito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
             </td>
             <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-xs font-semibold text-slate-500">
-                  {{cliente.transferencia | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
-                </p>
-              </div>
+              <p class="text-xs font-semibold text-slate-500">{{cliente.transferencia | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
             </td>
             <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-xs font-semibold text-slate-500">
-                  {{cliente.cheque | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
-                </p>
-              </div>
+              <p class="text-xs font-semibold text-slate-500">{{cliente.cheque | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
             </td>
             <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-xs font-semibold text-slate-500">
-                  {{cliente.gasto | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
-                </p>
-              </div>
+              <p class="text-xs font-semibold text-slate-500">{{cliente.gasto | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
             </td>
             <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-xs font-semibold text-slate-500">
-                  {{getTotal(cliente) | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
-                </p>
-              </div>
+              <p class="text-xs font-semibold text-slate-500">{{getTotal(cliente) | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
             </td>
             <td class="p-4 border-b border-slate-200">
-              <div class="flex flex-col">
-                <p class="text-xs font-semibold text-slate-500">
-                  {{cliente.observacion}}
-                </p>
-              </div>
+              <p class="text-xs font-semibold text-slate-500">{{cliente.observacion}}</p>
             </td>
             <td class="p-4 border-b border-slate-200">
               <div class="flex gap-2">
-                <!--cliente viene del for-->
-                <button (click)="updateClient(cliente)" *ngIf="isAdmin()" class="text-slate-500 hover:text-blue-600"
-                  title="Editar">
+                <button (click)="nuevaCobranza('update', cliente)" *ngIf="isAdmin()" class="text-slate-500 hover:text-blue-600" title="Editar">
                   <i class="fa-solid fa-pencil"></i>
                 </button>
                 <button (click)="openDeleteConfirm(cliente)" class="text-slate-500 hover:text-red-600" title="Eliminar">
@@ -217,8 +166,6 @@
           </tr>
         </tbody>
 
-
-
         <ng-template #noData>
           <tbody>
             <tr>
@@ -228,10 +175,10 @@
             </tr>
           </tbody>
         </ng-template>
-
       </table>
     </div>
   </ng-container>
+
   <ng-template #carga>
     <div class="flex justify-center items-center h-full">
       <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>

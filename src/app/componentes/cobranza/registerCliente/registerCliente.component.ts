@@ -2,10 +2,13 @@ import { Component, OnInit, EventEmitter, Output, Input, Inject } from '@angular
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { CobranzaService } from '../../../services/cobranza.service';
-import { CobranzaComponent } from '../cobranza.component';
-import { OnChanges, SimpleChanges } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { DIALOG_DATA } from '@angular/cdk/dialog';
+
+// Tipos disponibles de pago, tendria que venir desde api
+const tiposDePagos: string[] = [
+  'Efectivo', 'Debito', 'Credito', 'Transferencia', 'Cheque'
+]
 
 
 @Component({
@@ -14,12 +17,6 @@ import { DIALOG_DATA } from '@angular/cdk/dialog';
   styleUrls: ['./registerCliente.component.css']
 })
 export class RegisterClienteComponent implements OnInit {
-  //emite eventos
-  @Output() loadClientes = new EventEmitter<void>();
-  @Input() clientEdit: any;
-  accion: string = '';
-  //editMode = false;
-  form!: FormGroup;
 
   constructor(
     public dialogRef: MatDialogRef<RegisterClienteComponent>,
@@ -30,71 +27,43 @@ export class RegisterClienteComponent implements OnInit {
   ) {
   }
 
-  onSubmit() {
-    if (this.form.invalid) {
-      return;
-    }
+  //emite eventos
+  @Output() loadClientes = new EventEmitter<void>();
 
-    const camposNumericos: string[] = [
-      'efectivo', 'debito', 'credito', 'transferencia', 'cheque', 'gasto'
-    ];
+  @Input() clientEdit: any;
 
-    camposNumericos.forEach((campo: string) => {
-      const control = this.form.get(campo);
-      if (control?.value === null) { //si mi campo coincide con el string, pregunto si es null y si lo es seteo (0)
-        control?.setValue(0);
+  accion: string = '';
+  esGasto: boolean = false;
+  pagoSeleccionado: string | null = null;
+  pagos: { tipo: string, monto: number }[] = [];
+  observacion: string = '';
+  detalle: string = '';
+
+  agregarVenta() {
+
+    const payload = { detalle: this.detalle, observacion: this.observacion, pagos: this.pagos };
+    const idAdmin = this.authService.getIdAdmin();
+
+    console.log(payload);
+    this.cobranzaService.postClientDaily(payload, idAdmin).subscribe({
+      error: (err) => {
+        console.error('Error al registrar:', err);
+      },
+      complete: () => {
+        this.dialogRef.close("submit");
       }
     });
 
-    const payload = this.form.value;
-    const idAdmin = this.authService.getIdAdmin();
-
-    if (this.accion == 'editar' && this.data.client?.id) {//si client existe, entonces dame su id_client
-      this.cobranzaService.updateClient(this.data.client.id, idAdmin, payload).subscribe({
-        error: (err) => {
-          console.error('Error al actualizar:', err);
-        },
-        complete: () => {
-          this.dialogRef.close("submit"); //cierro modal
-        }
-      });
-      } else {
-      this.cobranzaService.postClientDaily(payload, idAdmin).subscribe({
-        error: (err) => {
-          console.error('Error al registrar:', err);
-        },
-        complete: () => {
-          this.dialogRef.close("submit");
-        }
-      });
-      this.dialogRef.close("submit"); //cierro modal
-    }
+    this.dialogRef.close("submit"); //cierro modal
   }
 
   ngOnInit() {
-    this.form = this.fb.group({
-      detalle: ['', Validators.required],
-      efectivo: [],
-      debito: [],
-      credito: [],
-      transferencia: [],
-      cheque: [],
-      observacion: [''],
-      gasto: [],
-    });
-    this.accion = this.data.accion;
-    
-    if (this.data.client) {
-      this.form.setValue({
-        detalle: this.data.client.detalle,
-        efectivo: this.data.client.efectivo,
-        debito: this.data.client.debito,
-        credito: this.data.client.credito,
-        transferencia: this.data.client.transferencia,
-        cheque: this.data.client.cheque,
-        observacion: this.data.client.observacion,
-        gasto: this.data.client.gasto,
-      })
+    if(this.data && this.data.accion){
+      this.accion = this.data.accion;
+      
+      if(this.accion == 'gasto'){
+        this.pagos.push({ tipo:'Gasto', monto: 0 });
+      }
     }
   }
 
@@ -104,5 +73,33 @@ export class RegisterClienteComponent implements OnInit {
 
   asFormControl(control: AbstractControl | null): FormControl {
     return control as FormControl;
+  }
+
+  agregarPago() {
+    if (this.pagoSeleccionado) {
+      this.pagos.push({ tipo: this.pagoSeleccionado, monto: 0 });
+    }
+
+    setTimeout(() => {
+      this.pagoSeleccionado = null;
+    });
+  }
+
+  get tiposDePagoSeleccionables(): string[] {
+    return tiposDePagos.filter(
+      tipo => !this.pagos.some(p => p.tipo === tipo)
+    );
+  }
+
+  get montoTotal(): number {
+    return this.pagos.reduce((total, pago) => total + pago.monto, 0);
+  }
+
+  onDeleteSelector(index: number) {
+    this.pagos.splice(index, 1);
+  }
+
+  actualizarMonto(index: number, event: any) {
+    this.pagos[index].monto = event;
   }
 }
