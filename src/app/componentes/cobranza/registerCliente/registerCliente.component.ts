@@ -36,14 +36,15 @@ export class RegisterClienteComponent implements OnInit {
   esGasto: boolean = false;
   pagoSeleccionado: string | null = null;
   pagos: { tipo: string, monto: number }[] = [];
-  descripcion: string = '';
+  observacion: string = '';
   detalle: string = '';
 
   agregarVenta() {
 
-    const payload = { detalle: this.detalle, descripcion: this.descripcion, pagos: this.pagos };
+    const payload = { detalle: this.detalle, observacion: this.observacion, pagos: this.pagos };
     const idAdmin = this.authService.getIdAdmin();
 
+    console.log(payload);
     this.cobranzaService.postClientDaily(payload, idAdmin).subscribe({
       error: (err) => {
         console.error('Error al registrar:', err);

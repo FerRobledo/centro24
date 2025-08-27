@@ -221,7 +221,7 @@ module.exports = async (req, res) => {
             // 4. Query con todas las columnas
             const query = `
                 INSERT INTO public.caja
-                    (fecha, detalle, efectivo, debito, credito, transferencia, cheque, gasto, observacion, user_admin)
+                    (fecha, detalle, observacion, efectivo, debito, credito, transferencia, cheque, gasto, user_admin)
                 VALUES
                     (CURRENT_DATE, $1, $2, $3, $4, $5, $6, $7, $8, $9)
                 RETURNING *;
@@ -230,16 +230,15 @@ module.exports = async (req, res) => {
             // 5. Armado de parámetros
             const values = [
                 payload.detalle || null,
+                payload.observacion || null,
                 valoresPagos.efectivo,
                 valoresPagos.debito,
                 valoresPagos.credito,
                 valoresPagos.transferencia,
                 valoresPagos.cheque,
                 valoresPagos.gasto,
-                payload.observacion || null,
                 id,
             ];
-            console.log(values);
             const { rows } = await pool.query(query, values);
             return res.status(201).json(rows[0]);
         } catch (error) {
