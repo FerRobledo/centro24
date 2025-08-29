@@ -36,10 +36,19 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
 import { LogsComponent } from '../componentes/logs/logs.component';
 import { ConfirmarDeleteComponent } from '../componentes/productos/confirmar-delete/confirmar-delete.component';
-import { ProductFormComponent } from '../componentes/productos/product-form/product-form.component';
 import { MatOptionModule, MatNativeDateModule, NativeDateAdapter, DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatRadioModule } from '@angular/material/radio';
+import { HistorialClientsComponent } from '../componentes/historial-clients/historial-clients.component';
+import { FiltroProductosPipe } from '../pipes/filtro-productos.pipe';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ProductFormDialogComponent } from '../componentes/productos/product-form-dialog/product-form-dialog.component';
+import { DetailsHistorialComponent } from '../componentes/detailsHistorial/detailsHistorial.component';
+import { CdkNoDataRow } from "@angular/cdk/table";
+import { SelectorDePagosComponent } from '../componentes/cobranza/selectorDePagos/selectorDePagos.component';
+
 
 export const MONTH_YEAR_FORMATS = {
   parse: {
@@ -78,7 +87,11 @@ export const MONTH_YEAR_FORMATS = {
     SelectorClientesComponent,
     LogsComponent,
     ConfirmarDeleteComponent,
-    ProductFormComponent,
+    HistorialClientsComponent,
+    FiltroProductosPipe,
+    ProductFormDialogComponent,
+    DetailsHistorialComponent,
+    SelectorDePagosComponent,
   ],
   imports: [
     CommonModule,
@@ -98,8 +111,12 @@ export const MONTH_YEAR_FORMATS = {
     MatAutocompleteModule,
     MatNativeDateModule,
     MatButtonModule,
-    MatCardModule
-  ],
+    MatCardModule,
+    MatRadioModule,
+    MatFormFieldModule,
+    MatProgressSpinnerModule,
+    CdkNoDataRow
+],
   providers: [
     provideAnimationsAsync(),
     { provide: DateAdapter, useClass: NativeDateAdapter },

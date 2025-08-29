@@ -19,25 +19,47 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     public clientesService: ClientesService,
     public dialog: MatDialog,
-    private cdr: ChangeDetectorRef,
   ) { }
 
   ngOnInit() {
-    this.mapearClientes();
+    this.loadClientsMonthly();
   }
 
   ngOnDestroy(): void {
     this.dialog.closeAll();
   }
 
-  @Output() loadClientsMonthly = new EventEmitter<void>();
-  @Input() clientsOfMonth: any[] = [];
+  clientsOfMonth: any[] = [];
   clicked: Boolean = false;
   clientEdit: any = null;
   eliminandoClienteId: number | null = null;
   filtroClients: string = '';
-  porcentaje: number | null = null; // enlazado al input
+  porcentaje: number = 0; // enlazado al input
+  isLoading: boolean = true;
 
+  loadClientsMonthly() {
+    const idAdmin = this.authService.getIdAdmin();
+    if (!idAdmin) {
+      this.clientsOfMonth = [];
+      this.isLoading = false;
+      return;
+    }
+
+    this.isLoading = true;
+    this.clientesService.getClientsOfMonth(idAdmin).subscribe({
+      next: (data) => {
+        this.clientsOfMonth = data;
+      },
+      error: (error) => {
+        console.error("Error en el pedido de clientes del día: ", error);
+        this.clientsOfMonth = [];
+      },
+      complete: () => {
+        this.isLoading = false;
+        this.mapearClientes();
+      }
+    })
+  }
 
   public updateClient(client: any) {
     const dialogRef = this.dialog.open(InsertarClienteComponent, {
@@ -47,7 +69,7 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result == 'submit') {
-        this.loadClientsMonthly.emit();
+        this.loadClientsMonthly();
       }
     });
   }
@@ -62,7 +84,7 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
 
     this.dialogRef.afterClosed().subscribe(result => {
       if (result == 'submit') {
-        this.loadClientsMonthly.emit();
+        this.loadClientsMonthly();
       }
       this.dialogRef = null;
     });
@@ -72,18 +94,43 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     this.eliminandoClienteId = client.id_client;
     const idClient = client.id_client;
     const idAdmin = this.authService.getIdAdmin();
+
+    console.log("que id es? :" + idClient);
+    
     if (idAdmin) {
       this.clientesService.deleteClient(idAdmin, idClient).subscribe({
         next: () => {
+          ;
           this.eliminandoClienteId = null;
-          this.loadClientsMonthly.emit();
+          this.loadClientsMonthly();
+
         },
         error: (error) => {
+          ;
           this.eliminandoClienteId = null;
           console.log("Error en la eliminacion del cliente: ", error)
         },
       })
     }
+  }
+
+  openDeleteConfirm(client: any) {
+    let titulo = 'Confirmar borrado';
+    let mensaje = '';
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: titulo,
+        message: mensaje
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteClient(client);
+      }
+    })
   }
 
   abrirConfirmacion() {
@@ -109,23 +156,14 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
       if (result) {
 
         const idAdmin = this.authService.getIdAdmin();
-        this.cdr.detectChanges();
-
         if (idAdmin && this.porcentaje !== null) {
           this.subscriptions.add(
             this.clientesService.incrementClient(idAdmin, this.porcentaje).subscribe({
-              next: (data) => {
-                this.cdr.detectChanges();
-                this.loadClientsMonthly.emit();
-              },
               error: (error) => {
                 console.error(error);
-                this.cdr.detectChanges();
-                this.loadClientsMonthly.emit();
               },
               complete: () => {
-                this.cdr.detectChanges();
-                this.loadClientsMonthly.emit();
+                this.loadClientsMonthly();
               }
             })
           );
@@ -135,87 +173,59 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
   }
 
   mapearClientes() {
-    const hoy = new Date();
+    this.mapearMesesClientes();
+    this.mapearMontos();
+  }
 
+  mapearMontos() {
     this.clientsOfMonth = this.clientsOfMonth.map(client => {
-      const pagos = client.pagos || [];
+      let monto = 0;
+      if (client.tipo == "Mensual") {
+        monto = client.monto;
+      } else if (client.tipo == "Semestral") {
+        monto = client.monto * 5;
+      }
 
-      if (pagos.length > 0) {
-        // Ordenar pagos por fecha inicio
-        const pagosOrdenados = pagos
-          .map((p: { periodo_desde: string | number | Date; periodo_hasta: string | number | Date; }) => ({
-            desde: new Date(p.periodo_desde),
-            hasta: new Date(p.periodo_hasta)
-          }))
-          .sort((a: { desde: { getTime: () => number; }; }, b: { desde: { getTime: () => number; }; }) => a.desde.getTime() - b.desde.getTime());
+      return {
+        ...client,
+        monto: monto,
+      }
+    })
+  }
 
-        // Combinar periodos
-        const periodosCombinados: { desde: Date; hasta: Date }[] = [];
-        let periodoActual = pagosOrdenados[0];
+  mapearMesesClientes() {
+    const hoy = new Date;
+    this.clientsOfMonth = this.clientsOfMonth.map(client => {
 
-        for (let i = 1; i < pagosOrdenados.length; i++) {
-          const pago = pagosOrdenados[i];
+      let pagos = client.pagos;
+      pagos.sort((a: any, b: any) => new Date(a.periodo_hasta).getTime() - new Date(b.periodo_hasta).getTime());
+      const ultimoPago = pagos[pagos.length - 1];
+      let mesesVigente = 0;
+      let periodoHasta: { anio: number, mes: number } = { anio: 0, mes: 0 };
+      // Si tiene pagos hacer el calculo de cuantos meses le quedan
+      if (ultimoPago) {
+        const [anio, mes] = ultimoPago.periodo_hasta.split('-').map(Number);
+        periodoHasta = { anio, mes };
+        mesesVigente = this.calcularMesesDiferencia(hoy, periodoHasta);
+      }
 
-          if (pago.desde <= periodoActual.hasta) {
-            // Hay solapamiento o continuidad, extendemos periodoActual
-            if (pago.hasta > periodoActual.hasta) {
-              periodoActual.hasta = pago.hasta;
-            }
-          } else {
-            // No solapan, guardamos periodoActual y comenzamos uno nuevo
-            periodosCombinados.push(periodoActual);
-            periodoActual = pago;
-          }
-        }
-        // Agregar último periodo
-        periodosCombinados.push(periodoActual);
-
-        // Sumar meses de los periodos combinados
-        let totalMesesPagados = 0;
-        let ultimoPeriodoHasta = periodosCombinados[0].hasta;
-
-        for (const periodo of periodosCombinados) {
-          totalMesesPagados += this.calcularMesesDiferencia(periodo.desde, periodo.hasta);
-
-          if (periodo.hasta > ultimoPeriodoHasta) {
-            ultimoPeriodoHasta = periodo.hasta;
-          }
-        }
-
-        // Calcular mes siguiente al último periodo para deuda
-        const mesSiguienteAlUltimoPago = new Date(ultimoPeriodoHasta);
-        mesSiguienteAlUltimoPago.setMonth(mesSiguienteAlUltimoPago.getMonth() + 1);
-
-        // Calcular meses adeudados
-        const mesesAdeudados = this.calcularMesesDiferencia(mesSiguienteAlUltimoPago, hoy);
-
-        return {
-          ...client,
-          mesesActivos: totalMesesPagados,
-          periodoHasta: ultimoPeriodoHasta,
-          mesesAdeudados
-        };
-      } else {
-        const fechaAlta = new Date(client.fecha);
-        const mesesAdeudados = this.calcularMesesDiferencia(fechaAlta, hoy);
-
-        return {
-          ...client,
-          mesesActivos: 0,
-          periodoHasta: null,
-          mesesAdeudados
-        };
+      return {
+        ...client,
+        monto: Number(client.monto),
+        mesesVigente: mesesVigente,
+        periodoHasta: periodoHasta,
       }
     });
   }
 
-
-
-  calcularMesesDiferencia(desde: Date, hasta: Date): number {
-    const anios = hasta.getFullYear() - desde.getFullYear();
-    const meses = hasta.getMonth() - desde.getMonth();
-    const totalMeses = anios * 12 + meses + 1; // +1 para incluir ambos meses
-    return totalMeses > 0 ? totalMeses : 0;
+  getPeriodoHasta(client: any): Date {
+    return new Date(client.periodoHasta.anio, client.periodoHasta.mes - 1, 1);
+  }
+  
+  calcularMesesDiferencia(desde: Date, hasta: { anio: number, mes: number }): number {
+    const yearDiff = hasta.anio - desde.getFullYear();
+    const monthDiff = hasta.mes - (desde.getMonth() + 1);
+    return yearDiff * 12 + monthDiff + 1;
   }
 
   agregarPago(client: any) {
@@ -229,12 +239,8 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     this.dialogRef.afterClosed().subscribe(result => {
       this.dialogRef = null;
       if (result?.evento == 'pagoCreado') {
-        this.loadClientsMonthly.emit();
+        this.loadClientsMonthly();
       }
     });
-  }
-
-  detectChanges(){
-    this.cdr.detectChanges();
   }
 }

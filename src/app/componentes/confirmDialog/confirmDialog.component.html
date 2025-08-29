@@ -1,12 +1,26 @@
 <h2 mat-dialog-title>Confirmar</h2>
-<mat-dialog-content>¿Estás seguro que deseas cerrar sesión?</mat-dialog-content>
+
+<mat-dialog-content>
+  ¿Estás seguro que deseas cerrar sesión?
+</mat-dialog-content>
+
 <mat-dialog-actions class="w-full h-[10vh] flex gap-x-6 pt-4" style="justify-content: center;">
-  <button mat-stroked-button class="bg-zinc-100 flex items-center gap-2 p-2 rounded-md border-b-zinc-500 border-b-2 hover:border-b-0 hover:bg-zinc-200" (click)="onCancel()">
+  <!-- Botón Cancelar -->
+  <button
+    class="bg-gray-100 flex items-center gap-2 px-4 py-2 rounded-md border border-gray-300
+           hover:bg-gray-200 hover:shadow-md transition-all"
+    (click)="onCancel()"
+  >
     <mat-icon>close</mat-icon>
     Cancelar
   </button>
 
-  <button mat-flat-button class="bg-red-400 flex items-center gap-2 p-2 rounded-md border-b-red-500 border-b-2 hover:border-b-0 hover:bg-red-500" (click)="onConfirm()">
+  <!-- Botón Cerrar sesión -->
+  <button
+    class="bg-red-500 text-white flex items-center gap-2 px-4 py-2 rounded-md border-b-4 border-red-700
+           hover:bg-red-600 hover:border-b-2 hover:shadow-md transition-all"
+    (click)="onConfirm()"
+  >
     <mat-icon>logout</mat-icon>
     Cerrar sesión
   </button>

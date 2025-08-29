@@ -1,6 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Log } from 'src/assets/dto/log';
 import { LogsService } from 'src/app/services/logs.service';
+
+interface DialogData {
+  titulo?: string;
+}
 
 @Component({
   selector: 'app-logs',
@@ -24,30 +29,19 @@ export class LogsComponent implements OnInit {
   cargando: boolean = false;
 
 
-  constructor(private logsService: LogsService) {}
+  constructor(
+    private logsService: LogsService,
+    public dialogRef: MatDialogRef<LogsComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: DialogData
+  ) {}
 
   ngOnInit() {
-    // No cargar logs al inicializar, solo cuando se abra el modal
+    this.cargarLogs(); // Carga los logs al abrir el dialog
   }
 
-  // Método para abrir el modal
-  abrirModal() {
-    this.mostrarModal = true;
-    this.cargarLogs(); // Carga los logs cuando se abre el modal  
-  }
-
-  // Método para cerrar el modal
-  cerrarModal() {
-    this.mostrarModal = false;
-    this.limpiarFiltros();
-  }
-
-  // Método que se ejecuta cuando se hace clic fuera del modal
-  cerrarModalFuera(event: Event) {
-    if (event.target === event.currentTarget) {
-      this.cerrarModal();
-      this.limpiarFiltros();
-    }
+  // Metodo para cerrar el dialog
+  onCerrar() {
+    this.dialogRef.close();
   }
 
   // Método para cargar los logs desde el backend
@@ -59,7 +53,6 @@ export class LogsComponent implements OnInit {
         this.logs = logs;
         this.logsFiltrados = logs;
         this.cargando = false;
-        console.log('Logs cargados:', logs); // Para debug
       },
       error: (error: any) => {
         console.error('Error al cargar logs:', error);
@@ -79,9 +72,10 @@ export class LogsComponent implements OnInit {
         if (fechaString) {
           // Convertir la fecha del log a formato YYYY-MM-DD
           const fechaLog = new Date(fechaString);
-          const fechaLogFormatted = fechaLog.getFullYear() + '-' + 
-                                   String(fechaLog.getMonth() + 1).padStart(2, '0') + '-' + 
-                                   String(fechaLog.getDate()).padStart(2, '0');
+          // Extraer solo la parte de la fecha y convertirla a formato YYYY-MM-DD
+          const fechaParts = fechaString.split(' ')[0]; // "DD/MM/YYYY"
+          const [dia, mes, año] = fechaParts.split('/');
+          const fechaLogFormatted = `${año}-${mes}-${dia}`;
           cumpleFiltros = cumpleFiltros && fechaLogFormatted === this.filtroFecha;
         }
       }

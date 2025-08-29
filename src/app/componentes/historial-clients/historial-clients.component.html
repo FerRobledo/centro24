@@ -1,0 +1,64 @@
+<div class="p-10 mx-auto w-full text-gray-800 overflow-y-scroll">
+	<div class="relative flex items-center justify-center mb-3">
+		<div class="absolute left-0 flex items-center">
+			<input 
+			type="date" [(ngModel)]="selectedDate" 
+			(ngModelChange)="fitrarFecha()"
+			class="w-[136px] bg-transparent focus:outline-none text-slate-700 border rounded p-1">
+		</div>
+	  
+		<h2 class="text-2xl font-semibold text-green-700 text-center">
+		  Auditoría de caja
+		</h2>
+	  </div>
+				  
+	<div class="overflow-x-auto rounded-lg border border-green-300 shadow-md">
+		<div class="max-h-80 overflow-y-auto">
+			<table class="w-full text-sm table-auto">
+				<colgroup>
+					<col>
+					<col>
+					<col>
+					<col>
+				</colgroup>
+				<thead class="bg-green-100 text-green-800 uppercase text-xs font-semibold">
+					<tr class="text-left">
+						<th class="p-3 text-left">Nombre usuario</th>
+						<th class="p-3 text-left">Fecha de cierres</th>
+						<th class="p-3 text-left">Monto</th>
+						<th class="p-3 text-left">Detalle</th>
+					</tr>
+				</thead>
+				<tbody class="divide-y divide-green-200 bg-white" *ngIf="!isLoading; else carga"> 
+					<tr *ngFor="let item of historial" class="hover:bg-green-50">
+						<td class="p-3 text-left size-2">{{ item.nombre_usuario }}</td>
+						<td class="p-3 text-left">
+						  {{ item.fecha | date: 'short' }}<br />
+						  <span class="text-xs text-green-600">{{ item.fecha | date: 'EEEE' }}</span>
+						</td>
+						<td class="p-3 text-left">{{ item.monto | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}</td>
+						<td class="p-5 text-left">
+							<button class="text-blue-500 hover:underline text-left" (click)="openDetails(item.id)">Ver detalle</button>
+						</td>
+					</tr>
+					<tr *ngIf="historial.length === 0">
+						<td colspan="4" class="p-3 text-center text-gray-500">
+						  No hay datos de cierres en esta fecha para mostrar
+						</td>
+					  </tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<ng-template #carga>
+		<tbody>
+		  <tr>
+			<td colspan="4" class="py-16">
+			  <div class="flex justify-center">
+				<div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
+			  </div>
+			</td>
+		  </tr>
+		</tbody>
+	</ng-template>
+</div>

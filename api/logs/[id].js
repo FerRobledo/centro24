@@ -30,14 +30,19 @@ module.exports = async (req, res) => {
           error: 'Faltan campos requeridos: id_producto, id_user, accion' 
         });
       }
+
+      // Crear fecha en horario argentino usando JavaScript
+      const fechaArgentina = new Date().toLocaleString('sv-SE', {
+        timeZone: 'America/Argentina/Buenos_Aires'
+      });
       
       const query = `
         INSERT INTO logs (id_producto, id_user, accion, date, user_admin)
-        VALUES ($1, $2, $3, now(), $4)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING *
       `;
       
-      const values = [id_producto, id_user, accion, id];
+      const values = [id_producto, id_user, accion, fechaArgentina, id];
       const result = await pool.query(query, values);
       
       return res.status(201).json({
@@ -67,7 +72,7 @@ module.exports = async (req, res) => {
     // Se calculo la hora a mano para Argentina porque no andaba
     const query = `
         SELECT u.nombre, l.id_user, l.accion, l.id_producto, 
-                (l.date - INTERVAL '3 hours') AS fecha_y_hora
+            TO_CHAR(l.date, 'DD/MM/YYYY HH24:MI') AS fecha_y_hora
         FROM logs l 
         JOIN users u ON l.id_user = u.id
         WHERE l.user_admin = $1

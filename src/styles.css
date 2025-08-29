@@ -12,16 +12,6 @@ body {
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-html,
-body {
-    height: 100%;
-}
-
-body {
-    margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
-}
-
 .rounded-scroll::-webkit-scrollbar {
     width: 8px;
     border-radius: 9999px;

@@ -1,12 +1,14 @@
 import { DIALOG_DATA } from '@angular/cdk/dialog';
-import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from 'src/app/services/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
-import { setMonth, setYear, parseISO, format, differenceInMonths, startOfMonth } from 'date-fns';
 
-const fechaFormateada = format(new Date(), 'MM/yyyy');
+const fechaFormateada = new Date().toLocaleDateString('es-AR', {
+  month: '2-digit',
+  year: 'numeric'
+});
 
 @Component({
   selector: 'app-agregarPagoModal',
@@ -21,6 +23,7 @@ export class AgregarPagoModalComponent implements OnInit {
     private authService: AuthService,
     private clientesService: ClientesService,
     @Inject(DIALOG_DATA) public data: any,
+    private cdr: ChangeDetectorRef
   ) { }
 
   pagoForm!: FormGroup;
@@ -31,6 +34,8 @@ export class AgregarPagoModalComponent implements OnInit {
   @Output() iniciarCarga = new EventEmitter<void>();
   cliente: any = null;
   controlCliente!: FormControl<any>;
+  descuento: number = 0;
+
 
   ngOnInit() {
     // Verificás si viene `client` y lo asignás
@@ -74,35 +79,23 @@ export class AgregarPagoModalComponent implements OnInit {
     return fechaDesde <= fechaHasta ? null : { fechasInvalidas: true };
   }
 
-  formatearMesAnio(fecha: Date | string) {
-    const fechaObj = (fecha instanceof Date) ? fecha : new Date(fecha);
-    const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
-    const anio = fechaObj.getFullYear();
-    return `${anio}-${mes}-1`;
-  }
-
   crearPago() {
     if (this.pagoForm.invalid) {
       this.error = "Formulario inválido";
       return;
     }
 
-    // Si usás Moment, obtené la fecha Date con ._d
-    const fechaDesdeDate: Date = this.pagoForm.value.fechaDesde._d || this.pagoForm.value.fechaDesde;
-    const fechaHastaDate: Date = this.pagoForm.value.fechaHasta._d || this.pagoForm.value.fechaHasta;
+    let fechaDesde = this.pagoForm.get('fechaDesde')?.value;
+    let fechaHasta = this.pagoForm.get('fechaHasta')?.value;
 
-    // Formatear fechas
-    const fechaDesdeStr = this.formatearMesAnio(fechaDesdeDate);
-    let fechaHastaStr = fechaDesdeStr;
-    if (fechaHastaDate) {
-      fechaHastaStr = this.formatearMesAnio(fechaHastaDate);
+    if(fechaHasta == ''){
+      fechaHasta = fechaDesde;
     }
-
     // Armá el objeto a enviar con fechas formateadas
     const pagoData = {
-      ...this.pagoForm.value,
-      fechaDesde: fechaDesdeStr,
-      fechaHasta: fechaHastaStr,
+      client: this.pagoForm.get('client')?.value.id_client,
+      fechaDesde: fechaDesde,
+      fechaHasta: fechaHasta,
       monto: this.monto,
     };
 
@@ -115,21 +108,16 @@ export class AgregarPagoModalComponent implements OnInit {
     this.dialogRef.close({ evento: 'pagoCreado', data: pagoData });
   }
 
-  chosenMonthHandler(normalizedMonth: Date, controlName: string, datepicker: any) {
-    const ctrl = this.pagoForm.get(controlName);
-    const currentValue = ctrl?.value ? parseISO(ctrl.value) : new Date();
-    const updated = setMonth(setYear(currentValue, normalizedMonth.getFullYear()), normalizedMonth.getMonth());
-    ctrl?.setValue(updated.toISOString());
-    this.actualizarCantidadMeses();
-    datepicker.close();
-  }
+  chosenMonthHandler(event: any, controlName: string) {
+    let value = event.target.value;
 
-  chosenYearHandler(event: any, controlName: string) {
-    const ctrl = this.pagoForm.get(controlName);
-    if (event.value) {
-      const start = startOfMonth(new Date(event.value));
-      ctrl?.setValue(start.toISOString());
+    // Si viene con formato completo (ej: 2025-08-01T00:00:00.000Z)
+    if (value.includes("T")) {
+      value = value.substring(0, 7); // 👉 "2025-08"
     }
+
+    this.pagoForm.get(controlName)?.setValue(value);
+    this.actualizarCantidadMeses();
   }
 
   actualizarCantidadMeses() {
@@ -137,11 +125,13 @@ export class AgregarPagoModalComponent implements OnInit {
     const hasta = this.pagoForm.get('fechaHasta')?.value;
 
     if (desde && hasta) {
-      const fechaDesde = parseISO(desde);
-      const fechaHasta = parseISO(hasta);
+      const fechaDesde = new Date(desde);
+      const fechaHasta = new Date(hasta);
 
-      const diferenciaMeses = differenceInMonths(fechaHasta, fechaDesde);
-      this.cantidadMeses = diferenciaMeses + 1; // incluir ambos meses
+      let diff = (fechaHasta.getFullYear() - fechaDesde.getFullYear()) * 12;
+      diff += fechaHasta.getMonth() - fechaDesde.getMonth();
+
+      this.cantidadMeses = diff + 1; // incluir ambos meses
     } else if (desde && !hasta) {
       this.cantidadMeses = 1;
     } else {
@@ -151,12 +141,30 @@ export class AgregarPagoModalComponent implements OnInit {
     this.actualizarMonto(this.pagoForm.get('client')?.value);
   }
 
+  formatearMesAnio(fecha: Date | string) {
+    const fechaObj = (fecha instanceof Date) ? fecha : new Date(fecha);
+    const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
+    const anio = fechaObj.getFullYear();
+    return `${anio}-${mes}-1`;
+  }
+
 
   actualizarMonto(client: any) {
     if (client) {
-      this.monto = client.monto * this.cantidadMeses;
+      if (client.tipo === 'Semestral') {
+        const mesesGratis = Math.floor(this.cantidadMeses / 6); // 1 mes gratis cada 6
+        const montoMensual = client.monto;
+        const mesesPagados = this.cantidadMeses - mesesGratis;
+
+        this.descuento = montoMensual * mesesGratis;
+        this.monto = montoMensual * mesesPagados;
+      } else {
+        this.monto = client.monto * this.cantidadMeses;
+        this.descuento = 0;
+      }
     } else {
-      this.monto = 0; // o el valor que corresponda si no hay cliente
+      this.monto = 0;
+      this.descuento = 0;
     }
   }
 
@@ -171,5 +179,6 @@ export class AgregarPagoModalComponent implements OnInit {
 
   onClienteSeleccionado(cliente: any) {
     this.pagoForm.get('client')?.setValue(cliente);
+    ;
   }
 }

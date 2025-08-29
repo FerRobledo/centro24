@@ -25,8 +25,8 @@ export class ClientesService {
   }
 
   public updateClient(idClient: number, idAdmin: number, payload: any) {
-    const body = { ...payload, idAdmin };
-    return this.http.put(this.origin + '/api/clientes/' + idClient, body);
+    const body = { ...payload, idClient };
+    return this.http.put(this.origin + '/api/clientes/' + idAdmin, body);
   }
 
   public getMontOfCurrentClient(monthSelected: string) {
@@ -44,8 +44,8 @@ export class ClientesService {
     return this.http.put(this.origin + '/api/clientes/' + idAdmin, body);
   }
   
-  public deletePago(idAdmin: number, pago: any): Observable<any>{
-    const body = {pago, accion:'deletePago'};
+  public deletePago(idAdmin: number, id: number): Observable<any>{
+    const body = {action:'deletePago', id};
     return this.http.delete(this.origin + '/api/clientes/' + idAdmin, { body });
   }
 }
