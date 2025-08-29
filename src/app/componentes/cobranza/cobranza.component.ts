@@ -73,7 +73,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   public loadClientsDaily() {
     const id = this.authService.getIdAdmin();
     this.isLoadingCobranza = true;
-    ; // Fuerza el spinner a mostrarse
+ // Fuerza el spinner a mostrarse
 
     if (id) {
       this.subscriptions.add(
@@ -86,8 +86,8 @@ export class CobranzaComponent implements OnInit, OnDestroy {
                 fecha: client.fecha.replace('T', ' ').replace('Z', '')
               };
             });
+            this.ngOnInit();
             this.isLoadingCobranza = false;
-            ;
           },
           error: (error) => {
             console.log("Error en el pedido de clientes del dia: ", error);

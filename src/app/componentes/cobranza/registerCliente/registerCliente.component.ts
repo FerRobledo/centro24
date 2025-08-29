@@ -40,10 +40,10 @@ export class RegisterClienteComponent implements OnInit {
   detalle: string = '';
 
   agregarVenta() {
-
+    
     const payload = { detalle: this.detalle, observacion: this.observacion, pagos: this.pagos };
     const idAdmin = this.authService.getIdAdmin();
-
+    
     console.log(payload);
     this.cobranzaService.postClientDaily(payload, idAdmin).subscribe({
       error: (err) => {
@@ -52,8 +52,8 @@ export class RegisterClienteComponent implements OnInit {
       complete: () => {
         this.dialogRef.close("submit");
       }
-    });
-
+    });    
+    this.loadClientes.emit;
     this.dialogRef.close("submit"); //cierro modal
   }
 
