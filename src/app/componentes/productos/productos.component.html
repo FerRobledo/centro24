@@ -1,80 +1,66 @@
-<div class="relative flex flex-col w-full max-w-full h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl bg-clip-border mx-auto sm:w-[95vw] md:w-[90vw] lg:w-[75vw]">
+<div
+  class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl overflow-hidden bg-clip-border">
+  <!-- Header -->
+  <div class="grid grid-cols-3 items-center w-full p-4 text-slate-700 bg-white bg-clip-border">
+    <!-- Título -->
+    <div class="flex flex-col space-y-1 justify-start">
+      <div>
+        <h3 class="text-lg font-semibold text-slate-800">
+          <i class="fa-solid fa-bag-shopping"></i> Productos
+        </h3>
+        <p class="text-slate-500">Lista de productos</p>
+      </div>
+    </div>
 
-  <!-- Header para escritorio -->
-  <div class="flex-shrink-0 px-4 mt-4">
-    <div class="flex justify-between items-end w-full">
-      
-      <!-- Lado izquierdo: Productos, Filtro y Toggle Switch -->
-      <div class="flex items-start space-x-8">
-        
-        <!-- Productos -->
-        <div class="space-y-1 flex-shrink-0">
-          <h3 class="text-lg font-semibold text-slate-800">
-            <i class="fa-solid fa-bag-shopping"></i> Productos
-          </h3>
-          <p class="text-slate-500">Lista de productos</p>
-        </div>
-        
-        <!-- Filtro general y Toggle Switch en la misma línea -->
-        <div class="flex items-end space-x-4">
-          
-          <!-- Filtro general -->
-          <div class="flex-grow max-w-md mx-auto w-full">
-            <div class="flex items-center border border-gray-300 rounded px-3 bg-white">
-              <i class="fa fa-search text-gray-500 mr-2"></i>
-              <input type="text" class="flex-1 h-9 outline-none py-1 bg-transparent text-sm"
-                placeholder="ID, Descripción o Categoría" [(ngModel)]="filtroTexto" (keyup)="detectChanges()"/>
-            </div>
-          </div>
-          
-          <!-- Toggle Switch -->
-          <div class="flex items-center space-x-3 pb-1">
-            <span class="text-sm font-medium text-gray-700" [class.font-bold]="!mostrarSoloStock">Todos</span>
-            <mat-slide-toggle 
-              [checked]="mostrarSoloStock"
-              (change)="toggleFiltroStock($event.checked)"
-              color="primary"
-              class="transition-all duration-200">
-            </mat-slide-toggle>
-            <span class="text-sm font-medium text-gray-700" [class.font-bold]="mostrarSoloStock">Mi Stock</span>
-          </div>
+    <!-- Filtro general y Toggle Switch en la misma línea -->
+    <div class="flex justify-center items-center gap-2 rounded px-3 w-full">
+
+      <!-- Filtro general -->
+      <div class="flex-grow max-w-md mx-auto w-full">
+        <div class="flex items-center border rounded px-3">
+          <i class="fa fa-search text-gray-500 mr-2"></i>
+          <input type="text" class="flex-1 h-9 outline-none py-1 bg-transparent text-sm"
+            placeholder="ID, Descripción o Categoría" [(ngModel)]="filtroTexto" (keyup)="detectChanges()" />
         </div>
       </div>
 
-      <div class="flex items-center gap-3 mb-2.5 pb-1 flex-shrink-0">
+      <!-- Toggle Switch -->
+      <div class="flex items-center space-x-3 pb-1">
+        <span class="text-sm font-medium text-gray-700" [class.font-bold]="!mostrarSoloStock">Todos</span>
+        <mat-slide-toggle [checked]="mostrarSoloStock" (change)="toggleFiltroStock($event.checked)" color="primary"
+          class="transition-all duration-200">
+        </mat-slide-toggle>
+        <span class="text-sm font-medium text-gray-700" [class.font-bold]="mostrarSoloStock">Mi Stock</span>
+      </div>
+    </div>
+    <!-- Botones -->
+    <div class="flex justify-end w-full">
+      <div class="flex flex-wrap gap-4 w-max justify-self-end justify-center">
 
-        <!-- Logs -->
-        <button *ngIf="esAdmin()"
-          (click)="abrirLogs()"
-          class="inline-flex items-center justify-center h-9 px-4 gap-2 rounded-lg bg-blue-600 hover:bg-blue-700
-                 text-xs font-semibold text-white shadow-md hover:shadow-lg transition-all duration-200"
-          type="button" title="Ver logs del sistema">
-          <i class="fa-solid fa-file-lines"></i>
-          Logs
-        </button>
-      
+
         <!-- Agregar producto -->
-        <button *ngIf="esAdmin()"
-          (click)="abrirFormularioAgregar()"
-          class="inline-flex items-center justify-center h-9 px-4 gap-2 rounded bg-emerald-500
-                 text-xs font-semibold text-white min-w-[160px]"
+        <button *ngIf="esAdmin()" (click)="abrirFormularioAgregar()"
+          class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 ease-in-out"
           type="button">
           <i class="fa-solid fa-bag-shopping"></i>
           Agregar producto
         </button>
-      
+
         <!-- Actualizar productos (componente) -->
-        <div class="min-w-[160px] h-9 flex items-center self-center">
-          <app-cargaProductos
-            class="h-full inline-flex items-center"
-            (cargaIniciada)="onCargaIniciada()"
-            (cargaFinalizada)="onCargaCompleta()">
-          </app-cargaProductos>
-        </div>
-      
+        <app-cargaProductos (cargaIniciada)="onCargaIniciada()"
+          (cargaFinalizada)="onCargaCompleta()">
+        </app-cargaProductos>
+
+        <!-- Logs -->
+        <button *ngIf="esAdmin()" (click)="abrirLogs()"
+          class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-blue-500 hover:bg-blue-600 transition-all duration-200 ease-in-out"
+          type="button" title="Ver registros del sistema">
+          <i class="fa-solid fa-file-lines"></i>
+          Registros
+        </button>
       </div>
-      
-          </div>
+    </div>
+
   </div>
 
   <!-- SI ESTA cargandoProductoProducto MUESTRA EL ESTADO DE CARGA -->
@@ -83,7 +69,7 @@
       <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
     </div>
   </ng-container>
-  
+
   <!-- TABLA -->
   <ng-template #tablaProductos>
     <div class="flex-1 border border-slate-200 rounded-lg mt-4 mb-4 mx-4 overflow-hidden">
@@ -146,7 +132,8 @@
 
           <!-- Cuerpo de la tabla -->
           <tbody *ngIf="productos.length > 0">
-            <tr *ngFor="let producto of productos | filtroProductos:filtroTexto:mostrarSoloStock" class="hover:bg-slate-50">
+            <tr *ngFor="let producto of productos | filtroProductos:filtroTexto:mostrarSoloStock"
+              class="hover:bg-slate-50">
               <td class="p-4 w-28 border-b border-slate-200">
                 <p class="text-sm text-slate-500 font-semibold">
                   {{ producto.id }}
@@ -194,7 +181,8 @@
                   <button (click)="editarProducto(producto)" class="text-slate-500 hover:text-blue-600" title="Editar">
                     <i class="fa-solid fa-pencil"></i>
                   </button>
-                  <button (click)="confirmarEliminar(producto)" class="text-slate-500 hover:text-red-600" title="Eliminar">
+                  <button (click)="confirmarEliminar(producto)" class="text-slate-500 hover:text-red-600"
+                    title="Eliminar">
                     <i class="fa-solid fa-trash"></i>
                   </button>
                 </div>
@@ -210,10 +198,6 @@
 
 
 <!-- Cartel de confirmacion cuando se elimina un producto -->
-<app-confirmar-delete 
-  [mostrar]="mostrarConfirmacion" 
-  [producto]="productoAEliminar" 
-  [cargando]="cargandoProducto"
-  (confirmar)="eliminarProducto()" 
-  (cancelar)="cancelarEliminar()">
+<app-confirmar-delete [mostrar]="mostrarConfirmacion" [producto]="productoAEliminar" [cargando]="cargandoProducto"
+  (confirmar)="eliminarProducto()" (cancelar)="cancelarEliminar()">
 </app-confirmar-delete>

@@ -279,7 +279,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       maxWidth: '1200px',
       height: '',
       data: {
-        titulo: 'Logs de Productos'
+        titulo: 'Registro de Productos'
       }
     })
   }
