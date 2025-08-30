@@ -1,122 +1,92 @@
-<!-- Header del diálogo -->
-<h3 mat-dialog-title class="text-lg font-semibold mb-4 text-gray-900 border-b pb-2">
-  {{ tituloDialog }}
-</h3>
+<div class="flex w-full max-w-4xl mx-auto md:h-max">
+  <form (ngSubmit)="onGuardar()"
+    class="container flex flex-col w-full h-full p-6 bg-zinc-100 rounded-2xl shadow-sm">
 
-<!-- Contenido del diálogo -->
-<mat-dialog-content class="py-4">
-  <form (ngSubmit)="onGuardar()" class="space-y-4">
-    <!-- ID -->
-    <div>
-      <label for="id" class="block text-sm font-medium text-gray-700 mb-1">ID</label>
-      <input 
-        type="text" 
-        id="id" 
-        [(ngModel)]="productoLocal.id" 
-        name="id" 
-        required 
-        [readonly]="data.modoEdicion"
-        class="w-full px-3 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-md transition-colors"
-        [class.bg-gray-200]="data.modoEdicion"
-        [class.bg-white]="!data.modoEdicion">
+    <!-- Header -->
+    <div class="flex justify-center items-center gap-2 mb-6 flex-shrink-0">
+      <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center shadow-md">
+        <i class="fa-solid fa-plus text-white"></i>
+      </div>
+      <h6 class="text-lg font-bold text-gray-900">{{ tituloDialog }}</h6>
     </div>
 
-    <!-- Precio de costo (solo para admin) -->
-    <div *ngIf="data.esAdmin">
-      <label for="precio_costo" class="block text-sm font-medium text-gray-700 mb-1">Precio de costo</label>
-      <input 
-        type="number" 
-        id="precio_costo" 
-        [(ngModel)]="productoLocal.precio_costo" 
-        name="precio_costo" 
-        required
-        min="0"
-        step="0.01"
-        class="w-full px-3 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-md bg-white transition-colors">
+    <!-- Contenido: en mobile columna, en PC grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
+
+      <!-- Columna izquierda -->
+      <div class="flex flex-col gap-4">
+        <!-- ID -->
+        <div class="flex flex-col gap-2">
+          <p class="font-semibold text-gray-800">ID</p>
+          <input type="text" id="id" [(ngModel)]="productoLocal.id" name="id" required [readonly]="data.modoEdicion"
+            class="w-full rounded-xl bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
+                   placeholder:text-gray-400 shadow-inner
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+        </div>
+
+        <!-- Precio de costo solo admin -->
+        <div class="flex flex-col gap-2" *ngIf="data.esAdmin">
+          <p class="font-semibold text-slate-700 text-sm">Precio de costo</p>
+          <input type="number" step="0.01" placeholder="0.00" [(ngModel)]="productoLocal.precio_costo"
+            class="w-full rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700 border border-slate-300 
+                   placeholder:text-slate-400 shadow-inner
+                   focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition" />
+        </div>
+
+        <!-- Ganancia solo admin -->
+        <div *ngIf="data.esAdmin" class="flex flex-col gap-2">
+          <p class="font-semibold text-slate-700 text-sm">Ganancia (%)</p>
+          <input type="number" [(ngModel)]="productoLocal.ganancia" step="0.1" placeholder="0.0"
+            class="w-full rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700 border border-slate-300 
+                   placeholder:text-slate-400 shadow-inner
+                   focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition" />
+        </div>
+
+        <!-- Stock -->
+        <div class="flex flex-col gap-2">
+          <p class="font-semibold text-slate-700 text-sm">Stock</p>
+          <input type="number" [(ngModel)]="productoLocal.stock" placeholder="0"
+            class="w-full rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700 border border-slate-300 
+                   placeholder:text-slate-400 shadow-inner
+                   focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition" />
+        </div>
+      </div>
+
+      <!-- Columna derecha -->
+      <div class="flex flex-col gap-4">
+        <!-- Categoría -->
+        <div class="flex flex-col gap-2">
+          <p class="font-semibold text-slate-700 text-sm">Categoría</p>
+          <input type="number" [(ngModel)]="productoLocal.categoria" placeholder="0"
+            class="w-full rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700 border border-slate-300 
+                   placeholder:text-slate-400 shadow-inner
+                   focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition" />
+        </div>
+
+        <!-- Descripción -->
+        <div class="flex flex-col gap-2">
+          <p class="font-semibold text-slate-700 text-sm">Descripción</p>
+          <textarea [(ngModel)]="productoLocal.descripcion" name="descripcion" id="descripcion"
+            placeholder="Descripción del producto..." rows="5"
+            class="w-full rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700 border border-slate-300 
+                   placeholder:text-slate-400 shadow-inner resize-none
+                   focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 transition"></textarea>
+        </div>
+
+        <!-- Precio calculado -->
+        <div class="flex justify-between items-center border-t border-slate-200 pt-4">
+          <p class="text-sm font-medium text-slate-600">Precio de venta:</p>
+          <p class="text-lg font-bold text-emerald-600">$0.00</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Ganancia (solo para admin) -->
-    <div *ngIf="data.esAdmin">
-      <label for="ganancia" class="block text-sm font-medium text-gray-700 mb-1">Ganancia (%)</label>
-      <input 
-        type="number" 
-        id="ganancia" 
-        [(ngModel)]="productoLocal.ganancia" 
-        name="ganancia" 
-        required 
-        min="0"
-        step="0.01"
-        class="w-full px-3 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-md bg-white transition-colors">
-    </div>
-
-    <!-- Descripción -->
-    <div>
-      <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-      <input 
-        type="text" 
-        id="descripcion" 
-        [(ngModel)]="productoLocal.descripcion" 
-        name="descripcion" 
-        required
-        class="w-full px-3 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-md bg-white transition-colors">
-    </div>
-
-    <!-- Stock -->
-    <div>
-      <label for="stock" class="block text-sm font-medium text-gray-700 mb-1">Stock</label>
-      <input 
-        type="number" 
-        id="stock" 
-        [(ngModel)]="productoLocal.stock" 
-        name="stock" 
-        required 
-        min="0"
-        class="w-full px-3 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-md bg-white transition-colors">
-    </div>
-
-    <!-- Categoría -->
-    <div>
-      <label for="categoria" class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
-      <input 
-        type="text" 
-        id="categoria" 
-        [(ngModel)]="productoLocal.categoria" 
-        name="categoria" 
-        required
-        class="w-full px-3 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-md bg-white transition-colors">
-    </div>
-
-    <!-- Mensaje de error -->
-    <div *ngIf="mensaje" class="p-3 bg-red-50 border border-red-200 rounded-md">
-      <p class="text-sm text-red-600">{{ mensaje }}</p>
+    <!-- Botón abajo -->
+    <div class="mt-6">
+      <button
+        class="w-full py-2.5 rounded-xl bg-emerald-500 text-white font-semibold text-sm shadow-md hover:bg-emerald-600 transition">
+        Agregar Producto
+      </button>
     </div>
   </form>
-</mat-dialog-content>
-
-<!-- Botones del diálogo -->
-<mat-dialog-actions class="flex justify-end space-x-3 pt-4 border-t">
-  <button 
-    type="button" 
-    (click)="onCancelar()" 
-    [disabled]="cargando"
-    class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 font-medium flex items-center">
-    <i class="fa-solid fa-times mr-2"></i>
-    Cancelar
-  </button>
-  <button 
-    type="button" 
-    (click)="onGuardar()" 
-    [disabled]="cargando"
-    class="px-4 py-2 bg-emerald-500 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 font-medium flex items-center">
-    <i class="fa-solid fa-check mr-2"></i>
-    {{ textoBoton }}
-  </button>
-</mat-dialog-actions>
-
-<!-- Spinner de carga -->
-<div *ngIf="cargando" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-  <div class="bg-white p-4 rounded-lg shadow-lg">
-    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-600 mx-auto"></div>
-    <p class="mt-2 text-sm text-gray-600">Guardando...</p>
-  </div>
 </div>
