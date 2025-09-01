@@ -1,61 +1,58 @@
-<div class="p-6 h-auto w-[58vw] max-w-none text-gray-800">
+<div class="flex flex-col w-max h-[85vh] overflow-y-auto p-6 text-gray-800">
 	<h2 class="mb-4 text-2xl text-center font-semibold text-green-700">
-	  Detalles del cierre
+		Detalles del cierre
 	</h2>
-  
-	<div class="overflow-x-auto h-full border border-green-300 shadow-md rounded-lg">
 
-	  <table class="w-full text-sm table-auto">
-		<colgroup>
-		  <col>
-		  <col>
-		  <col>
-		  <col>
-		</colgroup>
-		<thead
-		  class="bg-green-100 text-green-800 uppercase text-xs font-semibold"
-		>
-		  <tr class="text-left">
-			<th class="p-3">Fuente</th>
-			<th class="p-3">Monto</th>
-			<th class="p-3">Efectivo</th>
-			<th class="p-3">Débito</th>
-			<th class="p-3">Crédito</th>
-			<th class="p-3">Transferencia</th>
-			<th class="p-3">Cheque</th>
-		  </tr>
-		</thead>
-		<tbody class="divide-y divide-green-200 bg-white" *ngIf="!isLoading; else carga">
-		  <tr *ngFor="let item of detailsCurrent?.detalle" class="hover:bg-green-50">
-			<!-- fuente -->
-			<td class="p-3 text-left whitespace-nowrap">
-			  {{ item?.fuente === 'pagos_mensuales' ? 'Pagos mensuales:' : 'Caja diaria:' }}
-			</td>
-  
-			<!-- monto -->
-			<td class="p-3 text-left whitespace-nowrap">
-			  {{ item?.monto | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}
-			</td>
-  
-			<!-- totales solo si es caja -->
-			<td class="p-3 text-left whitespace-nowrap">
-			  {{ item?.fuente === 'caja' ? (item?.efectivo | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
-			</td>
-			<td class="p-3 text-left whitespace-nowrap">
-			  {{ item?.fuente === 'caja' ? (item?.debito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
-			</td>
-			<td class="p-3 text-left whitespace-nowrap">
-			  {{ item?.fuente === 'caja' ? (item?.credito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
-			</td>
-			<td class="p-3 text-left whitespace-nowrap">
-			  {{ item?.fuente === 'caja' ? (item?.transferencia | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
-			</td>
-			<td class="p-3 text-left whitespace-nowrap">
-			  {{ item?.fuente === 'caja' ? (item?.cheque | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
-			</td>
-		  </tr>
-		</tbody>
-	  </table>
+	<div class="flex-1 overflow-y-auto border border-green-300 shadow-md rounded-lg">
+		<table class="w-max table-fixed text-sm">
+			<thead class="bg-green-100 text-green-800 uppercase text-xs font-semibold">
+				<tr class="text-left">
+					<th class="p-3 w-32">Fuente</th>
+					<th class="p-3 w-40">Detalle</th>
+					<th class="p-3 w-28">Monto</th>
+					<th class="p-3 w-28">Efectivo</th>
+					<th class="p-3 w-28">Débito</th>
+					<th class="p-3 w-28">Crédito</th>
+					<th class="p-3 w-36">Transferencia</th>
+					<th class="p-3 w-28">Cheque</th>
+				</tr>
+			</thead>
+			<tbody class="divide-y divide-green-200 bg-white" *ngIf="!isLoading; else carga">
+				<tr *ngFor="let item of detailsCurrent" class="hover:bg-green-50">
+					<!-- fuente -->
+					<td class="p-3 truncate">
+						{{ item?.fuente === 'pagos_mensuales' ? 'Pagos mensuales' : 'Caja diaria' }}
+					</td>
+
+					<!-- detalle -->
+					<td class="p-3 truncate">
+						{{ item?.detalle }}
+					</td>
+
+					<!-- monto -->
+					<td class="p-3 whitespace-nowrap">
+						{{ (item?.monto ?? getTotal(item)) | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}
+					</td>
+
+					<!-- totales solo si es caja -->
+					<td class="p-3 whitespace-nowrap">
+						{{ item?.fuente === 'caja' ? (item?.efectivo | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
+					</td>
+					<td class="p-3 whitespace-nowrap">
+						{{ item?.fuente === 'caja' ? (item?.debito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
+					</td>
+					<td class="p-3 whitespace-nowrap">
+						{{ item?.fuente === 'caja' ? (item?.credito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
+					</td>
+					<td class="p-3 whitespace-nowrap">
+						{{ item?.fuente === 'caja' ? (item?.transferencia | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
+					</td>
+					<td class="p-3 whitespace-nowrap">
+						{{ item?.fuente === 'caja' ? (item?.cheque | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 
 	<ng-template #carga>
@@ -63,11 +60,10 @@
 			<tr>
 				<td colspan="7" class="py-16">
 					<div class="flex justify-center">
-					<div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
+						<div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
 					</div>
 				</td>
 			</tr>
 		</tbody>
 	</ng-template>
-  </div>
-  
+</div>

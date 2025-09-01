@@ -120,16 +120,54 @@ module.exports = async (req, res) => {
             }
         } else if (action === 'details') {
             try {
-                const result = await pool.query(`
-                SELECT d.fuente, d.monto, d.id_origen, h.fecha, c.efectivo, c.debito, c.credito, c.transferencia, c.cheque
-                    FROM public.detalle_cierre d
-                    JOIN historial_cierres h ON d.id_cierre = h.id
-                        LEFT JOIN caja c ON c.id = d.id_origen AND d.fuente = 'caja'
-                        WHERE h.user_admin = $1 AND d.id_cierre = $2
-                        ORDER BY d.id;
-                `, [id, idCierre]);
 
-                return res.status(200).json({ detalle: result.rows });
+                const { rows } = await pool.query(`
+                    SELECT dc.fuente, dc.id_origen 
+                    FROM detalle_cierre dc
+                    JOIN historial_cierres hc on dc.id_cierre = hc.id
+                    WHERE dc.id_cierre = $2 AND hc.user_admin = $1
+                    `, [id, idCierre])
+
+                const mapeo = Object.values(
+                    rows.reduce((acc, { fuente, id_origen }) => {
+                        if (!acc[fuente]) {
+                            acc[fuente] = { fuente, id: [] };
+                        }
+                        acc[fuente].id.push(id_origen);
+                        return acc;
+                    }, {})
+                );
+
+                let data = [];
+
+                for (const { fuente, id } of mapeo) {
+                    let sql;
+                    if (fuente === "pagos_mensuales") {
+                        sql = `SELECT f.monto, f.fecha_pago AS fecha, cm.cliente as detalle
+                            FROM ${fuente} f
+                            JOIN clientes_mensuales cm ON f.id_client = cm.id_client
+                            WHERE f.id IN (${id.join(", ")});`;
+                    } else {
+                        sql = `SELECT * FROM ${fuente} WHERE id IN (${id.join(", ")});`;
+                    }
+
+                    let resultSQL = await pool.query(sql);
+
+                    // 🔹 Agrego la fuente a cada registro antes de acumular
+                    resultSQL = resultSQL.rows.map(row => ({
+                        ...row,
+                        fuente
+                    }));
+
+                    // Acumulo resultados en data
+                    data.push(...resultSQL);
+                }
+
+                // 🔹 Ordenar resultados por fecha (ajustá el campo de fecha real, por ej. "fecha")
+                data.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+
+                return res.status(200).json({ data });
             } catch (error) {
                 console.log(error);
                 return res.status(500).json({ error: 'Error no se pudo obtener detalles', details: error.message });
@@ -185,7 +223,7 @@ module.exports = async (req, res) => {
     if (req.method === 'POST') {
         const { id } = req.query;
         const payload = req.body;
-        
+
         if (!id) {
             return res.status(400).json({
                 error: 'Falta id para insertar usuario',
