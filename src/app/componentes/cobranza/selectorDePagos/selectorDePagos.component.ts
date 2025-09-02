@@ -14,9 +14,9 @@ export class SelectorDePagosComponent implements OnInit {
   @Input() tipoDePago!: string;
   
   monto: number = 0;
-  esGasto?: boolean;
 
   ngOnInit() {
+    console.log(this.tipoDePago);
   }
 
   eliminarPago(){
