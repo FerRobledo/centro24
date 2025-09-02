@@ -15,31 +15,32 @@ export class DetailsHistorialComponent implements OnInit {
   isLoading = false;
 
   constructor(
-  @Inject(MAT_DIALOG_DATA) public data: number,
-  private authService: AuthService,
-  private cobranzaService: CobranzaService,
+    @Inject(MAT_DIALOG_DATA) public data: number,
+    private authService: AuthService,
+    private cobranzaService: CobranzaService,
   ) {
-     this.idCierre = data;
-    }
+    this.idCierre = data;
+  }
 
   ngOnInit() {
-    this.getDetailsById()    
+    this.getDetailsById()
   }
 
   getDetailsById() {
     const idAdmin = this.authService.getIdAdmin();
     this.isLoading = true;
 
-    if(idAdmin){
+    if (idAdmin) {
       this.subscriptions.add(
         this.cobranzaService.getDetailsId(idAdmin, this.idCierre).subscribe({
           next: (data) => {
-            this.detailsCurrent = data;//data tiene dos objetos y accedo con .detalles o .totales
-            this.isLoading=false;
+            this.detailsCurrent = data.data;//data tiene dos objetos y accedo con .detalles o .totales
+            console.log(this.detailsCurrent);
+            this.isLoading = false;
           },
           error: (error) => {
             console.log("Error en el GET de details: ", error);
-            this.isLoading=false;
+            this.isLoading = false;
           },
         })
       );
@@ -47,4 +48,16 @@ export class DetailsHistorialComponent implements OnInit {
       console.log("Error falta el id admin");
     }
   }
+
+  getTotal(cliente: any): number {
+    let suma = 0;
+    suma += Number(cliente.efectivo);
+    suma += Number(cliente.debito);
+    suma += Number(cliente.credito);
+    suma += Number(cliente.transferencia);
+    suma += Number(cliente.cheque);
+    suma -= Number(cliente.gasto);
+    return suma;
+  }
+
 }

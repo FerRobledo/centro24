@@ -1,12 +1,17 @@
-<div class="min-w-[350px] w-[40rem] flex flex-col p-4">
-  <div class="w-11/12 py-3 m-auto">
+<div class="flex w-[35rem] max-w-4xl mx-auto md:h-max">
 
-    <div class="py-2">
-      <p class="text-lg font-bold" style="margin: 0;">Agregar un nuevo usuario</p>
-      <p class="text-zinc-700 text-base">Completa la información del nuevo usuario</p>
+  <form [formGroup]="registerForm" (ngSubmit)="crearUsuario()"
+    class="container flex flex-col w-full h-full p-6 bg-zinc-100 rounded-2xl shadow-sm">
+
+    <!-- Header -->
+    <div class="flex justify-center items-center gap-2 mb-6 flex-shrink-0">
+      <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center shadow-md">
+        <i class="fa-solid fa-plus text-white"></i>
+      </div>
+      <h6 class="text-lg font-bold text-gray-900">Agregar usuario</h6>
     </div>
 
-    <form class="space-y-6" [formGroup]="registerForm" (ngSubmit)="crearUsuario()">
+    <div class="flex flex-col gap-6">
       <div>
         <label for="username" class="block text-sm font-medium text-gray-900">Usuario</label>
         <div class="mt-2">
@@ -47,9 +52,8 @@
 
       <!-- Botón + Spinner -->
       <div class="relative">
-        <button type="submit"
-          [disabled]="cargando"
-          class="w-full rounded-md bg-zinc-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed">
+        <button type="submit" [disabled]="cargando"
+          class="w-full py-2.5 rounded-xl text-white font-semibold text-sm shadow-md transition bg-emerald-500 hover:bg-emerald-600">
           Agregar Usuario
         </button>
 
@@ -58,7 +62,6 @@
           <div class="w-5 h-5 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
         </div>
       </div>
-
-    </form>
-  </div>
+    </div>
+  </form>
 </div>
