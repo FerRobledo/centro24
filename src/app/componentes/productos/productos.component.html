@@ -13,7 +13,7 @@
     </div>
 
     <!-- Filtro general y Toggle Switch en la misma línea -->
-    <div class="flex justify-center items-center gap-2 rounded px-3 w-full">
+    <div class="flex flex-col items-center w-full space-y-2">
 
       <!-- Filtro general -->
       <div class="flex-grow max-w-md mx-auto w-full">
@@ -34,9 +34,8 @@
       </div>
     </div>
     <!-- Botones -->
-    <div class="flex justify-end w-full">
-      <div class="flex flex-wrap gap-4 w-max justify-self-end justify-center">
-
+    <div class="flex justify-end gap-8">
+      <div class="flex flex-col gap-4">
 
         <!-- Agregar producto -->
         <button *ngIf="esAdmin()" (click)="abrirFormularioAgregar()"
@@ -46,11 +45,12 @@
           Agregar producto
         </button>
 
-        <!-- Actualizar productos (componente) -->
-        <app-cargaProductos (cargaIniciada)="onCargaIniciada()"
-          (cargaFinalizada)="onCargaCompleta()">
-        </app-cargaProductos>
+      </div>
 
+      <div class="flex flex-col gap-4">
+        <!-- Actualizar productos (componente) -->
+        <app-cargaProductos (cargaIniciada)="onCargaIniciada()" (cargaFinalizada)="onCargaCompleta()">
+        </app-cargaProductos>
         <!-- Logs -->
         <button *ngIf="esAdmin()" (click)="abrirLogs()"
           class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-blue-500 hover:bg-blue-600 transition-all duration-200 ease-in-out"

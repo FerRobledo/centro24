@@ -46,7 +46,7 @@ async function getStatsPreviousMonth(id) {
     ), 0)
     +
     COALESCE((
-      SELECT SUM(efectivo + debito + transferencia + cheque + gasto)
+      SELECT SUM(efectivo + debito + transferencia + cheque - gasto)
       FROM caja
       WHERE fecha >= date_trunc('month', CURRENT_DATE - INTERVAL '1 month')
         AND fecha < date_trunc('month', CURRENT_DATE)
@@ -67,7 +67,7 @@ async function getStatsCurrenMonth(id) {
     ), 0)
     +
     COALESCE((
-      SELECT SUM(efectivo + debito + transferencia + cheque + gasto)
+      SELECT SUM(efectivo + debito + transferencia + cheque - gasto)
       FROM caja
       WHERE fecha >= date_trunc('month', CURRENT_DATE)
         AND fecha < date_trunc('month', CURRENT_DATE + INTERVAL '1 month')
@@ -112,7 +112,7 @@ async function getCollectionYesterday(id) {
     ), 0)
     +
     COALESCE((
-      SELECT SUM(efectivo + debito + transferencia + cheque + gasto)
+      SELECT SUM(efectivo + debito + transferencia + cheque - gasto)
       FROM caja
       WHERE fecha >= date_trunc('day', CURRENT_DATE - INTERVAL '1 day')
         AND fecha < date_trunc('day', CURRENT_DATE)
