@@ -1,8 +1,9 @@
 <div
   class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl overflow-hidden bg-clip-border">
-  <div class="flex gap-4 items-start w-full justify-between relative p-4 text-slate-700 bg-white bg-clip-border items-center">
+  <div class="grid grid-cols-3 items-center w-full p-4 text-slate-700 bg-white bg-clip-border">
 
-    <div class="flex w-1/4 justify-start space-y-1">
+    <!-- Izquierda -->
+    <div class="flex flex-col space-y-1 justify-start">
       <div>
         <h3 class="text-lg font-semibold text-slate-800">
           <i class="fa-solid fa-cash-register"></i> Caja de cobranza
@@ -11,7 +12,8 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-2">
+    <!-- Centro -->
+    <div class="flex justify-center items-center gap-2">
       <label class="text-sm font-semibold text-gray-500 whitespace-nowrap">
         Filtrar por fecha:
       </label>
@@ -24,36 +26,40 @@
       </div>
     </div>
 
-    <div class="flex gap-8">
+    <!-- Derecha -->
+    <div class="flex justify-end gap-8">
       <div class="flex flex-col gap-4">
-        <button (click)="openModalCloseDay()" class="flex items-center m-auto gap-1 rounded py-2 px-4 text-xs font-semibold text-white w-[129px]
-        transition-all duration-200 ease-in-out bg-amber-500 hover:bg-amber-600 hover:scale-105" type="button">
-          <i class="fa-solid fa-lock"></i>
-          Cerrar caja
+        <button
+          class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-amber-500 hover:bg-amber-600 transition-all duration-200 ease-in-out"
+          (click)="openModalCloseDay()"
+          type="button">
+          <i class="fa-solid fa-lock"></i> Cerrar caja
         </button>
-
-        <button (click)="openHistorial()" class="flex items-center m-auto gap-1 rounded py-2 px-4 text-xs font-semibold text-white w-[129px]
-        transition-all duration-200 ease-in-out bg-blue-500 hover:bg-blue-600 hover:scale-105" type="button">
-          <i class="fa-solid fa-clock-rotate-left"></i>
-          Historial caja
+        <button
+          class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-blue-500 hover:bg-blue-600 transition-all duration-200 ease-in-out"
+          (click)="openHistorial()"
+          type="button">
+          <i class="fa-solid fa-clock-rotate-left"></i> Historial 
         </button>
       </div>
-
       <div class="flex flex-col gap-4">
-        <button (click)="nuevaCobranza('venta')" class="flex items-center m-auto gap-1 rounded bg-emerald-500 py-2 px-4 text-xs font-semibold text-white w-[129px]
-        transition-all duration-200 ease-in-out hover:bg-emerald-600 hover:scale-105" type="button">
-          <i class="fa-solid fa-user-plus"></i>
-          Agregar venta
+        <button
+          class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 ease-in-out"
+          (click)="nuevaCobranza('venta')"
+          type="button">
+          <i class="fa-solid fa-user-plus"></i> Agregar venta
         </button>
-
-        <button (click)="nuevaCobranza('gasto')" class="flex items-center m-auto gap-1 rounded bg-red-500 py-2 px-4 text-xs font-semibold text-white w-[129px]
-          transition-all duration-200 ease-in-out hover:bg-red-600 hover:scale-105" type="button">
-          <i class="fa-solid fa-user-plus"></i>
-          Agregar gasto
+        <button
+          class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-red-500 hover:bg-red-600 transition-all duration-200 ease-in-out"
+          (click)="nuevaCobranza('gasto')"
+          type="button">
+          <i class="fa-solid fa-user-plus"></i> Agregar gasto
         </button>
       </div>
     </div>
+
   </div>
+
 
   <ng-container *ngIf="!isLoadingCobranza else carga">
 
@@ -153,7 +159,7 @@
                 currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
             </td>
             <td class="p-4 border-b border-slate-200">
-              <p class="text-xs font-semibold text-slate-500">{{getTotal(cliente) |
+              <p class="text-xs font-bold text-slate-500">{{getTotal(cliente) |
                 currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
             </td>
             <td class="p-4 border-b border-slate-200">

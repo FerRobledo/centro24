@@ -7,7 +7,7 @@
     <ul class="space-y-2 rounded-xl xs:space-y-1 flex-grow">
       <li *ngFor="let seccion of seccionesDisponibles">
         <a [routerLink]="seccion.nombre === 'Home' ? '' : seccion.nombre.toLowerCase()" routerLinkActive="active-link"
-          [routerLinkActiveOptions]="{ exact: true }"
+          [routerLinkActiveOptions]="seccion.nombre === 'Home' ? { exact: true } : { exact: false }"
           class="flex items-center text-lg gap-2 px-4 py-2 font-medium text-gray-900 transition-all duration-200 ease-in-out rounded-lg xs:text-lg xs:px-3 xs:py-1.5 hover:bg-green-100 hover:text-green-700 hover:shadow-md hover:scale-[1.02]">
           <i [ngClass]="seccion.icono" class="p-2"></i>
           <p>{{ seccion.nombre }}</p>
@@ -24,14 +24,13 @@
     </div>
   </div>
 
-  <div class="border-t-2 border-gray-300 xs:relative xs:bg-transparent xs:border-0">
-    <a href="#" class="flex items-center gap-3 p-4 hover:bg-gray-50 xs:p-3 xs:gap-2">
-      <img alt="User avatar"
-        src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-        class="size-10 rounded-full object-cover xs:size-8" />
-      <div class="leading-tight">
-        <strong class="block font-medium text-lg xs:text-base">{{nameUserCurrent}}</strong>
-      </div>
-    </a>
+  <div
+    class="flex items-center gap-3 p-4 hover:bg-gray-50 xs:p-3 xs:gap-2 border-t-2 border-gray-300 xs:relative xs:bg-transparent xs:border-0">
+    <i class="fa-solid fa-circle-user text-4xl mr-3 text-slate-600"></i>
+    <!-- contenedor que limita el ancho -->
+    <div class="leading-tight flex-1 min-w-0">
+      <p class="font-medium text-lg xs:text-base truncate">{{ nameUserCurrent }}</p>
+    </div>
   </div>
+
 </div>

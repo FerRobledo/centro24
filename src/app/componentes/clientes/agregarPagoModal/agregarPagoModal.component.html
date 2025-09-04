@@ -1,37 +1,48 @@
-<div class="w-full max-w-3xl mx-auto flex flex-col p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+<div class="flex w-full max-w-4xl mx-auto md:h-max">
 
-  <div class="w-full py-3">
+  <form [formGroup]="pagoForm" (ngSubmit)="crearPago()"
+    class="container flex flex-col w-full h-full p-6 bg-zinc-100 rounded-2xl shadow-sm">
 
-    <div class="py-2">
-      <p class="text-lg font-bold m-0">Agregar un nuevo pago</p>
-      <p class="text-zinc-700 text-base">Selecciona el cliente y el período de pago</p>
+    <!-- Header -->
+    <div class="flex justify-center items-center gap-2 mb-6 flex-shrink-0">
+      <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center shadow-md">
+        <i class="fa-solid fa-plus text-white"></i>
+      </div>
+      <h6 class="text-lg font-bold text-gray-900">Agregar pago mensual</h6>
     </div>
 
-    <form class="flex flex-col md:flex-row gap-6 w-full" [formGroup]="pagoForm" (ngSubmit)="crearPago()">
+    <!-- Contenido: en mobile columna, en PC grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
+
 
       <!-- IZQUIERDA: Cliente + Fechas -->
-      <div class="flex flex-col gap-4 w-full md:w-1/2">
+      <div class="flex flex-col gap-4">
 
         <app-selectorClientes [clientes]="clientsOfMonts" [control]="controlCliente" [cliente]="cliente"
           (clienteSeleccionadoChange)="onClienteSeleccionado($event)">
         </app-selectorClientes>
 
-        <div class="flex flex-col gap-2 w-full">
-          <label for="fechaDesde">Desde</label>
-          <div
-            class="flex items-center gap-2 px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200">
-            <input name="fechaDesde" type="month" formControlName="fechaDesde" (change)="chosenMonthHandler($event, 'fechaDesde')"
-              class="w-full bg-transparent focus:outline-none text-slate-700 text-sm leading-tight">
+        <div class="flex flex-col gap-2">
+          <div class="flex flex-col gap-2">
+            <p class="font-semibold text-gray-800">
+              Desde
+            </p>
+            <input name="fechaDesde" type="month" formControlName="fechaDesde" class="w-full rounded-xl bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
+                   placeholder:text-gray-400 shadow-inner
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
           </div>
-          <label for="fechaDesde">Hasta</label>
-          <div
-            class="flex items-center gap-2 px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200">
-            <input name="fechaHasta" type="month" formControlName="fechaHasta" (change)="chosenMonthHandler($event, 'fechaHasta')"
-              class="w-full bg-transparent focus:outline-none text-slate-700 text-sm leading-tight">
+
+          <div class="flex flex-col gap-2">
+            <p class="font-semibold text-gray-800">
+              Desde
+            </p>
+            <input name="fechaHasta" type="month" formControlName="fechaHasta" class="w-full rounded-xl bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
+                   placeholder:text-gray-400 shadow-inner
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
           </div>
         </div>
 
-        <div class="rounded flex gap-2 items-center w-full text-blue-700 bg-blue-50 p-3 text-sm">
+        <div class="rounded flex gap-2 items-center text-blue-700 bg-blue-50 p-3 text-sm">
           <i class="fa-solid fa-circle-info"></i>
           <p>Selecciona una fecha final solo si el pago cubre más de un mes</p>
         </div>
@@ -39,15 +50,11 @@
         <div *ngIf="error !== ''" class="text-red-500 text-sm">
           {{ error }}
         </div>
-
-        <button type="submit"
-          class="w-full rounded-md bg-zinc-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed">
-          Agregar pago
-        </button>
       </div>
 
       <!-- DERECHA: Resumen -->
-      <div class="w-full md:w-1/2">
+      <div class="flex flex-col gap-4">
+
         <div class="rounded-lg bg-slate-50 p-4 shadow-sm space-y-3">
           <div class="flex gap-2 items-center mb-2">
             <i class="fa-solid fa-dollar-sign text-xl text-green-600"></i>
@@ -88,6 +95,11 @@
           </div>
         </div>
       </div>
-    </form>
-  </div>
+    </div>
+
+    <button type="submit"
+      class="w-full py-2.5 rounded-xl text-white font-semibold text-sm shadow-md transition bg-emerald-500 hover:bg-emerald-600">
+      Agregar pago
+    </button>
+  </form>
 </div>

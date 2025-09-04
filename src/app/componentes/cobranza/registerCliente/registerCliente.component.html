@@ -2,11 +2,11 @@
   <form class="container flex flex-col h-full">
 
     <!-- Encabezado -->
-    <div class="flex justify-center items-center gap-4 mb-6">
-      <div [ngClass]="accion == 'gasto' ? 'bg-red-500' : 'bg-emerald-500'" class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-md">
-        <i class="fa-solid fa-user-plus text-2xl text-white"></i>
+    <div class="flex justify-center items-center gap-4 mb-4">
+      <div [ngClass]="accion == 'gasto' ? 'bg-red-500' : 'bg-emerald-500'" class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-md">
+        <i class="fa-solid fa-user-plus text-white"></i>
       </div>
-      <h6 class="text-xl font-bold text-gray-900">
+      <h6 class="text-lg font-bold text-gray-900">
         {{ accion=='gasto' ? 'Registrar gasto' : 'Registrar venta' }}
       </h6>
     </div>

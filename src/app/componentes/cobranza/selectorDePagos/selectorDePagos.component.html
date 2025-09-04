@@ -15,7 +15,7 @@
       (change)="emitirCambioMonto()">
   </div>
 
-  <button title="Eliminar pago">
+  <button *ngIf="tipoDePago != 'Gasto'" title="Eliminar pago">
     <i class="fa-solid fa-xmark" (click)="eliminarPago()"></i>
   </button>
 </div>

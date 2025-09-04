@@ -277,9 +277,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(LogsComponent, {
       width: '90vw',
       maxWidth: '1200px',
-      height: '',
       data: {
-        titulo: 'Logs de Productos'
+        titulo: 'Registro de Productos'
       }
     })
   }

@@ -180,11 +180,7 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
   mapearMontos() {
     this.clientsOfMonth = this.clientsOfMonth.map(client => {
       let monto = 0;
-      if (client.tipo == "Mensual") {
-        monto = client.monto;
-      } else if (client.tipo == "Semestral") {
-        monto = client.monto * 5;
-      }
+      monto = client.monto;
 
       return {
         ...client,

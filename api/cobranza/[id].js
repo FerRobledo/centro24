@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
         if (action === 'close') {
             try {
                 const result1 = await pool.query(`
-                        SELECT SUM(efectivo + debito + credito + transferencia + cheque + gasto) AS total_caja
+                        SELECT SUM(efectivo + debito + credito + transferencia + cheque - gasto) AS total_caja
                         FROM caja
                         WHERE user_admin = $1 AND estado = false
                     `, [id]);
@@ -45,59 +45,56 @@ module.exports = async (req, res) => {
                 const totalPagos = parseFloat(result2.rows[0]?.total_pagos ?? 0);
                 const total = totalCaja + totalPagos;
 
-                if (total > 0) {
-                    const cierreInsert = await pool.query(`
-                            INSERT INTO historial_cierres (fecha, user_admin, monto, nombre_usuario)
-                            VALUES (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires', $1, $2, $3)
-                            RETURNING id
-                        `, [id, total, (nameUser || '').trim()]);
+                const cierreInsert = await pool.query(`
+                        INSERT INTO historial_cierres (fecha, user_admin, monto, nombre_usuario)
+                        VALUES (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires', $1, $2, $3)
+                        RETURNING id
+                    `, [id, total, (nameUser || '').trim()]);
 
-                    const idCierre = cierreInsert.rows[0]?.id;
+                const idCierre = cierreInsert.rows[0]?.id;
 
-                    if (!idCierre) throw new Error('no se pudo obtener el id del cierre');
+                if (!idCierre) throw new Error('no se pudo obtener el id del cierre');
 
-                    //selecciono todos los detalles de la caja con estado=false y lo agrego a la intermedia
-                    const cajaDetalle = await pool.query(`
-                            SELECT id, (efectivo + debito + credito + transferencia + cheque + gasto) AS monto
+                //selecciono todos los detalles de la caja con estado=false y lo agrego a la intermedia
+                const cajaDetalle = await pool.query(`
+                            SELECT id, (efectivo + debito + credito + transferencia + cheque - gasto) AS monto
                             FROM caja
                             WHERE user_admin = $1 AND estado = false
                         `, [id]);
 
-                    for (const row of cajaDetalle.rows) {
-                        if (row.id == null || row.monto == null) {
-                            console.warn('fila incompleta en caja:', row);
-                            continue;
-                        }
-                        await pool.query(`
+                for (const row of cajaDetalle.rows) {
+                    if (row.id == null || row.monto == null) {
+                        console.warn('fila incompleta en caja:', row);
+                        continue;
+                    }
+                    await pool.query(`
                                 INSERT INTO detalle_cierre (id_cierre, fuente, id_origen, monto)
                                 VALUES ($1, 'caja', $2, $3)
                             `, [idCierre, row.id, row.monto]);
-                    }
+                }
 
-                    //selecciono detalles de los pagos mensuales con estado=false y lo agrego a la intermedia
-                    const pagosDetalle = await pool.query(`
+                //selecciono detalles de los pagos mensuales con estado=false y lo agrego a la intermedia
+                const pagosDetalle = await pool.query(`
                             SELECT id, monto FROM pagos_mensuales
                             WHERE id_admin = $1 AND estado = false
                         `, [id]);
 
-                    for (const row of pagosDetalle.rows) {
-                        if (row.id == null || row.monto == null) {
-                            console.warn('fila incompleta en pagos_mensuales:', row);
-                            continue;
-                        }
-                        await pool.query(`
+                for (const row of pagosDetalle.rows) {
+                    if (row.id == null || row.monto == null) {
+                        console.warn('fila incompleta en pagos_mensuales:', row);
+                        continue;
+                    }
+                    await pool.query(`
                                 INSERT INTO detalle_cierre (id_cierre, fuente, id_origen, monto)
                                 VALUES ($1, 'pagos_mensuales', $2, $3)
                             `, [idCierre, row.id, row.monto]);
-                    }
-                    //marco las tuplas que tengan false como true
-                    await pool.query(`UPDATE caja SET estado = true WHERE user_admin = $1 AND estado = false`, [id]);
-                    await pool.query(`UPDATE pagos_mensuales SET estado = true WHERE id_admin = $1 AND estado = false`, [id]);
-
-                    return res.status(200).json({ total });
-                } else {
-                    return res.status(200).json({ total: 0 });
                 }
+                //marco las tuplas que tengan false como true
+                await pool.query(`UPDATE caja SET estado = true WHERE user_admin = $1 AND estado = false`, [id]);
+                await pool.query(`UPDATE pagos_mensuales SET estado = true WHERE id_admin = $1 AND estado = false`, [id]);
+
+                return res.status(200).json({ total });
+
             } catch (error) {
                 console.error('error al cerrar caja:', error);
                 return res.status(500).json({ error: 'Error no se pudo cerrar la caja', details: error.message });
@@ -120,16 +117,54 @@ module.exports = async (req, res) => {
             }
         } else if (action === 'details') {
             try {
-                const result = await pool.query(`
-                SELECT d.fuente, d.monto, d.id_origen, h.fecha, c.efectivo, c.debito, c.credito, c.transferencia, c.cheque
-                    FROM public.detalle_cierre d
-                    JOIN historial_cierres h ON d.id_cierre = h.id
-                        LEFT JOIN caja c ON c.id = d.id_origen AND d.fuente = 'caja'
-                        WHERE h.user_admin = $1 AND d.id_cierre = $2
-                        ORDER BY d.id;
-                `, [id, idCierre]);
 
-                return res.status(200).json({ detalle: result.rows });
+                const { rows } = await pool.query(`
+                    SELECT dc.fuente, dc.id_origen 
+                    FROM detalle_cierre dc
+                    JOIN historial_cierres hc on dc.id_cierre = hc.id
+                    WHERE dc.id_cierre = $2 AND hc.user_admin = $1
+                    `, [id, idCierre])
+
+                const mapeo = Object.values(
+                    rows.reduce((acc, { fuente, id_origen }) => {
+                        if (!acc[fuente]) {
+                            acc[fuente] = { fuente, id: [] };
+                        }
+                        acc[fuente].id.push(id_origen);
+                        return acc;
+                    }, {})
+                );
+
+                let data = [];
+
+                for (const { fuente, id } of mapeo) {
+                    let sql;
+                    if (fuente === "pagos_mensuales") {
+                        sql = `SELECT f.monto, f.fecha_pago AS fecha, cm.cliente as detalle
+                            FROM ${fuente} f
+                            JOIN clientes_mensuales cm ON f.id_client = cm.id_client
+                            WHERE f.id IN (${id.join(", ")});`;
+                    } else {
+                        sql = `SELECT * FROM ${fuente} WHERE id IN (${id.join(", ")});`;
+                    }
+
+                    let resultSQL = await pool.query(sql);
+
+                    // 🔹 Agrego la fuente a cada registro antes de acumular
+                    resultSQL = resultSQL.rows.map(row => ({
+                        ...row,
+                        fuente
+                    }));
+
+                    // Acumulo resultados en data
+                    data.push(...resultSQL);
+                }
+
+                // 🔹 Ordenar resultados por fecha (ajustá el campo de fecha real, por ej. "fecha")
+                data.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+
+                return res.status(200).json({ data });
             } catch (error) {
                 console.log(error);
                 return res.status(500).json({ error: 'Error no se pudo obtener detalles', details: error.message });
@@ -185,7 +220,7 @@ module.exports = async (req, res) => {
     if (req.method === 'POST') {
         const { id } = req.query;
         const payload = req.body;
-        
+
         if (!id) {
             return res.status(400).json({
                 error: 'Falta id para insertar usuario',

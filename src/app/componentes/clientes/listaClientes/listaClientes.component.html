@@ -1,59 +1,33 @@
-<div class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl overflow-hidden">
-
+<div
+  class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl overflow-hidden bg-clip-border">
   <!-- Header -->
-  <div class="relative p-4 text-slate-700 bg-white bg-clip-border">
-    <div class="flex gap-4 items-start w-full">
-      
-      <!-- Título -->
-      <div class="flex w-1/4 justify-start space-y-1">
-        <div>
-          <h3 class="text-lg font-semibold text-slate-800">
-            <i class="fa-solid fa-user-group"></i> Clientes de Centro 24
-          </h3>
-          <p class="text-slate-500 text-sm">Lista clientes mensuales</p>
-        </div>
+  <div class="grid grid-cols-3 items-center w-full p-4 text-slate-700 bg-white bg-clip-border">
+    <!-- Título -->
+    <div class="flex flex-col space-y-1 justify-start">
+      <div>
+        <h3 class="text-lg font-semibold text-slate-800">
+          <i class="fa-solid fa-user-group"></i> Clientes de Centro 24
+        </h3>
+        <p class="text-slate-500">Lista clientes mensuales</p>
       </div>
+    </div>
 
-      <!-- Filtros y acciones -->
-      <div class="flex w-3/4 justify-between items-center mt-1 gap-4">
+    <!-- Buscador -->
+    <div class="flex justify-center items-center gap-2 border border-gray-300 rounded px-3 bg-white w-full">
+      <i class="fa fa-search text-gray-500 mr-2"></i>
+      <input type="text" class="flex-1 h-9 outline-none py-1 bg-transparent text-sm"
+        placeholder="Filtrar por N°, Cliente o Tipo" [(ngModel)]="filtroClients" />
+    </div>
 
-        <!-- Buscador -->
-        <div class="flex-grow max-w-md w-full">
-          <div class="flex items-center border border-gray-300 rounded px-3 bg-white">
-            <i class="fa fa-search text-gray-500 mr-2"></i>
-            <input type="text" class="flex-1 h-9 outline-none py-1 bg-transparent text-sm"
-              placeholder="Filtrar por N°, Cliente o Tipo" [(ngModel)]="filtroClients" />
-          </div>
-        </div>
+    <!-- Botones -->
+    <div class="flex flex-col gap-4 justify-self-end">
+      <button (click)="agregarCliente()" class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 ease-in-out">
+        <i class="fa-solid fa-user-plus"></i> Agregar cliente
+      </button>
 
-        <!-- Incremento -->
-        <fieldset class="space-y-1 rounded-md border p-3 shadow-sm">
-          <label for="price" class="block text-xs font-medium text-slate-600">Incremento porcentual</label>
-          <div class="flex border rounded-md overflow-hidden">
-            <input type="number" name="numberPorc" id="numberPorc" [(ngModel)]="porcentaje"
-              class="flex-1 p-2 w-7 text-right text-sm border-none outline-none text-slate-700 bg-gray-50">
-            <button type="button" [disabled]="porcentaje! <= 0" (click)="abrirConfirmacion()"
-              class="px-4 py-2 text-sm font-medium transition-colors duration-200
-              enabled:bg-violet-500 enabled:text-white enabled:hover:bg-violet-600
-              disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed">
-              %
-            </button>
-          </div>
-        </fieldset>
-
-        <!-- Botones -->
-        <div class="flex flex-col gap-4">
-          <button (click)="agregarCliente()"
-            class="flex justify-center items-center gap-2 rounded h-10 w-36 bg-emerald-500 py-2 px-4 text-xs font-semibold text-white transition-all duration-200 ease-in-out hover:bg-emerald-600 hover:scale-105">
-            <i class="fa-solid fa-user-plus"></i> Agregar cliente
-          </button>
-
-          <button [routerLink]="'listaPagos'"
-            class="flex items-center gap-2 text-sm font-semibold rounded border h-10 py-2 px-4 hover:bg-zinc-200 transition-all">
-            <i class="fa-solid fa-dollar-sign"></i> Ver Pagos
-          </button>
-        </div>
-      </div>
+      <button [routerLink]="'listaPagos'" class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-blue-500 hover:bg-blue-600 transition-all duration-200 ease-in-out">
+        <i class="fa-solid fa-dollar-sign"></i> Ver Pagos
+      </button>
     </div>
   </div>
 
@@ -74,7 +48,7 @@
                 <th class="w-12 p-3 border-b border-slate-300 text-slate-500">N°</th>
                 <th class="w-32 p-3 border-b border-slate-300 text-slate-500">Cliente</th>
                 <th class="w-24 p-3 border-b border-slate-300 text-slate-500">Tipo</th>
-                <th class="w-28 p-3 border-b border-slate-300 text-slate-500">Monto</th>
+                <th class="w-28 p-3 border-b border-slate-300 text-slate-500">Monto por mes</th>
                 <th class="w-40 p-3 border-b border-slate-300 text-slate-500">Pago</th>
                 <th class="w-28 p-3 border-b border-slate-300 text-slate-500">Modificar</th>
               </tr>
@@ -97,7 +71,8 @@
                         'text-yellow-600 flex items-center gap-1': client.mesesVigente === 1
                       }">
                         <ng-container *ngIf="client.mesesVigente === 1">Último mes pago</ng-container>
-                        <ng-container *ngIf="client.mesesVigente > 1">{{ client.mesesVigente }} meses pagos</ng-container>
+                        <ng-container *ngIf="client.mesesVigente > 1">{{ client.mesesVigente }} meses
+                          pagos</ng-container>
                       </div>
                       <div class="text-slate-500 text-xs mt-1">
                         {{ getPeriodoHasta(client) | date: 'MMMM yyyy' }}
@@ -121,7 +96,8 @@
                     <button (click)="updateClient(client)" class="text-slate-500 hover:text-blue-600" title="Editar">
                       <i class="fa-solid fa-pencil"></i>
                     </button>
-                    <button (click)="openDeleteConfirm(client)" class="text-slate-500 hover:text-red-600" title="Eliminar">
+                    <button (click)="openDeleteConfirm(client)" class="text-slate-500 hover:text-red-600"
+                      title="Eliminar">
                       <i class="fa-solid fa-trash"></i>
                     </button>
                   </div>
