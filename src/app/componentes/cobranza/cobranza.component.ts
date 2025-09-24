@@ -86,7 +86,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
                 fecha: client.fecha.replace('T', ' ').replace('Z', '')
               };
             });
-            this.ngOnInit();
+            //this.ngOnInit();
             this.isLoadingCobranza = false;
           },
           error: (error) => {
