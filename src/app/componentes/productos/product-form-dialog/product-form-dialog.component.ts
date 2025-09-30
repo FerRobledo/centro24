@@ -27,6 +27,9 @@ export class ProductFormDialogComponent implements OnInit {
   }
 
   onGuardar() {
+    // Calcular y asignar el precio de venta antes de validar
+    this.productoLocal.precio_venta = this.precioVenta;
+    
     // Validaciones básicas
     const error = this.productoLocal.validateRequired();
     if (error) {
@@ -52,5 +55,11 @@ export class ProductFormDialogComponent implements OnInit {
 
   get textoBoton(): string {
     return this.data.modoEdicion ? 'Actualizar' : 'Guardar';
+  }
+
+  get precioVenta(): number {
+    const costo = this.productoLocal.precio_costo || 0;
+    const ganancia = this.productoLocal.ganancia || 0;
+    return costo + (costo * ganancia / 100);
   }
 }
