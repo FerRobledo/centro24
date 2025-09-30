@@ -27,7 +27,7 @@
             <p class="font-semibold text-gray-800">
               Desde
             </p>
-            <input name="fechaDesde" type="month" formControlName="fechaDesde" class="w-full rounded-xl bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
+            <input name="fechaDesde" type="month" formControlName="fechaDesde" (change)="chosenMonthHandler($event, 'fechaDesde')" class="w-full rounded-xl bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
                    placeholder:text-gray-400 shadow-inner
                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
           </div>
@@ -36,7 +36,7 @@
             <p class="font-semibold text-gray-800">
               Desde
             </p>
-            <input name="fechaHasta" type="month" formControlName="fechaHasta" class="w-full rounded-xl bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
+            <input name="fechaHasta" type="month" formControlName="fechaHasta" (change)="chosenMonthHandler($event, 'fechaHasta')" class="w-full rounded-xl bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 
                    placeholder:text-gray-400 shadow-inner
                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
           </div>
