@@ -18,7 +18,6 @@ export class SelectorClientesComponent implements OnInit {
 
 
   ngOnInit() {
-    // Inicializamos filtrados
     this.clientesFiltrados = [...this.clientes];
 
     // Si tenés un cliente recibido por @Input
