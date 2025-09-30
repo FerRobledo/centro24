@@ -239,4 +239,8 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+  isAdmin() {
+    return this.authService.esAdmin();
+  }
 }
