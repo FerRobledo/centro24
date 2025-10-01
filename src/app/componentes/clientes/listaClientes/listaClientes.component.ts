@@ -49,6 +49,9 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     this.clientesService.getClientsOfMonth(idAdmin).subscribe({
       next: (data) => {
         this.clientsOfMonth = data;
+        //this.clientsOfMonth = data.sort((a, b) => a.id - b.id);  
+        //agarra dos elements y pregunta si el A es menor a B va a dar negativo y lo deja asi
+        //si es positivo quiere decir que A es mas grande que B y lo intercambia de lugar
       },
       error: (error) => {
         console.error("Error en el pedido de clientes del día: ", error);

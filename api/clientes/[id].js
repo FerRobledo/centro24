@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
 
         if (id) {
             try {
-                const { rows: clientes } = await pool.query("SELECT * FROM clientes_mensuales WHERE user_admin = $1 AND estado = 'Activo'", [id]);
+                const { rows: clientes } = await pool.query("SELECT * FROM clientes_mensuales WHERE user_admin = $1 AND estado = 'Activo' ORDER BY id_client ASC", [id]);
 
                 // Extraer los ids de clientes para buscar sus pagos
                 const idsClientes = clientes.map(c => c.id_client);
