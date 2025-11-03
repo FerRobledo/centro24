@@ -53,6 +53,7 @@ export class AgregarPagoModalComponent implements OnInit {
         client: [this.cliente, [Validators.required]],
         fechaDesde: ['', [Validators.required]],
         fechaHasta: [''],
+        metodoPago: ['', [Validators.required]],
       },
       {
         validators: this.validarFechas
@@ -80,10 +81,15 @@ export class AgregarPagoModalComponent implements OnInit {
   }
 
   crearPago() {
+    // Mostrar marcas en la UI
+    this.pagoForm.markAllAsTouched();
+
     if (this.pagoForm.invalid) {
       this.error = "Formulario inválido";
       return;
     }
+
+    this.error = "";
 
     let fechaDesde = this.pagoForm.get('fechaDesde')?.value;
     let fechaHasta = this.pagoForm.get('fechaHasta')?.value;
@@ -97,6 +103,7 @@ export class AgregarPagoModalComponent implements OnInit {
       fechaDesde: fechaDesde,
       fechaHasta: fechaHasta,
       monto: this.monto,
+      metodoPago: this.pagoForm.get('metodoPago')?.value
     };
 
     const adminId = this.authService.getIdAdmin();

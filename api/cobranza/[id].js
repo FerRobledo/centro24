@@ -140,7 +140,7 @@ module.exports = async (req, res) => {
                 for (const { fuente, id } of mapeo) {
                     let sql;
                     if (fuente === "pagos_mensuales") {
-                        sql = `SELECT f.monto, f.fecha_pago AS fecha, cm.cliente as detalle
+                        sql = `SELECT f.monto, f.fecha_pago AS fecha, cm.cliente as detalle, f.metodo_pago
                             FROM ${fuente} f
                             JOIN clientes_mensuales cm ON f.id_client = cm.id_client
                             WHERE f.id IN (${id.join(", ")});`;

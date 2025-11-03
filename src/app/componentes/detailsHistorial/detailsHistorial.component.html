@@ -34,22 +34,70 @@
 						{{ (item?.monto ?? getTotal(item)) | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}
 					</td>
 
-					<!-- totales solo si es caja -->
-					<td class="p-3 whitespace-nowrap">
-						{{ item?.fuente === 'caja' ? (item?.efectivo | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
-					</td>
-					<td class="p-3 whitespace-nowrap">
-						{{ item?.fuente === 'caja' ? (item?.debito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
-					</td>
-					<td class="p-3 whitespace-nowrap">
-						{{ item?.fuente === 'caja' ? (item?.credito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
-					</td>
-					<td class="p-3 whitespace-nowrap">
-						{{ item?.fuente === 'caja' ? (item?.transferencia | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
-					</td>
-					<td class="p-3 whitespace-nowrap">
-						{{ item?.fuente === 'caja' ? (item?.cheque | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR') : '-' }}
-					</td>
+					<!-- Efectivo -->
+                    <td class="p-3 whitespace-nowrap">
+                      <ng-container *ngIf="item?.fuente === 'caja'; else pagoEfectivo">
+                        {{ item?.efectivo | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}
+                      </ng-container>
+                      <ng-template #pagoEfectivo>
+                        <span *ngIf="(item?.metodo_pago ?? item?.metodoPago) === 'Efectivo'">
+                          {{ (item?.pago_monto ?? item?.monto) | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}
+                        </span>
+                        <span *ngIf="(item?.metodo_pago ?? item?.metodoPago) !== 'Efectivo'">-</span>
+                      </ng-template>
+                    </td>
+
+                    <!-- Débito -->
+                    <td class="p-3 whitespace-nowrap">
+                      <ng-container *ngIf="item?.fuente === 'caja'; else pagoDebito">
+                        {{ item?.debito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}
+                      </ng-container>
+                      <ng-template #pagoDebito>
+                        <span *ngIf="(item?.metodo_pago ?? item?.metodoPago) === 'Debito'">
+                          {{ (item?.pago_monto ?? item?.monto) | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}
+                        </span>
+                        <span *ngIf="(item?.metodo_pago ?? item?.metodoPago) !== 'Debito'">-</span>
+                      </ng-template>
+                    </td>
+
+                    <!-- Crédito -->
+                    <td class="p-3 whitespace-nowrap">
+                      <ng-container *ngIf="item?.fuente === 'caja'; else pagoCredito">
+                        {{ item?.credito | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}
+                      </ng-container>
+                      <ng-template #pagoCredito>
+                        <span *ngIf="(item?.metodo_pago ?? item?.metodoPago) === 'Credito'">
+                          {{ (item?.pago_monto ?? item?.monto) | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}
+                        </span>
+                        <span *ngIf="(item?.metodo_pago ?? item?.metodoPago) !== 'Credito'">-</span>
+                      </ng-template>
+                    </td>
+
+                    <!-- Transferencia -->
+                    <td class="p-3 whitespace-nowrap">
+                      <ng-container *ngIf="item?.fuente === 'caja'; else pagoTransferencia">
+                        {{ item?.transferencia | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}
+                      </ng-container>
+                      <ng-template #pagoTransferencia>
+                        <span *ngIf="(item?.metodo_pago ?? item?.metodoPago) === 'Transferencia'">
+                          {{ (item?.pago_monto ?? item?.monto) | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}
+                        </span>
+                        <span *ngIf="(item?.metodo_pago ?? item?.metodoPago) !== 'Transferencia'">-</span>
+                      </ng-template>
+                    </td>
+
+                    <!-- Cheque -->
+                    <td class="p-3 whitespace-nowrap">
+                      <ng-container *ngIf="item?.fuente === 'caja'; else pagoCheque">
+                        {{ item?.cheque | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}
+                      </ng-container>
+                      <ng-template #pagoCheque>
+                        <span *ngIf="(item?.metodo_pago ?? item?.metodoPago) === 'Cheque'">
+                          {{ (item?.pago_monto ?? item?.monto) | currency:'ARS':'symbol-narrow':'1.2-2':'es-AR' }}
+                        </span>
+                        <span *ngIf="(item?.metodo_pago ?? item?.metodoPago) !== 'Cheque'">-</span>
+                      </ng-template>
+                    </td>
 				</tr>
 			</tbody>
 		</table>

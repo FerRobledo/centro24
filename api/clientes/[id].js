@@ -91,13 +91,21 @@ module.exports = async (req, res) => {
 
         if (accion === 'addPago') {
             const { infoPago } = req.body;
+
+            // Validar método de pago conocido
+            const allowedMetodos = ['Efectivo', 'Debito', 'Credito', 'Transferencia', 'Cheque'];
+            const metodo = infoPago.metodoPago;
+            if (!allowedMetodos.includes(metodo)) {
+                return res.status(400).json({ error: 'Método de pago inválido' });
+            }
+
             try {
                 await pool.query(
                     `
                     INSERT INTO pagos_mensuales
-                    (id_client, fecha_pago, monto, periodo_desde, periodo_hasta, id_admin, estado)
-                    VALUES ($1, now(), $2, $3, $4, $5, $6)
-                    `, [infoPago.client, infoPago.monto, infoPago.fechaDesde, infoPago.fechaHasta, id, 'false']
+                    (id_client, fecha_pago, monto, periodo_desde, periodo_hasta, id_admin, estado, metodo_pago)
+                    VALUES ($1, now(), $2, $3, $4, $5, $6, $7)
+                    `, [infoPago.client, infoPago.monto, infoPago.fechaDesde, infoPago.fechaHasta, id, 'false', metodo]
                 );
                 return res.status(201).json({ success: true });
             } catch (error) {

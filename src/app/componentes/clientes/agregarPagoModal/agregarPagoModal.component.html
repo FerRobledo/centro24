@@ -42,6 +42,26 @@
           </div>
         </div>
 
+        <div class="flex flex-col gap-2">
+          <p class="font-semibold text-gray-800">
+            Método de pago
+          </p>
+          <select formControlName="metodoPago"
+            class="w-full rounded-xl bg-white px-3 py-2 text-base text-gray-900 border border-gray-300 placeholder:text-gray-400 shadow-inner
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+            <option value="Efectivo">Efectivo</option>
+            <option value="Debito">Débito</option>
+            <option value="Credito">Crédito</option>
+            <option value="Transferencia">Transferencia</option>
+            <option value="Cheque">Cheque</option>
+          </select>
+
+          <div *ngIf="pagoForm.get('metodoPago')?.touched && pagoForm.get('metodoPago')?.hasError('required')" class="text-red-500 text-sm">
+            El método de pago es obligatorio.
+          </div>
+          
+        </div>
+
         <div class="rounded flex gap-2 items-center text-blue-700 bg-blue-50 p-3 text-sm">
           <i class="fa-solid fa-circle-info"></i>
           <p>Selecciona una fecha final solo si el pago cubre más de un mes</p>
