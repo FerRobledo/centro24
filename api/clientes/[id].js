@@ -144,9 +144,9 @@ module.exports = async (req, res) => {
             try {
                 const { rows } = await pool.query(
                     `UPDATE public.clientes_mensuales
-            SET monto = ROUND(monto + (monto * $1 / 100), 2)
-            WHERE user_admin = $2
-            RETURNING *;`,
+                        SET monto = ROUND((monto + (monto * $1 / 100)) / 1000.0) * 1000
+                        WHERE user_admin = $2
+                        RETURNING *;`,
                     [porcentaje, idAdmin]
                 );
                 return res.status(200).json(rows);
@@ -254,15 +254,5 @@ module.exports = async (req, res) => {
             });
         }
     }
-}
-async function getPagos(id_cliente, id_admin) {
-    const query = `
-        SELECT *  
-        FROM pagos_mensuales
-        WHERE id_client = $1 and id_admin = $2
-        ORDER BY fecha_pago DESC
-    `;
-    const { rows } = await pool.query(query, [id_cliente, id_admin]);
-    return rows;
 }
 
