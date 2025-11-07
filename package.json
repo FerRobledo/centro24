@@ -5,7 +5,10 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "dev:angular": "ng serve --port 4200 --disable-host-check --host 0.0.0.0 --allowed-hosts all",
+    "dev:api": "vercel dev",
+    "dev": "concurrently \"npm run dev:angular\" \"npm run dev:api\""
   },
   "dependencies": {
     "@angular/animations": "^17.3.12",
@@ -40,6 +43,7 @@
     "@types/jasmine": "~4.3.0",
     "@types/pg": "^8.11.11",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^9.2.1",
     "jasmine-core": "~4.5.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.1.0",

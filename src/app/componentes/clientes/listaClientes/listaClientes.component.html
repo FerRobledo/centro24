@@ -14,25 +14,34 @@
     </div>
 
     <!-- Buscador -->
-    <div class="flex justify-center items-center gap-2 border border-gray-300 rounded px-3 bg-white w-full">
-      <i class="fa fa-search text-gray-500 mr-2"></i>
-      <input
-        type="text"
-        class="flex-1 h-9 outline-none py-1 bg-transparent text-sm"
-        placeholder="Filtrar por N°, Cliente o Tipo"
-        [(ngModel)]="filtroClients" />
+    <div class="flex space-x-4">
+
+      <div class="flex justify-center items-center gap-2 border border-gray-300 rounded px-3 bg-white w-full">
+        <i class="fa fa-search text-gray-500 mr-2"></i>
+        <input type="text" class="flex-1 h-9 outline-none py-1 bg-transparent text-sm"
+          placeholder="Filtrar por N°, Cliente o Tipo" [(ngModel)]="filtroClients" />
+      </div>
+
+      <div class="space-y-1 w-52">
+        <label for="price" class="block text-xs font-medium">Incremento porcentual</label>
+        <div class="flex">
+          <input type="number" name="numberPorc" id="numberPorc" placeholder="Porcentaje" [(ngModel)]="porcentaje"
+            class="flex w-1 flex-1 text-right border sm:text-sm rounded-l-md focus:ring-inset">
+          <button type="button" (click)="abrirConfirmacion()"
+            class="px-3 text-sm font-medium rounded-r-md text-white bg-blue-500 hover:bg-blue-600">%</button>
+        </div>
+      </div>
+
     </div>
 
     <!-- Botones -->
     <div class="flex flex-col gap-4 justify-self-end">
-      <button
-        (click)="agregarCliente()"
+      <button (click)="agregarCliente()"
         class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 ease-in-out">
         <i class="fa-solid fa-user-plus"></i> Agregar cliente
       </button>
 
-      <button
-        [routerLink]="'listaPagos'"
+      <button [routerLink]="'listaPagos'"
         class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-blue-500 hover:bg-blue-600 transition-all duration-200 ease-in-out">
         <i class="fa-solid fa-dollar-sign"></i> Ver Pagos
       </button>
@@ -64,8 +73,7 @@
             </thead>
 
             <tbody *ngIf="clientsOfMonth.length > 0">
-              <tr
-                *ngFor="let client of clientsOfMonth | filtroClientes:'cliente':filtroClients"
+              <tr *ngFor="let client of clientsOfMonth | filtroClientes:'cliente':filtroClients"
                 class="hover:bg-gray-50">
                 <td class="p-3 border-b border-slate-200 text-slate-600 truncate">{{ client.id_client }}</td>
                 <td class="p-3 border-b border-slate-200 text-slate-600 truncate">{{ client.cliente }}</td>
@@ -76,14 +84,13 @@
                 <td class="relative group p-3 border-b border-slate-200 text-center">
                   <div class="flex flex-col items-center text-sm">
                     <ng-container *ngIf="client.mesesVigente > 0; else sinPago">
-                      <div
-                        class="font-semibold"
-                        [ngClass]="{
+                      <div class="font-semibold" [ngClass]="{
                           'text-green-600': client.mesesVigente > 1,
                           'text-yellow-600 flex items-center gap-1': client.mesesVigente === 1
                         }">
                         <ng-container *ngIf="client.mesesVigente === 1">Último mes pago</ng-container>
-                        <ng-container *ngIf="client.mesesVigente > 1">{{ client.mesesVigente }} meses pagos</ng-container>
+                        <ng-container *ngIf="client.mesesVigente > 1">{{ client.mesesVigente }} meses
+                          pagos</ng-container>
                       </div>
                       <div class="text-slate-500 text-xs mt-1">
                         {{ getPeriodoHasta(client) | date: 'MMMM yyyy' }}
@@ -96,8 +103,7 @@
                       </div>
                     </ng-template>
                   </div>
-                  <button
-                    (click)="agregarPago(client)"
+                  <button (click)="agregarPago(client)"
                     class="absolute bottom-2 right-2 bg-green-500 hover:bg-emerald-500 text-white text-xs p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                     title="Agregar pago">
                     <i class="fa-solid fa-circle-plus"></i>
@@ -108,7 +114,8 @@
                     <button (click)="updateClient(client)" class="text-slate-500 hover:text-blue-600" title="Editar">
                       <i class="fa-solid fa-pencil"></i>
                     </button>
-                    <button (click)="openDeleteConfirm(client)" class="text-slate-500 hover:text-red-600" title="Eliminar">
+                    <button (click)="openDeleteConfirm(client)" class="text-slate-500 hover:text-red-600"
+                      title="Eliminar">
                       <i class="fa-solid fa-trash"></i>
                     </button>
                   </div>
