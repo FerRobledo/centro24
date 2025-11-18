@@ -3,9 +3,15 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
 import { AgregarPagoModalComponent } from '../agregarPagoModal/agregarPagoModal.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
 
 @Component({
   selector: 'app-listaPagos',
+  standalone: true,
+  imports: [ RouterModule, FormsModule, CommonModule, FiltroClientesPipe],
   templateUrl: './listaPagos.component.html',
   styleUrls: ['./listaPagos.component.css']
 })

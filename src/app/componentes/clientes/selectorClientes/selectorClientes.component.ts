@@ -1,8 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-selectorClientes',
+  standalone: true,
+  imports: [ FormsModule, CommonModule ],
   templateUrl: './selectorClientes.component.html',
   styleUrls: ['./selectorClientes.component.css']
 })

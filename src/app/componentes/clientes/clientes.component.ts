@@ -1,13 +1,17 @@
-import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from 'src/app/auth/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
 import { Subscription } from 'rxjs';
+import { RouterModule } from '@angular/router';
+import { ListaClientesComponent } from './listaClientes/listaClientes.component';
 
 @Component({
   selector: 'app-clientes',
+  standalone: true,
+  imports: [ RouterModule, ListaClientesComponent ],
   templateUrl: './clientes.component.html',
-  styleUrls: ['./clientes.component.css']
+  styleUrls: [],
 })
 export class ClientesComponent implements OnInit, OnDestroy {
   clientsOfMonth: any[] = [];
@@ -21,7 +25,6 @@ export class ClientesComponent implements OnInit, OnDestroy {
     public clientesService: ClientesService,
     private authService: AuthService,
     public dialog: MatDialog,
-    private cdr: ChangeDetectorRef // inyecto ChangeDetectorRef
   ) { }
 
   ngOnInit() {

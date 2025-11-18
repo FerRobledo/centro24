@@ -14,7 +14,6 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [ CommonModule, FormsModule ],
   templateUrl: './cobranza.component.html',
-  styleUrls: ['./cobranza.component.css']
 })
 export class CobranzaComponent implements OnInit, OnDestroy {
   public clientEdit: any = null;

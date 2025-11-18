@@ -3,6 +3,7 @@ import { RegisterComponent } from './componentes/auth/register/register.componen
 import { LoginComponent } from './componentes/auth/login/login.component';
 import { COBRANZA_ROUTES } from './componentes/cobranza/cobranza.routes';
 import { AuthGuard } from './auth/auth.guard';
+import { CLIENTES_ROUTES } from './componentes/clientes/clientes.routes';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -14,6 +15,10 @@ export const routes: Routes = [
     children: [{
       path: 'cobranza',
       children: COBRANZA_ROUTES,
+    },
+    {
+      path: 'clientes',
+      children: CLIENTES_ROUTES,
     },
     { path: '', redirectTo: '/login', pathMatch: 'full' },
     { path: '**', redirectTo: '/login' }

@@ -1,14 +1,18 @@
 import { Component, OnInit, EventEmitter, Output, Input, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/auth/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
 import { FormControl } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AbstractControl } from '@angular/forms';
 import { DIALOG_DATA } from '@angular/cdk/dialog';
+import { MatRadioModule } from '@angular/material/radio';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-insertarCliente',
+  standalone: true,
+  imports: [ FormsModule, ReactiveFormsModule, MatRadioModule, CommonModule ],
   templateUrl: './insertarCliente.component.html',
   styleUrls: ['./insertarCliente.component.css']
 })

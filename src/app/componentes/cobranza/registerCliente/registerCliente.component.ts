@@ -18,7 +18,7 @@ const tiposDePagos: string[] = [
   standalone: true,
   imports: [ FormsModule, SelectorDePagosComponent, CommonModule ],
   templateUrl: './registerCliente.component.html',
-  styleUrls: ['./registerCliente.component.css']
+  styleUrls: []
 })
 export class RegisterClienteComponent implements OnInit {
 

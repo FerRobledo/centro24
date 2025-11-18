@@ -1,9 +1,12 @@
 import { DIALOG_DATA } from '@angular/cdk/dialog';
 import { ChangeDetectorRef, Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from 'src/app/auth/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
+import { SelectorClientesComponent } from '../selectorClientes/selectorClientes.component';
+import { CommonModule } from '@angular/common';
+import { MatDividerModule } from '@angular/material/divider';
 
 const fechaFormateada = new Date().toLocaleDateString('es-AR', {
   month: '2-digit',
@@ -12,6 +15,8 @@ const fechaFormateada = new Date().toLocaleDateString('es-AR', {
 
 @Component({
   selector: 'app-agregarPagoModal',
+  standalone: true,
+  imports: [ ReactiveFormsModule, SelectorClientesComponent, CommonModule, MatDividerModule ],
   templateUrl: './agregarPagoModal.component.html',
   styleUrls: ['./agregarPagoModal.component.css']
 })

@@ -6,9 +6,16 @@ import { InsertarClienteComponent } from '../insertarCliente/insertarCliente.com
 import { Subscription } from 'rxjs';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { AgregarPagoModalComponent } from '../agregarPagoModal/agregarPagoModal.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { MatDividerModule } from '@angular/material/divider';
+import { CommonModule } from '@angular/common';
+import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
 
 @Component({
   selector: 'app-listaClientes',
+  standalone: true,
+  imports: [ RouterModule, FormsModule, ReactiveFormsModule, MatDividerModule, CommonModule, FiltroClientesPipe ],
   templateUrl: './listaClientes.component.html',
   styleUrls: ['./listaClientes.component.css']
 })
