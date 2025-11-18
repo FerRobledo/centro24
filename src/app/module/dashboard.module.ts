@@ -3,9 +3,6 @@ import { CommonModule } from '@angular/common';
 import { CargaProductosComponent } from '../componentes/cargaProductos/cargaProductos.component';
 import { ClientesComponent } from '../componentes/clientes/clientes.component';
 import { InsertarClienteComponent } from '../componentes/clientes/insertarCliente/insertarCliente.component';
-import { CobranzaComponent } from '../componentes/cobranza/cobranza.component';
-import { RegisterClienteComponent } from '../componentes/cobranza/registerCliente/registerCliente.component';
-import { ConfirmDialogComponent } from '../componentes/confirmDialog/confirmDialog.component';
 import { DashboardComponent } from '../componentes/dashboard/dashboard.component';
 import { EstadisticasComponent } from '../componentes/estadisticas/estadisticas.component';
 import { InformacionComponent } from '../componentes/informacion/informacion.component';
@@ -29,8 +26,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { DashboardRoutes } from './dashboard.routing';
-import { SideMenuComponent } from '../componentes/sideMenu/sideMenu.component';
-import { HomeComponent } from '../componentes/home/home.component';
 import { SelectorClientesComponent } from '../componentes/clientes/selectorClientes/selectorClientes.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
@@ -40,14 +35,11 @@ import { MatOptionModule, MatNativeDateModule, NativeDateAdapter, DateAdapter, M
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
-import { HistorialClientsComponent } from '../componentes/historial-clients/historial-clients.component';
 import { FiltroProductosPipe } from '../pipes/filtro-productos.pipe';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ProductFormDialogComponent } from '../componentes/productos/product-form-dialog/product-form-dialog.component';
-import { DetailsHistorialComponent } from '../componentes/detailsHistorial/detailsHistorial.component';
 import { CdkNoDataRow } from "@angular/cdk/table";
-import { SelectorDePagosComponent } from '../componentes/cobranza/selectorDePagos/selectorDePagos.component';
 
 
 export const MONTH_YEAR_FORMATS = {
@@ -72,9 +64,6 @@ export const MONTH_YEAR_FORMATS = {
     UsuariosComponent,
     UsuarioModalComponent,
     UsuarioCardComponent,
-    CobranzaComponent,
-    RegisterClienteComponent,
-    ConfirmDialogComponent,
     ClientesComponent,
     InsertarClienteComponent,
     CargaProductosComponent,
@@ -82,16 +71,11 @@ export const MONTH_YEAR_FORMATS = {
     ListaClientesComponent,
     FiltroClientesPipe,
     ListaPagosComponent,
-    SideMenuComponent,
-    HomeComponent,
     SelectorClientesComponent,
     LogsComponent,
     ConfirmarDeleteComponent,
-    HistorialClientsComponent,
     FiltroProductosPipe,
     ProductFormDialogComponent,
-    DetailsHistorialComponent,
-    SelectorDePagosComponent,
   ],
   imports: [
     CommonModule,

@@ -1,11 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ConfirmDialogComponent } from '../confirmDialog/confirmDialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { AuthService } from 'src/app/services/auth.service';
-import { Router } from '@angular/router';
+import { AuthService } from 'src/app/auth/auth.service';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-sideMenu',
+  standalone: true,
+  imports: [RouterModule, CommonModule],
   templateUrl: './sideMenu.component.html',
   styleUrls: ['./sideMenu.component.css']
 })

@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ProductosService } from 'src/app/services/productos.service';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from 'src/app/auth/auth.service';
 import { Producto, ProductoDTO } from 'src/assets/dto/producto';
 import { LogsService } from 'src/app/services/logs.service';
 import { Log } from 'src/assets/dto/log';

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, from, map, mergeMap, Observable, of, toArray } from 'rxjs';
-import { AuthService } from './auth.service';
+import { AuthService } from '../auth/auth.service';
 import { Producto, ProductoDTO } from 'src/assets/dto/producto';
 
 @Injectable({

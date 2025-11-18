@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-confirmDialog',
+  standalone: true,
   templateUrl: './confirmDialog.component.html',
+  imports: [MatDialogModule, MatIcon],
   styleUrls: ['./confirmDialog.component.css']
 })
 export class ConfirmDialogComponent implements OnInit {

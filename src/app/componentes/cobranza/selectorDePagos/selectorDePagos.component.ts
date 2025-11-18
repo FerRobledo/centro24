@@ -1,7 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-selectorDePagos',
+  standalone: true,
+  imports: [ FormsModule, CommonModule ],
   templateUrl: './selectorDePagos.component.html',
   styleUrls: ['./selectorDePagos.component.css']
 })

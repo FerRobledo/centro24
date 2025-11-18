@@ -1,13 +1,16 @@
-import { isNgTemplate } from '@angular/compiler';
 import { Component, Inject, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from 'src/app/auth/auth.service';
 import { CobranzaService } from 'src/app/services/cobranza.service';
 import { DetailsHistorialComponent } from '../detailsHistorial/detailsHistorial.component';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-historial-clients',
+  standalone: true,
+  imports: [ FormsModule, CommonModule ],
   templateUrl: './historial-clients.component.html',
   styleUrls: ['./historial-clients.component.css'],
 })

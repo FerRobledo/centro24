@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from 'src/app/auth/auth.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { Usuario } from 'src/assets/dto/usuario';
