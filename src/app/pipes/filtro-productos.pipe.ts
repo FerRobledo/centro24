@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { ProductoDTO } from 'src/assets/dto/producto';
 
 @Pipe({
-  name: 'filtroProductos'
+  name: 'filtroProductos',
+  standalone: true
 })
 
 export class FiltroProductosPipe implements PipeTransform {

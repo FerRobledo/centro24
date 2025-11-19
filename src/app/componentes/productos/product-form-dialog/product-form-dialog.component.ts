@@ -1,4 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProductoDTO } from 'src/assets/dto/producto';
 
@@ -10,6 +12,8 @@ interface DialogData {
 
 @Component({
   selector: 'app-product-form-dialog',
+  standalone: true,
+  imports: [ FormsModule, CommonModule ], 
   templateUrl: './product-form-dialog.component.html'
 })
 export class ProductFormDialogComponent implements OnInit {

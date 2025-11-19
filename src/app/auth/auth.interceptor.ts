@@ -12,6 +12,11 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService, private router: Router) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Evitar que las llamadas a Google Sheets lleven token
+    if (req.url.includes('googleapis.com') || req.url.includes('googleusercontent.com')) {
+      return next.handle(req);
+    }
+    
     const token = this.auth.getToken();
     let authReq = req;
     if (token) {

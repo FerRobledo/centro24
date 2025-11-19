@@ -1,13 +1,16 @@
+import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
 import { EstadisticasService } from 'src/app/services/estadisticas.service';
+import { CardComponent } from './card/card.component';
 
 @Component({
   selector: 'app-estadisticas',
+  standalone: true,
+  imports: [ CommonModule, CardComponent ],
   templateUrl: './estadisticas.component.html',
-  styleUrls: ['./estadisticas.component.css']
 })
 export class EstadisticasComponent implements OnInit {
   collectionPreviousMonth: number = 0;

@@ -11,7 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 @Component({
   selector: 'app-modalCargaProductos',
   templateUrl: './modalCargaProductos.component.html',
-  styleUrls: ['./modalCargaProductos.component.css'],
+  styleUrls: [],
   imports: [CommonModule, FormsModule, MatCheckboxModule, MatCardModule, MatFormFieldModule, MatInputModule],
   standalone: true,
 })
@@ -28,11 +28,18 @@ export class ModalCargaProductosComponent implements OnInit {
 
 
   ngOnInit() {
-    this.sheetsService.hojas$.subscribe(hojas => {
-      this.hojas = hojas;
-      hojas.forEach(hoja => this.estadoCheckboxes[hoja] = false);
-    });
-    this.sheetsService.cargarHojas();
+    this.loadPage();
+  }
+
+  loadPage(){
+    this.sheetsService.cargarHojas().subscribe({
+      next: (data) => {
+        this.hojas = data.sheets.map((sheet: any) => sheet.properties.title);
+      },
+      error: (error) => {
+        console.log(error);
+      }
+    })
   }
 
   toggleSeleccion() {

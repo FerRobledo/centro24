@@ -7,7 +7,14 @@ import { Log } from 'src/assets/dto/log';
 import { Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ProductFormDialogComponent } from './product-form-dialog/product-form-dialog.component';
-import { LogsComponent } from '../logs/logs.component';
+import { LogsComponent } from './logs/logs.component';
+import { FormsModule } from '@angular/forms';
+import { CargaProductosComponent } from './cargaProductos/cargaProductos.component';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ConfirmarDeleteComponent } from './confirmar-delete/confirmar-delete.component';
+import { CommonModule } from '@angular/common';
+import { FiltroProductosPipe } from 'src/app/pipes/filtro-productos.pipe';
 
 interface AddProductoResponse {
   message: string;
@@ -18,8 +25,9 @@ interface AddProductoResponse {
 
 @Component({
   selector: 'app-productos',
+  standalone: true,
+  imports: [CommonModule, FormsModule, CargaProductosComponent, MatSlideToggle, MatTooltipModule, ConfirmarDeleteComponent, FiltroProductosPipe],
   templateUrl: './productos.component.html',
-  styleUrls: ['./productos.component.css'],
 })
 
 export class ProductosComponent implements OnInit, OnDestroy {
@@ -47,7 +55,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     private logsService: LogsService,
     private cdr: ChangeDetectorRef,
     public dialog: MatDialog
-  ) {}
+  ) { }
 
   ngOnInit() {
     const idAdmin = this.authService.getIdAdmin();
@@ -70,7 +78,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.productos = data.map((producto: Producto) => new ProductoDTO(producto));
           this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           this.cargandoProducto = false;
-          ; 
+          ;
         },
         error: (error) => {
           console.error('Error al obtener productos:', error);

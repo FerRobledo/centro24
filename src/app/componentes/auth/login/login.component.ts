@@ -9,7 +9,7 @@ import { AuthService } from 'src/app/auth/auth.service';
   templateUrl: './login.component.html',
   standalone: true,
   imports: [ RouterModule, ReactiveFormsModule, CommonModule ],
-  styleUrls: ['./login.component.css']
+  styleUrls: []
 })
 export class LoginComponent implements OnInit {
 

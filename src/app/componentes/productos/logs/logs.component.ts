@@ -1,7 +1,9 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Log } from 'src/assets/dto/log';
 import { LogsService } from 'src/app/services/logs.service';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 interface DialogData {
   titulo?: string;
@@ -9,6 +11,8 @@ interface DialogData {
 
 @Component({
   selector: 'app-logs',
+  standalone: true,
+  imports: [ FormsModule, MatDialogModule, CommonModule],
   templateUrl: './logs.component.html',
   styleUrl: './logs.component.css'
 })

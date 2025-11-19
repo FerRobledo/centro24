@@ -10,8 +10,10 @@ import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-cargaProductos',
+  standalone: true,
+  imports: [],
   templateUrl: './cargaProductos.component.html',
-  styleUrls: ['./cargaProductos.component.css']
+  styleUrls: []
 })
 export class CargaProductosComponent implements OnInit, OnDestroy {
 
@@ -27,7 +29,6 @@ export class CargaProductosComponent implements OnInit, OnDestroy {
   productos: ProductoDTO[] = [];
 
   ngOnInit() {
-    this.sheetsService.cargarHojas();
   }
 
   ngOnDestroy() {

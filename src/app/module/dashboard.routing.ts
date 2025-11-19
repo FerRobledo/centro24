@@ -21,10 +21,6 @@ const routes: Routes = [
         component: CobranzaComponent,
       },
       {
-        path: 'productos',
-        component: ProductosComponent
-      },
-      {
         path: 'usuarios',
         component: UsuariosComponent,
       },
