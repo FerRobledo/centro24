@@ -1,4 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { RolService } from 'src/app/services/rol.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { Rol } from 'src/assets/dto/rol';
@@ -6,6 +8,8 @@ import { newUsuario, Usuario } from 'src/assets/dto/usuario';
 
 @Component({
   selector: 'app-usuarioCard',
+  standalone: true,
+  imports: [MatSlideToggleModule, CommonModule],
   templateUrl: './usuarioCard.component.html',
   styleUrls: ['./usuarioCard.component.css']
 })

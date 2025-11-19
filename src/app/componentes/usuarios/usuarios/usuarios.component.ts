@@ -6,9 +6,14 @@ import { Usuario } from 'src/assets/dto/usuario';
 import { MatDialog } from '@angular/material/dialog';
 import { UsuarioModalComponent } from '../usuarioModal/UsuarioModal.component';
 import { Subscription } from 'rxjs';
+import {ReactiveFormsModule } from '@angular/forms';
+import { UsuarioCardComponent } from '../usuarioCard/usuarioCard.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-usuarios',
+  standalone: true,
+  imports:[ReactiveFormsModule, UsuarioCardComponent, CommonModule],//todos los import que uso en html
   templateUrl: './usuarios.component.html',
   styleUrls: ['./usuarios.component.css']
 })

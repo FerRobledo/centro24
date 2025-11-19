@@ -34,6 +34,7 @@
     "react-router-dom": "^7.1.5",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
+    "vercel": "^48.10.4",
     "zone.js": "~0.14.10"
   },
   "devDependencies": {

@@ -6,6 +6,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { CLIENTES_ROUTES } from './componentes/clientes/clientes.routes';
 import { PRODUCTO_ROUTES } from './componentes/productos/productos.routes';
 import { DashboardComponent } from './componentes/dashboard/dashboard.component';
+import { USUARIOS_ROUTES } from './componentes/usuarios/usuarios.routes';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -30,6 +31,10 @@ export const routes: Routes = [
       {
         path: 'productos',
         children: PRODUCTO_ROUTES,
+      },
+      {
+        path: 'usuarios',
+        children: USUARIOS_ROUTES,
       },
       { path: '**', redirectTo: '/login' }
     ]
