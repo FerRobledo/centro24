@@ -1,6 +1,5 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
+const { requireAuth } = require('../protected/requireAuth');
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL, // Definir en Vercel
@@ -17,6 +16,13 @@ module.exports = async (req, res) => {
     // Manejo de preflight (CORS)
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
+    }
+
+    // Autenticación
+    try {
+        req.user = requireAuth(req);
+    } catch (e) {
+        return res.status(401).json({ error: 'No autorizado', details: e.message });
     }
 
     if (req.method === 'GET') {

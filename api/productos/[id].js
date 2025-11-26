@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const { requireAuth } = require('../protected/requireAuth');
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL, // Definir en Vercel
@@ -19,7 +20,13 @@ module.exports = async (req, res) => {
         return res.status(200).end();
     }
 
-    
+    // Autenticación
+    try {
+        req.user = requireAuth(req);
+    } catch (e) {
+        return res.status(401).json({ error: 'No autorizado', details: e.message });
+    }
+
     // GET
     if (req.method === 'GET') {
         const { id } = req.query;
@@ -207,7 +214,7 @@ module.exports = async (req, res) => {
     if (req.method === 'DELETE') {
         try {
             // Extraer id_admin de la ruta y id_producto del query con validación
-            const {id} = req.query; // Usa el operador opcional
+            const { id } = req.query; // Usa el operador opcional
             const id_producto = req.query?.id_producto;
 
             console.log('Parámetros recibidos:', { id_producto, id });

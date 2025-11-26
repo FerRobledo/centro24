@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const { requireAuth } = require('../protected/requireAuth');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -15,6 +16,13 @@ module.exports = async (req, res) => {
   const origin = req.headers.origin || '*';
   Object.entries(HEADERS).forEach(([key, value]) => res.setHeader(key, value));//map para key -> value de options
   res.setHeader('Access-Control-Allow-Origin', origin);
+
+  // Autenticación
+  try {
+    req.user = requireAuth(req);
+  } catch (e) {
+    return res.status(401).json({ error: 'No autorizado', details: e.message });
+  }
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).json({ error: 'Método no permitido' });
