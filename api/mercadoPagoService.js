@@ -8,7 +8,7 @@ const pool = new Pool({
 });
 
 async function crearPreferenciaConToken(access_token, userId) {
-    const backUrl = 'http://localhost:4200/';
+    const backUrl = 'https://centro24-git-main-raices-projects-a29c0585.vercel.app';
     try {
         console.log("BODY QUE SE ENVÍA A MP =>", JSON.stringify({
             items: [{
