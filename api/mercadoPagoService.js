@@ -8,24 +8,15 @@ const pool = new Pool({
 });
 
 async function crearPreferenciaConToken(access_token, userId) {
-    const backUrl = 'https://centro24-git-main-raices-projects-a29c0585.vercel.app';
+
+    // DEFINO A QUE URL VOY A RECIBIR LA RESPUESTA DE MP
+    let backUrl = 'https://centro24.vercel.app';
+
+    if (process.env.ENV != 'prod') {
+        backUrl = 'https://centro24-git-feature-pagosclientes-raices-projects-a29c0585.vercel.app';
+    }
+
     try {
-        console.log("BODY QUE SE ENVÍA A MP =>", JSON.stringify({
-            items: [{
-                title: "Suscripción Gestión ERP",
-                description: "Acceso por 1 mes al sistema Gestión ERP",
-                currency_id: "ARS",
-                quantity: 1,
-                unit_price: 1.00
-            }],
-            back_urls: {
-                success: backUrl,
-                failure: backUrl,
-                pending: backUrl,
-            },
-            auto_return: "approved",
-            external_reference: userId?.toString(),
-        }, null, 2));
 
         const response = await axios.post(
             "https://api.mercadopago.com/checkout/preferences",
@@ -42,6 +33,7 @@ async function crearPreferenciaConToken(access_token, userId) {
                     failure: backUrl,
                     pending: backUrl,
                 },
+                // Seteo a donde se va a recibir la respuesta
                 notification_url: backUrl + '/api/mercadopago/callback',
                 auto_return: "approved",
                 external_reference: userId.toString(),
@@ -55,7 +47,7 @@ async function crearPreferenciaConToken(access_token, userId) {
 
         return response.data.init_point;
     } catch (error) {
-        console.log("DATA ERROR =>", error.response?.data);
+        console.log("DATA ERROR =>", error.response);
     }
 }
 
