@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
     console.log("Webhook recibido:", JSON.stringify(req.body, null, 2));
     // MercadoPago envía el ID del pago en `data.id`
     const { type, data, user_id } = req.body;
-    console.log("safdasdfdsa")
+    res.status(200).end();
     return;
     if (type === "payment") {
         const paymentId = data.id;
