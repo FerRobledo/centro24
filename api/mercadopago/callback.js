@@ -17,63 +17,39 @@ module.exports = async (req, res) => {
 
     console.log("Webhook recibido:", JSON.stringify(req.body, null, 2));
     // MercadoPago envía el ID del pago en `data.id`
-    const { type, data, user_id } = req.body;
-    res.status(200).end();
-    return;
+    const { type, data } = req.body;
     if (type === "payment") {
-        const paymentId = data.id;
+        try{
 
-        //Obtener usuario del pago para obtener token
-        const { rows } = await pool.query('SELECT * FROM usuario_facturacion WHERE mp_user_id = $1', [user_id]);
-        const usuario = rows[0];
-        if (!usuario) {
-            return res.status(404).json({ error: 'Usuario no encontrado' });
-        }
-
-        // Consultar a MercadoPago para obtener detalles del pago
-        const { data: payment } = await axios.get(
-            `https://api.mercadopago.com/v1/payments/${paymentId}`,
-            {
-                headers: { Authorization: `Bearer ${await getAccessTokenValido(usuario)}` }
+            const paymentId = data.id;
+            console.log(req.body);
+            //Obtener usuario del pago para obtener token
+            const { rows } = await pool.query('SELECT * FROM mercado_pago');
+            const usuario = rows[0];
+            if (!usuario) {
+                return res.status(404).json({ error: 'Usuario no encontrado' });
             }
-        );
-
-        console.log("Detalle del pago:", payment);
-        const estadoPago = payment.status; // approved, rejected, pending
-        const referencia = payment.external_reference; // tu id_venta
-        console.log(`Pago ${payment.id} | Estado: ${estadoPago} | Ref: ${referencia}`);
-        if (referencia) {
-            await updateEstado(referencia, ((estadoPago === "approved") ? 'Pendiente' : 'Cancelado'));
-            await pool.query('UPDATE venta SET id_pago = $1 WHERE id = $2',
-                [payment.id, referencia]);
-
-            if (await debeFacturarDB(usuario.id_usuario) && estadoPago === "approved" && referencia) {
-                await insertaFacturable(referencia);
+            
+            // Consultar a MercadoPago para obtener detalles del pago
+            const { data: payment } = await axios.get(
+                `https://api.mercadopago.com/v1/payments/${paymentId}`,
+                {
+                    headers: { Authorization: `Bearer ${await getAccessTokenValido(usuario)}` }
+                }
+            );
+            
+            console.log("Detalle del pago:", payment);
+            const estadoPago = payment.status; // approved, rejected, pending
+            const referencia = payment.external_reference; // tu id_venta
+            console.log(`Pago ${payment.id} | Estado: ${estadoPago} | Ref: ${referencia}`);
+            if (referencia) {
+                
             }
+        } catch (error){
+            console.log(error);
+            return res.status(500).json(error);
         }
     }
     // Responder 200 a MercadoPago (OBLIGATORIO)
     res.status(200).end();
 };
-
-async function insertaFacturable(pedido_id) {
-    await pool.query(
-        `INSERT INTO venta_facturable (venta_id) VALUES ($1)`,
-        [pedido_id]
-    );
-}
-
-// Control persistente en base de datos para facturación parcial (7 de cada 10)
-async function debeFacturarDB(id_usuario) {
-    await pool.query('INSERT INTO facturacion_control (contador, id_usuario_fact) SELECT 0, $1 WHERE NOT EXISTS (SELECT 1 FROM facturacion_control WHERE id_usuario_fact = $1);', [id_usuario]);
-    const { rows } = await pool.query(`UPDATE facturacion_control fc
-      SET contador = CASE
-        -- suma normalmente, con rollover en 10
-        WHEN fc.contador + 1 > 10
-          THEN 1
-        ELSE fc.contador + 1
-      END
-    WHERE fc.id_usuario_fact = $1
-    RETURNING contador <= 7 AS facturar;`, [id_usuario]);
-    return rows[0].facturar;
-}

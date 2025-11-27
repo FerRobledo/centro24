@@ -10,7 +10,7 @@ const pool = new Pool({
 async function crearPreferenciaConToken(access_token, userId) {
 
     // DEFINO A QUE URL VOY A RECIBIR LA RESPUESTA DE MP
-    let backUrl = 'https://centro24.vercel.app';
+    var backUrl = 'https://centro24.vercel.app';
 
     if (process.env.ENV != 'prod') {
         backUrl = 'https://centro24-git-feature-pagosclientes-raices-projects-a29c0585.vercel.app';
