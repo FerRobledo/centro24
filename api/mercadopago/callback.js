@@ -15,14 +15,13 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    console.log("Webhook recibido:", JSON.stringify(req.body, null, 2));
+    console.log("fdasfsda")
+    return res.status(200).json({message: "Webhook"});
     // MercadoPago envía el ID del pago en `data.id`
-    const { type, data } = req.body;
     if (type === "payment") {
         try{
 
             const paymentId = data.id;
-            console.log(req.body);
             //Obtener usuario del pago para obtener token
             const { rows } = await pool.query('SELECT * FROM mercado_pago');
             const usuario = rows[0];
