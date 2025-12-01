@@ -36,7 +36,7 @@ async function crearPreferenciaConToken(access_token, userId) {
                 // Seteo a donde se va a recibir la respuesta
                 notification_url: backUrl + '/api/mercadopago/callback',
                 auto_return: "approved",
-                external_reference: userId.toString(),
+                external_reference: 'USER ID dfasdf',
             },
             {
                 headers: {
