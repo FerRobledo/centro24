@@ -31,20 +31,20 @@ module.exports = async (req, res) => {
             }
             
             // Consultar a MercadoPago para obtener detalles del pago
-            const { data: payment } = await axios.get(
-                `https://api.mercadopago.com/v1/payments/${paymentId}`,
-                {
-                    headers: { Authorization: `Bearer ${await getAccessTokenValido(usuario)}` }
-                }
-            );
+            // const { data: payment } = await axios.get(
+            //     `https://api.mercadopago.com/v1/payments/${paymentId}`,
+            //     {
+            //         headers: { Authorization: `Bearer ${await getAccessTokenValido(usuario)}` }
+            //     }
+            // );
             
-            console.log("Detalle del pago:", payment);
-            const estadoPago = payment.status; // approved, rejected, pending
-            const referencia = payment.external_reference; // tu id_venta
-            console.log(`Pago ${payment.id} | Estado: ${estadoPago} | Ref: ${referencia}`);
-            if (referencia) {
+            // console.log("Detalle del pago:", payment);
+            // const estadoPago = payment.status; // approved, rejected, pending
+            // const referencia = payment.external_reference; // tu id_venta
+            // console.log(`Pago ${payment.id} | Estado: ${estadoPago} | Ref: ${referencia}`);
+            // if (referencia) {
                 
-            }
+            // }
         } catch (error){
             console.log(error);
             return res.status(500).json(error);
