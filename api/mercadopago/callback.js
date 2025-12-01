@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
                 return res.status(404).json({ error: 'Usuario no encontrado' });
             }
             
-            Consultar a MercadoPago para obtener detalles del pago
+            // Consultar a MercadoPago para obtener detalles del pago
             const { data: payment } = await axios.get(
                 `https://api.mercadopago.com/v1/payments/${paymentId}`,
                 {
