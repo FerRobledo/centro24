@@ -17,12 +17,12 @@ module.exports = async (req, res) => {
 
     console.log("Webhook recibido:", JSON.stringify(req.params, null, 2));
     // MercadoPago envía el ID del pago en `data.id`
-    const { topic, id } = req.params;
+    const { topic, id } = req.query;
     if (topic === "payment") {
         try{
 
             const paymentId = id;
-            console.log(req.params);
+            console.log(req.query);
             //Obtener usuario del pago para obtener token
             const { rows } = await pool.query('SELECT * FROM mercado_pago');
             const usuario = rows[0];
