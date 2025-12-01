@@ -101,5 +101,5 @@ async function getAccessTokenValido(usuario) {
 
 module.exports = {
     crearPreferencia,
-
+    getAccessTokenValido,
 };
