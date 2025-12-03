@@ -16,39 +16,35 @@ async function crearPreferenciaConToken(access_token, userId) {
         backUrl = 'https://gestionerp.ar';
     }
 
-    try {
 
-        const response = await axios.post(
-            "https://api.mercadopago.com/checkout/preferences",
-            {
-                items: [{
-                    "title": "Suscripción Gestión ERP",
-                    "description": "Acceso por 1 mes al sistema Gestión ERP",
-                    "currency_id": "ARS",
-                    "quantity": 1,
-                    "unit_price": 1.00
-                }],
-                back_urls: {
-                    success: backUrl,
-                    failure: backUrl,
-                    pending: backUrl,
-                },
-                // Seteo a donde se va a recibir la respuesta
-                notification_url: backUrl + '/api/mercadopago/callback',
-                auto_return: "approved",
-                external_reference: 'USER ID dfasdf',
+    const response = await axios.post(
+        "https://api.mercadopago.com/checkout/preferences",
+        {
+            items: [{
+                "title": "Suscripción Gestión ERP",
+                "description": "Acceso por 1 mes al sistema Gestión ERP",
+                "currency_id": "ARS",
+                "quantity": 1,
+                "unit_price": 1.00
+            }],
+            back_urls: {
+                success: backUrl,
+                failure: backUrl,
+                pending: backUrl,
             },
-            {
-                headers: {
-                    Authorization: `Bearer ${access_token}`
-                }
+            // Seteo a donde se va a recibir la respuesta
+            notification_url: backUrl + '/api/mercadopago/callback',
+            auto_return: "approved",
+            external_reference: 'USER ID dfasdf',
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${access_token}`
             }
-        );
+        }
+    );
 
-        return response.data.init_point;
-    } catch (error) {
-        console.log("DATA ERROR =>", error.response);
-    }
+    return response.data.init_point;
 }
 
 async function crearPreferencia(datosMp, userId) {
@@ -71,7 +67,6 @@ async function generarNuevoToken(client_id, client_secret) {
 
     return {
         access_token: response.data.access_token,
-        user_id: response.data.user_id,
         expires_at: new Date(new Date(getFechaArgentina()).getTime() + response.data.expires_in * 1000) // ahora + segundos
     };
 }
@@ -79,8 +74,8 @@ async function generarNuevoToken(client_id, client_secret) {
 // 🔹 2. Guardar token en la DB
 async function actualizarToken(access_token, expires_at, user_id) {
     await pool.query(
-        "UPDATE mercado_pago SET mp_access_token=$1, mp_expires_at=$2, mp_client_id=$3",
-        [access_token, expires_at, user_id]
+        "UPDATE mercado_pago SET mp_access_token=$1, mp_expires_at=$2",
+        [access_token, expires_at]
     );
 }
 
@@ -89,7 +84,7 @@ async function getAccessTokenValido(usuario) {
     // Si no hay token o está vencido → genero uno nuevo
     if (!usuario.mp_access_token || new Date(usuario.mp_expires_at) < new Date()) {
         const nuevo = await generarNuevoToken(usuario.mp_client_id, usuario.mp_client_secret);
-        await actualizarToken(nuevo.access_token, nuevo.expires_at, nuevo.user_id);
+        await actualizarToken(nuevo.access_token, nuevo.expires_at);
         return nuevo.access_token;
     }
 

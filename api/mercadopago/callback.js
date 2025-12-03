@@ -1,93 +1,44 @@
-export const config = {
-    api: {
-        bodyParser: false
-    }
-};
-
 const axios = require('axios');
 const { Pool } = require('pg');
 const { getAccessTokenValido } = require('../mercadoPagoService');
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
+    connectionString: process.env.DATABASE_URL, // Definir en Vercel
+    ssl: { rejectUnauthorized: false }, // Necesario si usas PostgreSQL en la nube
 });
 
 module.exports = async (req, res) => {
+    const origin = req.headers.origin || '*'; // Usa * si no hay origen
 
-    // CORS
-    const origin = req.headers.origin || '*';
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    if (req.method === "OPTIONS") {
-        return res.status(200).end();
-    }
+    console.log("Webhook recibido:", JSON.stringify(req.body, null, 2));
+    // MercadoPago envía el ID del pago en `data.id`
+    const { type, data } = req.body;
 
-    // 🔥 1. LEER RAW BODY (Vercel lo necesita)
-    const rawBody = await new Promise(resolve => {
-        let data = "";
-        req.on("data", chunk => (data += chunk));
-        req.on("end", () => resolve(data));
-    });
+    if (type === "payment") {
+        const paymentId = data.id;
 
-    let body;
-    try {
-        body = JSON.parse(rawBody);
-    } catch (e) {
-        console.error("Error al parsear JSON de webhook:", rawBody);
-        return res.status(400).end();
-    }
-
-    console.log("Webhook recibido:", JSON.stringify(body, null, 2));
-
-    const { type, data } = body;
-
-    // Aseguramos que sea de pagos
-    if (type === "payment" && data?.id) {
-
-        try {
-            const paymentId = data.id;
-
-            // Obtener usuario de la tabla
-            const { rows } = await pool.query('SELECT * FROM mercado_pago');
-            const usuario = rows[0];
-
-            if (!usuario) {
-                return res.status(404).json({ error: 'Usuario no encontrado' });
+        // Consultar a MercadoPago para obtener detalles del pago
+        const { data: payment } = await axios.get(
+            `https://api.mercadopago.com/v1/payments/${paymentId}`,
+            {
+                headers: { Authorization: `Bearer ${await getAccessTokenValido(usuario)}` }
             }
+        );
 
-            // Consultar pago a Mercado Pago
-            const { data: payment } = await axios.get(
-                `https://api.mercadopago.com/v1/payments/${paymentId}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${await getAccessTokenValido(usuario)}`
-                    }
-                }
-            );
+        console.log("Detalle del pago:", payment);
+        const estadoPago = payment.status; // approved, rejected, pending
+        const referencia = payment.external_reference; // tu id_venta
+        console.log(`Pago ${payment.id} | Estado: ${estadoPago} | Ref: ${referencia}`);
+        if (referencia) {
+            console.log(referencia);
 
-            console.log("Detalle del pago:", payment);
-
-            const estadoPago = payment.status;
-            const referencia = payment.external_reference;
-
-            console.log(`Pago ${payment.id} | Estado: ${estadoPago} | Ref: ${referencia}`);
-
-            // Acá actúas según estado
-            if (estadoPago === "approved") {
-                console.log("Pago aprobado 🎉");
-                // TODO: actualizar DB
-            }
-
-        } catch (error) {
-            console.error("ERROR en callback:", error);
-            return res.status(500).json({ error: error.message });
         }
     }
-
-    // MP REQUIERE RESPONDER SIEMPRE 200
-    return res.status(200).end();
+    // Responder 200 a MercadoPago (OBLIGATORIO)
+    res.status(200).end();
 };
