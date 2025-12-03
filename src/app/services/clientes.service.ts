@@ -39,8 +39,11 @@ export class ClientesService {
     return this.http.put(this.origin + '/api/clientes/' + idAdmin, body);
   }
   
-  public deletePago(idAdmin: number, id: number): Observable<any>{
-    const body = {action:'deletePago', id};
-    return this.http.delete(this.origin + '/api/clientes/' + idAdmin, { body });
-  }
+  // Movido a pagoMensual.service 
+  // Eliminta action: 'deletePago', la accion pasa a ser el metodo HTTP (this.http.delete());
+
+  // public deletePago(idAdmin: number, id: number): Observable<any>{
+  //   const body = {action:'deletePago', id};
+  //   return this.http.delete(this.origin + '/api/clientes/' + idAdmin, { body });
+  // }
 }

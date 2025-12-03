@@ -9,6 +9,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './app/auth/auth.interceptor';
 
 import { registerLocaleData } from '@angular/common';
+import { LOCALE_ID } from '@angular/core';
 import localeEsAR from '@angular/common/locales/es-AR';
 
 // Registro del locale
@@ -18,11 +19,12 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
 
-    provideHttpClient(
-      withInterceptorsFromDi()
-    ),
+    provideHttpClient(withInterceptorsFromDi()),
 
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+
+    // ⭐️ ESTE ES EL QUE FALTABA
+    { provide: LOCALE_ID, useValue: 'es-AR' }
   ]
 })
 .catch(err => console.error(err));

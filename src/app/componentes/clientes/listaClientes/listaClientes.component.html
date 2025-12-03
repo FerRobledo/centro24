@@ -86,21 +86,25 @@
                     <ng-container *ngIf="client.mesesVigente > 0; else sinPago">
                       <div class="font-semibold" [class]="{
                           'text-green-600': client.mesesVigente > 1,
-                          'text-yellow-600 flex items-center gap-1': client.mesesVigente === 1
+                          'text-yellow-600': client.mesesVigente === 1
                         }">
                         <ng-container *ngIf="client.mesesVigente === 1">Último mes pago</ng-container>
                         <ng-container *ngIf="client.mesesVigente > 1">{{ client.mesesVigente }} meses
                           pagos</ng-container>
                       </div>
                       <div class="text-slate-500 text-xs mt-1">
-                        {{ getPeriodoHasta(client) | date: 'MMMM yyyy' }}
+                        {{ client.pago_hasta | date: 'MMMM yyyy' }}
                       </div>
                     </ng-container>
                     <ng-template #sinPago>
-                      <div class="text-red-600 font-semibold">Sin pagos</div>
-                      <div *ngIf="client.mesesVigente > 0" class="text-xs text-slate-500 mt-1">
-                        Debe {{ client.mesesVigente }} mes{{ client.mesesVigente > 1 ? 'es' : '' }} desde alta
+                      <div *ngIf="client.pago_hasta">
+                        <div class="text-red-400 font-semibold">Atrasado desde</div>
+                        <div *ngIf="client.pago_hasta" class="text-xs text-slate-500 mt-1">
+                          {{client.pago_hasta | date: 'MMMM yyyy'}}
+                        </div>
+
                       </div>
+                      <div *ngIf="!client.pago_hasta" class="text-red-600 font-semibold">Sin pagos</div>
                     </ng-template>
                   </div>
                   <button (click)="agregarPago(client)"

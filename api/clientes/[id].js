@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
 
     // GET
     if (req.method === 'GET') {
-        const { id, monthSelected } = req.query;
+        const { id } = req.query;
 
         // id = id_admin
         if (!id) {
@@ -51,42 +51,28 @@ module.exports = async (req, res) => {
             //     paramIndex++;
             // }
 
+
+            // Consulta que trae todos los clientes mensuales y (SI TIENE) el ultimo pago mensual realizado
             const query = `
-            SELECT 
-                cm.*
-            FROM clientes_mensuales cm
-            LEFT JOIN pagos_mensuales pm 
-                ON cm.id_client = pm.id_client 
-            ${where}
-            ORDER BY cm.id_client ASC, pm.fecha_pago DESC
+                SELECT 
+                    cm.*,
+                    pm.id AS pago_id,
+                    pm.periodo_hasta AS pago_hasta
+                FROM clientes_mensuales cm
+                LEFT JOIN pagos_mensuales pm 
+                    ON pm.id_client = cm.id_client
+                    AND pm.periodo_hasta = (
+                        SELECT MAX(periodo_hasta)
+                        FROM pagos_mensuales
+                        WHERE id_client = cm.id_client
+                    )
+                ${where}
+                ORDER BY cm.id_client ASC;
         `;
 
             const { rows } = await pool.query(query, params);
 
-            // Agrupar por cliente
-            const clientesMap = {};
-
-            for (const row of rows) {
-                const idClient = row.id_client;
-
-                if (!clientesMap[idClient]) {
-                    clientesMap[idClient] = {
-                        ...row,
-                        pagos: []
-                    };
-                }
-
-                if (row.id_pago) {
-                    clientesMap[idClient].pagos.push({
-                        id_pago: row.id_pago,
-                        fecha_pago: row.fecha_pago,
-                        monto: row.monto,
-                        mes: row.mes
-                    });
-                }
-            }
-
-            return res.status(200).json(Object.values(clientesMap));
+            return res.status(200).json(rows);
 
         } catch (error) {
             console.error(error);
@@ -197,74 +183,44 @@ module.exports = async (req, res) => {
     // DELETE
     if (req.method === 'DELETE') {
         const idAdmin = req.query.id;
-        const { action, id, idClient } = req.body;
+        const { idClient } = req.body;
 
-        if (action === 'deletePago') {
-            if (!id) {
-                return res.status(400).json({ error: "Faltan datos para eliminar el pago" });
-            }
-            try {
-                await pool.query(`DELETE FROM pagos_mensuales WHERE id = $1 AND id_admin = $2`, [id, idAdmin]);
-                return res.status(200).json({ success: true });
-            } catch (error) {
-                console.log(error);
-                return res.status(500).json({ error: 'Error no se pudo eliminar el pago', details: error.message });
-            }
-        } else {
-            if (!idAdmin || !idClient) {
-                return res.status(400).json({ error: 'Falta idAdmin o idClient' });
-            }
-            try {
-                const result = await pool.query(
-                    `UPDATE public.clientes_mensuales 
+        // Movido a /pagosMensuales/[idAdmin]/[idPago].js, action pasa a ser req.method === 'DELETE'
+
+        // if (action === 'deletePago') {
+        //     if (!id) {
+        //         return res.status(400).json({ error: "Faltan datos para eliminar el pago" });
+        //     }
+        //     try {
+        //         await pool.query(`DELETE FROM pagos_mensuales WHERE id = $1 AND id_admin = $2`, [id, idAdmin]);
+        //         return res.status(200).json({ success: true });
+        //     } catch (error) {
+        //         console.log(error);
+        //         return res.status(500).json({ error: 'Error no se pudo eliminar el pago', details: error.message });
+        //     }
+        // } else {
+
+        if (!idAdmin || !idClient) {
+            return res.status(400).json({ error: 'Falta idAdmin o idClient' });
+        }
+        try {
+            const result = await pool.query(
+                `UPDATE public.clientes_mensuales 
                      SET estado = 'Desactivo' 
                      WHERE id_client = $1 AND user_admin = $2`,
-                    [idClient, idAdmin]
-                );
-
-                if (result.rowCount > 0) {
-                    return res.status(200).json({ success: true });
-                } else {
-                    return res.status(404).json({ success: false });
-                }
-            } catch (error) {
-                console.error(error);
-                return res.status(500).json({ success: false });
-            }
-        }
-    }
-
-    // GET MES CLIENT
-    if (req.method === 'GET') {
-        const month = req.query.monthSelected;
-
-        if (!month) {
-            return res.status(400).json({
-                error: 'Error falta mes',
-                details: 'No se recibió el mes necesario',
-            });
-        }
-
-        try {
-            const { rows } = await pool.query(
-                `
-        SELECT * 
-        FROM public.clientes_mensuales cm
-        JOIN public.pagos_mensuales pm 
-          ON cm.id_client = pm.id_client
-        WHERE pm.mes = $1
-        `,
-                [month]
+                [idClient, idAdmin]
             );
 
-            res.json(rows);
+            if (result.rowCount > 0) {
+                return res.status(200).json({ success: true });
+            } else {
+                return res.status(404).json({ success: false });
+            }
         } catch (error) {
             console.error(error);
-            return res.status(500).json({
-                error: 'Error no se pudo obtener los clientes del mes',
-                details: error.message,
-            });
+            return res.status(500).json({ success: false });
         }
+
     }
 }
 

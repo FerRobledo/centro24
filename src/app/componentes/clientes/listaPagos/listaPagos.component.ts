@@ -1,30 +1,28 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AuthService } from 'src/app/auth/auth.service';
-import { ClientesService } from 'src/app/services/clientes.service';
 import { AgregarPagoModalComponent } from '../agregarPagoModal/agregarPagoModal.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
+import { PagoMensualService } from 'src/app/services/pagoMensual.service';
 
 @Component({
   selector: 'app-listaPagos',
   standalone: true,
-  imports: [ RouterModule, FormsModule, CommonModule, FiltroClientesPipe],
+  imports: [RouterModule, FormsModule, CommonModule, FiltroClientesPipe],
   templateUrl: './listaPagos.component.html'
 })
 export class ListaPagosComponent implements OnInit {
   private dialogRef: MatDialogRef<any> | null = null;
   constructor(
-    private clienteService: ClientesService,
+    private pagoMensualService: PagoMensualService,
     public dialog: MatDialog,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef 
   ) { }
 
-  @Input() clientes: any = [];
-  listaPagos: any[] = [];
+  pagos: any[] = [];
   eliminandoPagoId: number | null = null; // guarda el id del pago que está siendo eliminado
   filtroPago: string = '';
   isLoading: boolean = true;
@@ -35,62 +33,52 @@ export class ListaPagosComponent implements OnInit {
 
   loadData() {
     const idAdmin = this.authService.getIdAdmin();
+    this.pagos = [];
+    this.isLoading = true;
     if (!idAdmin) {
-      this.clientes = [];
-      this.listaPagos = [];
       this.isLoading = false;
       return;
     }
-    this.clientes = [];
-    this.listaPagos = [];
-    this.isLoading = true;
-    this.clienteService.getClientsOfMonth(idAdmin).subscribe({
+
+    this.pagoMensualService.getPagosMensuales(idAdmin).subscribe({
       next: (data) => {
-        this.clientes = data;
+        this.pagos = data;
+        console.log(data);
       },
       error: (error) => {
         console.error("Error en el pedido de clientes del día: ", error);
-        this.clientes = [];
+        this.pagos = [];
       },
       complete: () => {
         this.isLoading = false;
-        this.generarListaPagos();
       }
     })
   }
 
-  generarListaPagos() {
-    this.listaPagos = [];
-    this.clientes.forEach((cliente: any) => {
-      cliente.pagos.forEach((pago: any) => {
-        pago = { ...pago, cliente: cliente.cliente }
-        this.listaPagos.push(pago);
-      });
-    });
-  }
 
-  deletePago(id: number) {    
+  deletePago(id: number) {
     const idAdmin = this.authService.getIdAdmin();
-    this.eliminandoPagoId = id;
-    this.clienteService.deletePago(idAdmin, id).subscribe({
+    this.isLoading = true;
+    if (!idAdmin) {
+      this.isLoading = false;
+      return;
+    }
 
+    this.pagoMensualService.deletePago(idAdmin, id).subscribe({
       next: () => {
-        this.eliminandoPagoId = null;
-        this.listaPagos = (this.listaPagos || []).filter(p => p.id !== id);
-  
-        this.loadData();        
+        this.loadData();
       },
       error: (error) => {
         console.log(error);
-        this.eliminandoPagoId = null;
-      },
-    });
+        this.isLoading = false;
+      }
+    })
   }
 
   agregarPago() {
     this.dialogRef = this.dialog.open(AgregarPagoModalComponent, {
       maxWidth: '100%',
-      data: { clients: this.clientes },
+      data: { clients: this.pagos },
       disableClose: false,
       autoFocus: true,
     });
@@ -101,5 +89,20 @@ export class ListaPagosComponent implements OnInit {
         this.loadData();
       }
     });
+  }
+
+  toInputDatetimeWithDay(date: string | Date): string {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  toInputDatetime(date: string | Date): string {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}`;
   }
 }
