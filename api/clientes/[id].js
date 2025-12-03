@@ -21,69 +21,81 @@ module.exports = async (req, res) => {
     if (req.method === 'GET') {
         const { id, monthSelected } = req.query;
 
-        if (id) {
-            try {
-                const { rows: clientes } = await pool.query("SELECT * FROM clientes_mensuales WHERE user_admin = $1 AND estado = 'Activo' ORDER BY id_client ASC", [id]);
+        // id = id_admin
+        if (!id) {
+            return res.status(400).json({ error: "Debe enviar id (id_admin)" });
+        }
 
-                // Extraer los ids de clientes para buscar sus pagos
-                const idsClientes = clientes.map(c => c.id_client);
+        try {
+            let where = `WHERE cm.user_admin = $1 AND cm.estado = 'Activo'`;
+            let params = [id];
 
-                if (idsClientes.length === 0) {
-                    return res.status(200).json([]);
+
+            // ESTO ES IMPORTANTE PARA AGREGAR $1, $2, SEGUN LA CANTIDAD DE PARAMETROS QUE TENGAN
+            // ESTA BUENO PARA UNA CONSULTA QUE TENGA MUCHOS FILTROS DE FORMA DINAMICA
+            // WHERE nombre = $1 AND localidad = $2
+            // WHERE localidad = $1, en el caso de que no venga nombre por parametros (es solo un ejemplo de como se puede aplicar)
+            // EN ESTE CASO NO TENEMOS FILTROS DINAMICOS XD
+            let paramsIndex = 2;
+
+            // // Si tuvieramos un filtro dinamico podriamos hacer:
+            // if(filtro){
+
+            // SE USA `` PARA QUE LOS ESPACIOS LOS TOME DE FORMA LITERAL
+
+            //     where += ` AND cm.filtro = $${i}`
+            //     params.push(filtro);
+
+            // DESPUES DE MODIFICAR EL WHERE AUMENTAMOS EL paramIndex POR SI HAY MAS FILTROS
+
+            //     paramIndex++;
+            // }
+
+            const query = `
+            SELECT 
+                cm.*
+            FROM clientes_mensuales cm
+            LEFT JOIN pagos_mensuales pm 
+                ON cm.id_client = pm.id_client 
+            ${where}
+            ORDER BY cm.id_client ASC, pm.fecha_pago DESC
+        `;
+
+            const { rows } = await pool.query(query, params);
+
+            // Agrupar por cliente
+            const clientesMap = {};
+
+            for (const row of rows) {
+                const idClient = row.id_client;
+
+                if (!clientesMap[idClient]) {
+                    clientesMap[idClient] = {
+                        ...row,
+                        pagos: []
+                    };
                 }
 
-                // Obtener pagos de todos los clientes en un solo query
-                const { rows: pagos } = await pool.query(`
-                    SELECT * FROM pagos_mensuales 
-                    WHERE id_client = ANY($1) AND id_admin = $2
-                    ORDER BY fecha_pago DESC
-                    `, [idsClientes, id]);
-
-                // Asociar pagos a cada cliente
-                const pagosPorCliente = pagos.reduce((acc, pago) => {
-                    if (!acc[pago.id_client]) acc[pago.id_client] = [];
-                    acc[pago.id_client].push(pago);
-                    return acc;
-                }, {});
-
-                // Agregar los pagos a cada cliente
-                clientes.forEach(cliente => {
-                    cliente.pagos = pagosPorCliente[cliente.id_client] || [];
-                });
-
-                return res.status(200).json(clientes);
-
-            } catch (error) {
-                console.error(error);
-                return res.status(500).json({ error: 'Error no se pudo obtener los clientes del dia', details: error.message });
+                if (row.id_pago) {
+                    clientesMap[idClient].pagos.push({
+                        id_pago: row.id_pago,
+                        fecha_pago: row.fecha_pago,
+                        monto: row.monto,
+                        mes: row.mes
+                    });
+                }
             }
-        } else if (monthSelected) {
-            // Obtener clientes con pagos para mes dado
-            try {
-                const { rows } = await pool.query(
-                    `
-                    SELECT * 
-                    FROM public.clientes_mensuales cm
-                    JOIN public.pagos_mensuales pm 
-                      ON cm.id_client = pm.id_client
-                    WHERE pm.mes = $1 AND cm.estado = 'Activo'
-                    `,
-                    [monthSelected]
-                );
 
-                return res.status(200).json(rows);
-            } catch (error) {
-                console.error(error);
-                return res.status(500).json({
-                    error: 'Error no se pudo obtener los clientes del mes',
-                    details: error.message,
-                });
-            }
-        } else {
-            return res.status(400).json({ error: 'Debe especificar parámetro id o monthSelected en query' });
+            return res.status(200).json(Object.values(clientesMap));
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({
+                error: 'Error al obtener datos',
+                details: error.message
+            });
         }
     }
-
     // POST
     if (req.method === 'POST') {
         const { accion } = req.body;

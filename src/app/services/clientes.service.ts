@@ -29,11 +29,6 @@ export class ClientesService {
     return this.http.put(this.origin + '/api/clientes/' + idAdmin, body);
   }
 
-  public getMontOfCurrentClient(monthSelected: string) {
-    const params = new HttpParams().set('monthSelected', monthSelected);
-    return this.http.get<any[]>(this.origin + '/api/clientes', { params });
-  }
-
   public asignarPago(idAdmin: number, infoPago: any): any{
     const data = {infoPago, accion:'addPago'}
     return this.http.post(this.origin + '/api/clientes/' + idAdmin, data)
