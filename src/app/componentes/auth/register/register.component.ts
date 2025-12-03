@@ -7,8 +7,7 @@ import { AuthService } from 'src/app/auth/auth.service';
   selector: 'app-register',
   standalone: true,
   imports: [ RouterModule, ReactiveFormsModule],
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+  templateUrl: './register.component.html'
 })
 export class RegisterComponent implements OnInit {
 

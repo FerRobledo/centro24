@@ -13,8 +13,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-insertarCliente',
   standalone: true,
   imports: [ FormsModule, ReactiveFormsModule, MatRadioModule, CommonModule ],
-  templateUrl: './insertarCliente.component.html',
-  styleUrls: ['./insertarCliente.component.css']
+  templateUrl: './insertarCliente.component.html'
 })
 export class InsertarClienteComponent implements OnInit {
   @Output() closeForm = new EventEmitter<void>();

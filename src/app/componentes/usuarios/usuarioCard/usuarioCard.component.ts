@@ -10,8 +10,7 @@ import { newUsuario, Usuario } from 'src/assets/dto/usuario';
   selector: 'app-usuarioCard',
   standalone: true,
   imports: [MatSlideToggleModule, CommonModule],
-  templateUrl: './usuarioCard.component.html',
-  styleUrls: ['./usuarioCard.component.css']
+  templateUrl: './usuarioCard.component.html'
 })
 export class UsuarioCardComponent implements OnInit {
 
@@ -40,7 +39,7 @@ export class UsuarioCardComponent implements OnInit {
     } else {
       this.usuario.roles = this.usuario.roles.filter(r => r.id !== rol.id);
     }
-    
+
     this.userService.editUsuario(this.usuario).subscribe({
       error: error => console.log(error),
       complete: () => this.cargandoCardUsuario = false,
@@ -52,7 +51,7 @@ export class UsuarioCardComponent implements OnInit {
     return this.usuario.roles.some(r => r.id === rol.id);
   }
 
-  eliminarUsuario(){
+  eliminarUsuario() {
     this.cargandoCardUsuario = true;
     this.userService.eliminarUsuario(this.usuario).subscribe({
       next: () => location.reload(),

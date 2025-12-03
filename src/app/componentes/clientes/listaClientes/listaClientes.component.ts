@@ -16,8 +16,7 @@ import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
   selector: 'app-listaClientes',
   standalone: true,
   imports: [ RouterModule, FormsModule, ReactiveFormsModule, MatDividerModule, CommonModule, FiltroClientesPipe ],
-  templateUrl: './listaClientes.component.html',
-  styleUrls: ['./listaClientes.component.css']
+  templateUrl: './listaClientes.component.html'
 })
 export class ListaClientesComponent implements OnInit, OnDestroy {
   private dialogRef: MatDialogRef<any> | null = null;

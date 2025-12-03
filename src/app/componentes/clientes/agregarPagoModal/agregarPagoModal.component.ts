@@ -17,8 +17,7 @@ const fechaFormateada = new Date().toLocaleDateString('es-AR', {
   selector: 'app-agregarPagoModal',
   standalone: true,
   imports: [ ReactiveFormsModule, SelectorClientesComponent, CommonModule, MatDividerModule ],
-  templateUrl: './agregarPagoModal.component.html',
-  styleUrls: ['./agregarPagoModal.component.css']
+  templateUrl: './agregarPagoModal.component.html'
 })
 export class AgregarPagoModalComponent implements OnInit {
 

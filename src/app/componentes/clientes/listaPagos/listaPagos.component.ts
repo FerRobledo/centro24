@@ -12,8 +12,7 @@ import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
   selector: 'app-listaPagos',
   standalone: true,
   imports: [ RouterModule, FormsModule, CommonModule, FiltroClientesPipe],
-  templateUrl: './listaPagos.component.html',
-  styleUrls: ['./listaPagos.component.css']
+  templateUrl: './listaPagos.component.html'
 })
 export class ListaPagosComponent implements OnInit {
   private dialogRef: MatDialogRef<any> | null = null;

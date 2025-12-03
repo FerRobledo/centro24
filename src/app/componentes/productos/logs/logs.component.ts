@@ -13,8 +13,7 @@ interface DialogData {
   selector: 'app-logs',
   standalone: true,
   imports: [ FormsModule, MatDialogModule, CommonModule],
-  templateUrl: './logs.component.html',
-  styleUrl: './logs.component.css'
+  templateUrl: './logs.component.html'
 })
 export class LogsComponent implements OnInit {
   

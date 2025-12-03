@@ -12,8 +12,7 @@ import { Rol } from 'src/assets/dto/rol';
   selector: 'app-UsuarioModal',
   standalone: true,
   imports:[ReactiveFormsModule, MatSlideToggleModule, CommonModule],
-  templateUrl: './UsuarioModal.component.html',
-  styleUrls: ['./UsuarioModal.component.css']
+  templateUrl: './UsuarioModal.component.html'
 })
 export class UsuarioModalComponent implements OnInit {
 

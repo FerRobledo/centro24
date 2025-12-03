@@ -11,8 +11,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-historial-clients',
   standalone: true,
   imports: [ FormsModule, CommonModule ],
-  templateUrl: './historial-clients.component.html',
-  styleUrls: ['./historial-clients.component.css'],
+  templateUrl: './historial-clients.component.html'
 })
 export class HistorialClientsComponent {
   isLoading = false;

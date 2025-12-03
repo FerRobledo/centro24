@@ -9,8 +9,7 @@ import { CobranzaService } from 'src/app/services/cobranza.service';
   selector: 'app-detailsHistorial',
   standalone: true,
   imports: [ FormsModule, CommonModule ],
-  templateUrl: './detailsHistorial.component.html',
-  styleUrls: ['./detailsHistorial.component.css']
+  templateUrl: './detailsHistorial.component.html'
 })
 export class DetailsHistorialComponent implements OnInit {
   idCierre!: number;

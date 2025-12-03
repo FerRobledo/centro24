@@ -6,8 +6,7 @@ import { FormControl, FormsModule } from '@angular/forms';
   selector: 'app-selectorClientes',
   standalone: true,
   imports: [ FormsModule, CommonModule ],
-  templateUrl: './selectorClientes.component.html',
-  styleUrls: ['./selectorClientes.component.css']
+  templateUrl: './selectorClientes.component.html'
 })
 export class SelectorClientesComponent implements OnInit {
 

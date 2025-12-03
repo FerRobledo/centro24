@@ -6,8 +6,7 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-selectorDePagos',
   standalone: true,
   imports: [ FormsModule, CommonModule ],
-  templateUrl: './selectorDePagos.component.html',
-  styleUrls: ['./selectorDePagos.component.css']
+  templateUrl: './selectorDePagos.component.html'
 })
 export class SelectorDePagosComponent implements OnInit {
 
