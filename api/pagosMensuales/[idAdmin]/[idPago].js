@@ -25,7 +25,7 @@ module.exports = async (req, res) => {
             return res.status(400).json({ error: "Faltan datos para eliminar el pago" });
         }
         try {
-            await pool.query(`DELETE FROM pagos_mensuales WHERE id = $1 AND id_admin = $2`, [idPago, idAdmin]);
+            await pool.query(`UPDATE pagos_mensuales SET activo = false WHERE id = $1 AND id_admin = $2`, [idPago, idAdmin]);
             return res.status(200).json({ success: true });
         } catch (error) {
             console.log(error);

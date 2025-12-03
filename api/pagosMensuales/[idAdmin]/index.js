@@ -27,14 +27,14 @@ module.exports = async (req, res) => {
 
         try {
             const query = `
-                SELECT 
-                    pm.*,
-                    cm.cliente as cliente_nombre
-                FROM pagos_mensuales pm
-                LEFT JOIN clientes_mensuales cm ON pm.id_client = cm.id_client
-                WHERE pm.estado = true AND pm.id_admin = $1
-                ORDER BY pm.fecha_pago DESC;
-        `;
+            SELECT 
+            pm.*,
+            cm.cliente as cliente_nombre
+            FROM pagos_mensuales pm
+            LEFT JOIN clientes_mensuales cm ON pm.id_client = cm.id_client
+            WHERE pm.activo = true AND pm.id_admin = $1
+            ORDER BY pm.fecha_pago DESC;
+            `;
 
             const { rows } = await pool.query(query, [idAdmin]);
 
@@ -50,9 +50,29 @@ module.exports = async (req, res) => {
     }
     // POST
     if (req.method === 'POST') {
-    }
+        const { idAdmin } = req.query;
+        const { client, fechaDesde, fechaHasta, monto, metodoPago } = req.body;
 
-    if (req.method === 'PUT') {
+        try {
+            // Validar método de pago conocido
+            const allowedMetodos = ['Efectivo', 'Debito', 'Credito', 'Transferencia', 'Cheque'];
+
+            if (!allowedMetodos.includes(metodoPago)) {
+                return res.status(400).json({ error: 'Método de pago inválido' });
+            }
+
+            await pool.query(
+                `
+                INSERT INTO pagos_mensuales
+                (id_client, fecha_pago, monto, periodo_desde, periodo_hasta, id_admin, activo, metodo_pago)
+                VALUES ($1, now(), $2, $3, $4, $5, $6, $7)
+                `, [client, monto, fechaDesde, fechaHasta, idAdmin, true, metodoPago]
+            );
+            return res.status(201).json({ success: true });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ error: 'Error no se pudo insertar el pago', details: error.message });
+        }
     }
 }
 

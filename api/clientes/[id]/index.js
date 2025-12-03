@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
             // WHERE nombre = $1 AND localidad = $2
             // WHERE localidad = $1, en el caso de que no venga nombre por parametros (es solo un ejemplo de como se puede aplicar)
             // EN ESTE CASO NO TENEMOS FILTROS DINAMICOS XD
-            let paramsIndex = 2;
+            let paramsIndex = 0;
 
             // // Si tuvieramos un filtro dinamico podriamos hacer:
             // if(filtro){
@@ -64,7 +64,7 @@ module.exports = async (req, res) => {
                     AND pm.periodo_hasta = (
                         SELECT MAX(periodo_hasta)
                         FROM pagos_mensuales
-                        WHERE id_client = cm.id_client
+                        WHERE id_client = cm.id_client and pm.activo = true
                     )
                 ${where}
                 ORDER BY cm.id_client ASC;
@@ -84,100 +84,59 @@ module.exports = async (req, res) => {
     }
     // POST
     if (req.method === 'POST') {
-        const { accion } = req.body;
         const { id } = req.query;
 
-        if (accion === 'addPago') {
-            const { infoPago } = req.body;
-
-            // Validar método de pago conocido
-            const allowedMetodos = ['Efectivo', 'Debito', 'Credito', 'Transferencia', 'Cheque'];
-            const metodo = infoPago.metodoPago;
-            if (!allowedMetodos.includes(metodo)) {
-                return res.status(400).json({ error: 'Método de pago inválido' });
-            }
-
-            try {
-                await pool.query(
-                    `
-                    INSERT INTO pagos_mensuales
-                    (id_client, fecha_pago, monto, periodo_desde, periodo_hasta, id_admin, estado, metodo_pago)
-                    VALUES ($1, now(), $2, $3, $4, $5, $6, $7)
-                    `, [infoPago.client, infoPago.monto, infoPago.fechaDesde, infoPago.fechaHasta, id, 'false', metodo]
-                );
-                return res.status(201).json({ success: true });
-            } catch (error) {
-                console.log(error);
-                return res.status(500).json({ error: 'Error no se pudo insertar el pago', details: error.message });
-            }
-        } else {
-            const payload = req.body;
-            if (!id) {
-                return res.status(400).json({ error: 'Error falta id para insertar usuario' });
-            }
-            try {
-                const { rows } = await pool.query(
-                    `INSERT INTO public.clientes_mensuales
+        const payload = req.body;
+        if (!id) {
+            return res.status(400).json({ error: 'Error falta id para insertar usuario' });
+        }
+        try {
+            const { rows } = await pool.query(
+                `INSERT INTO public.clientes_mensuales
                     (tipo, cliente, monto, user_admin)
                     VALUES ($2, $3, $4, $1) RETURNING *`,
-                    [id, payload.tipo, payload.cliente, payload.monto]
-                );
-                return res.status(201).json(rows[0]);
-            } catch (error) {
-                console.log(error);
-                return res.status(500).json({ error: 'Error no se pudo insertar el cliente', details: error.message });
-            }
+                [id, payload.tipo, payload.cliente, payload.monto]
+            );
+            return res.status(201).json(rows[0]);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ error: 'Error no se pudo insertar el cliente', details: error.message });
         }
+
     }
 
     if (req.method === 'PUT') {
-        const { accion, porcentaje, idClient, ...payload } = req.body;
+        const { idClient, ...payload } = req.body;
         const idAdmin = req.query.id;
 
         if (!idAdmin) {
             return res.status(400).json({ error: 'Error falta id ' });
         }
 
-        if (accion === 'incrementar') {
-            try {
-                const { rows } = await pool.query(
-                    `UPDATE public.clientes_mensuales
-                        SET monto = ROUND((monto + (monto * $1 / 100)) / 1000.0) * 1000
-                        WHERE user_admin = $2
-                        RETURNING *;`,
-                    [porcentaje, idAdmin]
-                );
-                return res.status(200).json(rows);
-
-            } catch (error) {
-                console.error(error);
-                return res.status(500).json({ error: 'Error al incrementar monto mensual', details: error.message });
-            }
-        } else {
-            if (!idClient) {
-                return res.status(400).json({ error: 'Falta id del cliente para actualizar' });
-            }
-            try {
-                const { rows } = await pool.query(
-                    `UPDATE public.clientes_mensuales
+        if (!idClient) {
+            return res.status(400).json({ error: 'Falta id del cliente para actualizar' });
+        }
+        try {
+            const { rows } = await pool.query(
+                `UPDATE public.clientes_mensuales
                  SET tipo = $1,
                      cliente = $2,
                      monto = $3
                  WHERE id_client = $4 AND user_admin = $5
                  RETURNING *;`,
-                    [payload.tipo, payload.cliente, payload.monto, idClient, idAdmin]
-                );
+                [payload.tipo, payload.cliente, payload.monto, idClient, idAdmin]
+            );
 
-                if (rows.length === 0) {
-                    return res.status(404).json({ error: 'Cliente no encontrado o no autorizado' });
-                }
-
-                return res.status(200).json(rows[0]);
-            } catch (error) {
-                console.log(error);
-                return res.status(500).json({ error: 'Error al actualizar cliente', details: error.message });
+            if (rows.length === 0) {
+                return res.status(404).json({ error: 'Cliente no encontrado o no autorizado' });
             }
+
+            return res.status(200).json(rows[0]);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ error: 'Error al actualizar cliente', details: error.message });
         }
+
     }
 
     // DELETE

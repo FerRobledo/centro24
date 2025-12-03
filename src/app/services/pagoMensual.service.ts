@@ -15,6 +15,10 @@ export class PagoMensualService {
   }
 
   public deletePago(idAdmin: number, idPago: number): Observable<any> {
-    return this.http.delete(this.origin + '/api/pagosMensuales/' + idAdmin + "/" + idPago );
+    return this.http.delete(this.origin + '/api/pagosMensuales/' + idAdmin + "/" + idPago);
+  }
+
+  public asignarPago(idAdmin: number, infoPago: any): any {
+    return this.http.post(this.origin + '/api/pagosMensuales/' + idAdmin, infoPago)
   }
 }

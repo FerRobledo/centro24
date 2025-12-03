@@ -29,14 +29,9 @@ export class ClientesService {
     return this.http.put(this.origin + '/api/clientes/' + idAdmin, body);
   }
 
-  public asignarPago(idAdmin: number, infoPago: any): any{
-    const data = {infoPago, accion:'addPago'}
-    return this.http.post(this.origin + '/api/clientes/' + idAdmin, data)
-  }
-
-  public incrementClient(idAdmin: number, porcentaje: number): Observable<any> {
-    const body = { porcentaje, accion:'incrementar' }; 
-    return this.http.put(this.origin + '/api/clientes/' + idAdmin, body);
+  public incrementClient(idAdmin: number, porcentaje: number): Observable<any> { 
+    // ANTES /aumentarPrecio era accion = 'incrementar', apuntaba a /api/clientes/[id], ahora apunta a /api/clientes/[id]/aumentarPrecio
+    return this.http.put(this.origin + '/api/clientes/' + idAdmin + "/aumentarPrecio", {porcentaje: porcentaje});
   }
   
   // Movido a pagoMensual.service 

@@ -1,12 +1,12 @@
 import { DIALOG_DATA } from '@angular/cdk/dialog';
-import { ChangeDetectorRef, Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from 'src/app/auth/auth.service';
-import { ClientesService } from 'src/app/services/clientes.service';
 import { SelectorClientesComponent } from '../selectorClientes/selectorClientes.component';
 import { CommonModule } from '@angular/common';
 import { MatDividerModule } from '@angular/material/divider';
+import { PagoMensualService } from 'src/app/services/pagoMensual.service';
 
 const fechaFormateada = new Date().toLocaleDateString('es-AR', {
   month: '2-digit',
@@ -25,9 +25,8 @@ export class AgregarPagoModalComponent implements OnInit {
     public dialogRef: MatDialogRef<AgregarPagoModalComponent>,
     private fb: FormBuilder,
     private authService: AuthService,
-    private clientesService: ClientesService,
+    private pagoMensualService: PagoMensualService,
     @Inject(DIALOG_DATA) public data: any,
-    private cdr: ChangeDetectorRef
   ) { }
 
   pagoForm!: FormGroup;
@@ -112,7 +111,7 @@ export class AgregarPagoModalComponent implements OnInit {
 
     const adminId = this.authService.getIdAdmin();
 
-    this.clientesService.asignarPago(adminId, pagoData).subscribe({
+    this.pagoMensualService.asignarPago(adminId, pagoData).subscribe({
       error: (error: any) => console.log(error),
     });
 
