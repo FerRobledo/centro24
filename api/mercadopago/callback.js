@@ -15,26 +15,32 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    console.log("Webhook recibido:", JSON.stringify(req.body, null, 2));
-    // MercadoPago envía el ID del pago en `data.id`
+    try{
 
-
-    // // Consultar a MercadoPago para obtener detalles del pago
-    // const { data: payment } = await axios.get(
-    //     `https://api.mercadopago.com/v1/payments/135763152487`,
-    //     {
-    //         headers: { Authorization: `Bearer ${await getAccessTokenValido(usuario)}` }
-    //     }
-    // );
-
-    // console.log("Detalle del pago:", payment);
-    // const estadoPago = payment.status; // approved, rejected, pending
-    // const referencia = payment.external_reference; // tu id_venta
-    // console.log(`Pago ${payment.id} | Estado: ${estadoPago} | Ref: ${referencia}`);
-    // if (referencia) {
-    //     console.log(referencia);
-
-    // }
+        console.log("Webhook recibido:", JSON.stringify(req.body, null, 2));
+        // MercadoPago envía el ID del pago en `data.id`
+        
+        const usuario = {mp_client_id: '6573400378868183', mp_client_secret: 'oKo3UVU5L7jJvqMvfBiIrEJW6eyNfw9Z'}
+        // Consultar a MercadoPago para obtener detalles del pago
+        const { data: payment } = await axios.get(
+            `https://api.mercadopago.com/v1/payments/135763152487`,
+            {
+                headers: { Authorization: `Bearer ${await getAccessTokenValido(usuario)}` }
+            }
+        );
+        
+        console.log("Detalle del pago:", payment);
+        const estadoPago = payment.status; // approved, rejected, pending
+        const referencia = payment.external_reference; // tu id_venta
+        console.log(`Pago ${payment.id} | Estado: ${estadoPago} | Ref: ${referencia}`);
+        if (referencia) {
+            console.log(referencia);
+            
+        }
+    } catch (error){
+        console.log(error);
+        return res.status(500).json({error: error});
+    }
     // Responder 200 a MercadoPago (OBLIGATORIO)
     res.status(200).end();
 };
