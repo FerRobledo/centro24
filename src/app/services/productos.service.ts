@@ -19,8 +19,8 @@ export class ProductosService {
   public actualizarProducto(producto: ProductoDTO): Observable<Producto> {
     const idAdmin = this.authService.getIdAdmin();
     const updates = producto.getUpdates();
-    const body = { ...updates, idAdmin };
-    return this.http.put<Producto>(this.origin + '/api/productos/' + producto.id, body);
+    const body = { ...updates };
+    return this.http.put<Producto>(this.origin + `/api/productos/${idAdmin}/${producto.id}`, body);
   }
 
   public actualizarStock(id: number, stock: number): Observable<any> {
@@ -36,8 +36,8 @@ export class ProductosService {
   public eliminarProducto(producto: ProductoDTO): Observable<any> {
     const id_admin = this.authService.getIdAdmin();
     const id_producto = producto.id;
-    const url = `${this.origin}/api/productos/${id_admin}`;
-    return this.http.delete<any>(url, { params: { id_producto: id_producto.toString() } });
+    const url = `${this.origin}/api/productos/${id_admin}/${id_producto}`;
+    return this.http.delete<any>(url);
   }
 
   public addAllProductos(productos: ProductoDTO[]): Observable<void> {
@@ -46,6 +46,6 @@ export class ProductosService {
       ...producto,
       id_admin
     }));
-    return this.http.post<any>(`${this.origin}/api/productos/${id_admin}`, {accion: 'addAll', productos: nuevosProductos})
+    return this.http.post<any>(`${this.origin}/api/productos/${id_admin}/agregarTodo`, {productos: nuevosProductos})
   }
 }
