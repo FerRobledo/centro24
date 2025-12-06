@@ -1,12 +1,15 @@
-const { Pool } = require('pg');
-
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL, // Definir en Vercel
-    ssl: { rejectUnauthorized: false }, // Necesario si usas PostgreSQL en la nube
-});
+const { pool } = require('../../db');
+const { requireAuth } = require('../../protected/requireAuth')
 
 module.exports = async (req, res) => {
     const origin = req.headers.origin || '*'; // Usa * si no hay origen
+    // Autenticación
+    try {
+        req.user = requireAuth(req);
+    } catch (e) {
+        return res.status(401).json({ error: 'No autorizado', details: e.message });
+    }
+
 
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
@@ -19,7 +22,7 @@ module.exports = async (req, res) => {
 
     // DELETE
     if (req.method === 'DELETE') {
-        const {idAdmin, idPago}= req.query;
+        const { idAdmin, idPago } = req.query;
 
         if (!idPago) {
             return res.status(400).json({ error: "Faltan datos para eliminar el pago" });

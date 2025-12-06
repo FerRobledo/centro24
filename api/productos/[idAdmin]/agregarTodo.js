@@ -10,6 +10,13 @@ const ProductoDTO = require('../../models/producto.dto'); // Inyecto el dto de l
 module.exports = async (req, res) => {
     const origin = req.headers.origin || '*'; // Usa * si no hay origen
 
+    // Autenticación
+    try {
+        req.user = requireAuth(req);
+    } catch (e) {
+        return res.status(401).json({ error: 'No autorizado', details: e.message });
+    }
+
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -65,7 +72,7 @@ module.exports = async (req, res) => {
 
 
     if (req.method === 'DELETE') {
-        
+
     }
 
     // Si ningún método coincide

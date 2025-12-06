@@ -1,11 +1,7 @@
 const axios = require('axios');
-const { Pool } = require('pg');
+const { pool } = require('./db');
 const getFechaArgentina = require('./helpers/getFechaArgentina');
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL, // Definir en Vercel
-    ssl: { rejectUnauthorized: false }, // Necesario si usas PostgreSQL en la nube
-});
 
 async function crearPreferenciaConToken(access_token, userId) {
 

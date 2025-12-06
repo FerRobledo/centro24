@@ -1,10 +1,5 @@
-const { Pool } = require('pg');
+const { pool } = require('../db');
 const { requireAuth } = require('../protected/requireAuth');
-
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-});
 
 module.exports = async (req, res) => {
     const origin = req.headers.origin || '*';

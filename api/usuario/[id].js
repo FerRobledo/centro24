@@ -1,13 +1,16 @@
-const { Pool } = require('pg');
+const { pool } = require('../db')
 const { requireAuth } = require('../protected/requireAuth');
-
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL, // Definir en Vercel
-    ssl: { rejectUnauthorized: false }, // Necesario si usas PostgreSQL en la nube
-});
 
 module.exports = async (req, res) => {
     const origin = req.headers.origin || '*'; // Usa * si no hay origen
+
+    // Autenticación
+    try {
+        req.user = requireAuth(req);
+    } catch (e) {
+        return res.status(401).json({ error: 'No autorizado', details: e.message });
+    }
+
 
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');

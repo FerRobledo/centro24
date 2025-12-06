@@ -1,12 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const jwtService = require('./protected/jwt')
-const { Pool } = require('pg');
-
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL, // Definir en Vercel
-    ssl: { rejectUnauthorized: false }, // Necesario si usas PostgreSQL en la nube
-});
+const { pool } = require('./db');
 
 module.exports = async (req, res) => {
     const origin = req.headers.origin || '*'; // Usa * si no hay origen
@@ -60,7 +55,7 @@ module.exports = async (req, res) => {
             }
 
             // Generar el JWT
-            const token = jwtService.generateToken(user);            
+            const token = jwtService.generateToken(user);
             return res.status(200).json({ token });
         } catch (error) {
             console.log(error);

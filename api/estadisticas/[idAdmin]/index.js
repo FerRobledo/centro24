@@ -1,11 +1,6 @@
 // api/estadisticas/[idAdmin]/index.js
-const { Pool } = require('pg');
-const { requireAuth } = require('../protected/requireAuth');
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
+const { pool } = require('../../db');
+const { requireAuth } = require('../../protected/requireAuth');
 
 const HEADERS = {
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -15,6 +10,7 @@ const HEADERS = {
 
 module.exports = async (req, res) => {
   const origin = req.headers.origin || '*';
+
   Object.entries(HEADERS).forEach(([key, value]) =>
     res.setHeader(key, value)
   );
@@ -33,19 +29,19 @@ module.exports = async (req, res) => {
   }
 
   try {
-//antes era id 
+    //antes era id 
     const { idAdmin } = req.query;
 
     if (!idAdmin) {
       return res.status(400).json({ error: 'Falta idAdmin en la ruta' });
     }
 
-    const previous   = await getStatsPreviousMonth(idAdmin);
-    const current    = await getStatsCurrenMonth(idAdmin);
-    const clients    = await getClients(idAdmin);
+    const previous = await getStatsPreviousMonth(idAdmin);
+    const current = await getStatsCurrenMonth(idAdmin);
+    const clients = await getClients(idAdmin);
     const newClients = await getNewClients(idAdmin);
-    const users      = await getUsersByAdmin(idAdmin);
-    const yesterday  = await getCollectionYesterday(idAdmin);
+    const users = await getUsersByAdmin(idAdmin);
+    const yesterday = await getCollectionYesterday(idAdmin);
 
     return res
       .status(200)
