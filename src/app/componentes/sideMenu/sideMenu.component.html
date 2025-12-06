@@ -34,3 +34,46 @@
   </div>
 
 </div>
+
+
+<div *ngIf="mostrarAdvertencia() && advertenciaVisible"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
+
+  <div class="relative bg-white w-full max-w-md rounded-2xl shadow-xl p-6 animate-fadeIn">
+
+    <!-- Botón X arriba a la derecha -->
+    <button (click)="cerrarAdvertencia()" *ngIf="diasRestantes>=0"
+      class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition text-xl font-bold">
+      ✕
+    </button>
+
+    <h2 class="text-xl font-semibold text-red-600 text-center mb-3">
+      ⚠️ Atención {{ nameUserCurrent }}
+    </h2>
+
+    <!-- Si aún no venció -->
+    <p *ngIf="diasRestantes >= 0" class="text-center text-gray-700">
+      Tu suscripción <span class="font-semibold">caduca en
+        {{ diasRestantes == 1 ? '1 día.' : diasRestantes + ' días.' }}
+      </span>
+    </p>
+
+    <!-- Si ya venció -->
+    <p *ngIf="diasRestantes < 0" class="text-center text-gray-700">
+      Tu suscripción ha <span class="font-semibold text-red-600">caducado</span>.
+    </p>
+
+    <!-- Botón para pagar -->
+    <div class="mt-6 flex justify-center space-x-3">
+      <button (click)="logout()"
+        class="px-5 py-2 rounded-xl bg-red-400 text-white hover:bg-red-500 transition shadow-md active:scale-95">
+        Cerrar sesión
+      </button>
+      <button (click)="redirigirMercadoPago()"
+        class="px-5 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition shadow-md active:scale-95">
+        Renovar con Mercado Pago
+      </button>
+    </div>
+
+  </div>
+</div>

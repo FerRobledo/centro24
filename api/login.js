@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const jwtService = require('./protected/jwt')
 const { Pool } = require('pg');
 
 const pool = new Pool({
@@ -27,6 +28,7 @@ module.exports = async (req, res) => {
                 const payload = jwt.verify(token, process.env.JWT_SECRET);
                 return res.status(200).json({ valid: true });
             } catch (err) {
+                console.log(err);
                 return res.status(401).json({ valid: false });
             }
         }
@@ -38,7 +40,7 @@ module.exports = async (req, res) => {
             // Verificar si el usuario existe en la base de datos
             const result = await pool.query(`
                     SELECT 
-                    u.id , u.nombre, u.password_hash, u.user_padre_id,
+                    u.id , u.nombre, u.password_hash, u.user_padre_id, u.fecha_ultimo_pago,
                     array_agg(r.nombre) AS roles
                     FROM users u
                     INNER JOIN user_rol ur ON u.id = ur.id_user
@@ -58,12 +60,7 @@ module.exports = async (req, res) => {
             }
 
             // Generar el JWT
-            const token = jwt.sign(
-                { userId: user.id, username: user.nombre, idAdmin: user.user_padre_id, roles: user.roles },
-                process.env.JWT_SECRET,
-                { expiresIn: '12h' } // El token expira en 12 horas
-            );
-
+            const token = jwtService.generateToken(user);            
             return res.status(200).json({ token });
         } catch (error) {
             console.log(error);
