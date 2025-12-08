@@ -1,6 +1,6 @@
-import { verifyToken } from './jwt.js';
+const { verifyToken } = require('./jwt');
 
-export function requireAuth(req) {
+function requireAuth(req) {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     throw new Error('No token provided');
@@ -13,5 +13,7 @@ export function requireAuth(req) {
     throw new Error('Token inválido o expirado');
   }
   // Puedes agregar más validaciones si querés (por ejemplo, chequear usuario en DB)
-  return { userId: payload.id, username: payload.username };
+  return { userId: payload.userId, username: payload.username };
 }
+
+module.exports = { requireAuth };

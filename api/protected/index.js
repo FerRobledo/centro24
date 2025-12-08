@@ -1,5 +1,5 @@
-import 'dotenv/config';
-import { withAuth } from './authMiddleware.js';
+require('dotenv/config');
+const { withAuth } = require('./authMiddleware');
 
 const handler = async (req, res) => {
   const origin = req.headers.origin || '*';
@@ -21,4 +21,4 @@ const handler = async (req, res) => {
   }
 };
 
-export default withAuth(handler);
+module.exports = withAuth(handler);

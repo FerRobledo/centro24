@@ -1,6 +1,6 @@
-import { requireAuth } from './requireAuth.js';
+const { requireAuth } = require('./requireAuth');
 
-export function withAuth(handler) {
+function withAuth(handler) {
   return async (req, res) => {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -15,3 +15,5 @@ export function withAuth(handler) {
     }
   };
 }
+
+module.exports = { withAuth };
