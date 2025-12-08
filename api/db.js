@@ -1,13 +1,18 @@
 const { Pool, types } = require('pg');
 
-// Esto hace que TIMESTAMP y TIMESTAMPTZ se devuelvan como string
 types.setTypeParser(types.builtins.TIMESTAMP, val => val);
 types.setTypeParser(types.builtins.TIMESTAMPTZ, val => val);
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
+});
+
+pool.on('error', (err, client) => {
+  console.error('❌ Error en pool:', err.message);
 });
 
 module.exports = { pool };
-
