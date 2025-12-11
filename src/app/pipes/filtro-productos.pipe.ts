@@ -1,13 +1,14 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ProductoDTO } from 'src/assets/dto/producto';
+import { Producto } from 'src/assets/dto/producto';
 
 @Pipe({
-  name: 'filtroProductos'
+  name: 'filtroProductos',
+  standalone: true
 })
 
 export class FiltroProductosPipe implements PipeTransform {
 
-  transform(productos: ProductoDTO[], filtroTexto: string, filtroStock: boolean = false): ProductoDTO[] {
+  transform(productos: Producto[], filtroTexto: string, filtroStock: boolean = false): Producto[] {
     if(!productos) 
       return [];
 

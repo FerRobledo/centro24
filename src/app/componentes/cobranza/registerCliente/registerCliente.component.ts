@@ -1,9 +1,11 @@
 import { Component, OnInit, EventEmitter, Output, Input, Inject } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from 'src/app/services/auth.service';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, Validators } from '@angular/forms';
+import { AuthService } from 'src/app/auth/auth.service';
 import { CobranzaService } from '../../../services/cobranza.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { DIALOG_DATA } from '@angular/cdk/dialog';
+import { SelectorDePagosComponent } from '../selectorDePagos/selectorDePagos.component';
+import { CommonModule } from '@angular/common';
 
 // Tipos disponibles de pago, tendria que venir desde api
 const tiposDePagos: string[] = [
@@ -13,8 +15,10 @@ const tiposDePagos: string[] = [
 
 @Component({
   selector: 'app-registerCliente',
+  standalone: true,
+  imports: [ FormsModule, SelectorDePagosComponent, CommonModule ],
   templateUrl: './registerCliente.component.html',
-  styleUrls: ['./registerCliente.component.css']
+  styleUrls: []
 })
 export class RegisterClienteComponent implements OnInit {
 

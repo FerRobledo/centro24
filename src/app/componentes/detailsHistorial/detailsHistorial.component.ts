@@ -1,12 +1,15 @@
+import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from 'src/app/auth/auth.service';
 import { CobranzaService } from 'src/app/services/cobranza.service';
 @Component({
   selector: 'app-detailsHistorial',
-  templateUrl: './detailsHistorial.component.html',
-  styleUrls: ['./detailsHistorial.component.css']
+  standalone: true,
+  imports: [ FormsModule, CommonModule ],
+  templateUrl: './detailsHistorial.component.html'
 })
 export class DetailsHistorialComponent implements OnInit {
   idCierre!: number;

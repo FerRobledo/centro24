@@ -4,7 +4,7 @@
     <!-- Header -->
     <div class="flex justify-center items-center gap-2 mb-6 flex-shrink-0">
       <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
-        [ngClass]="accion=='editar' ? 'bg-amber-500' : 'bg-emerald-500'">
+        [class]="accion=='editar' ? 'bg-amber-500' : 'bg-emerald-500'">
         <i class="fa-solid fa-plus text-white"></i>
       </div>
       <h6 class="text-lg font-bold text-gray-900">{{ accion=='editar' ? 'Editar cliente' : 'Agregar cliente' }}</h6>
@@ -50,7 +50,7 @@
     <!-- Botón abajo -->
     <div class="mt-6">
       <button
-        [ngClass]="accion == 'editar' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'"
+        [class]="accion == 'editar' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'"
         class="w-full py-2.5 rounded-xl text-white font-semibold text-sm shadow-md transition">
         {{ accion == 'editar' ? 'Editar cliente' : 'Agregar cliente' }}
       </button>

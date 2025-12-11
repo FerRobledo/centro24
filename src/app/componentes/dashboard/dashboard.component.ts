@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { EstadisticasComponent } from './estadisticas/estadisticas.component';
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
+  imports: [ EstadisticasComponent ],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: []
 })
 export class DashboardComponent implements OnInit {
 

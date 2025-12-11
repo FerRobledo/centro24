@@ -29,23 +29,16 @@ export class ClientesService {
     return this.http.put(this.origin + '/api/clientes/' + idAdmin, body);
   }
 
-  public getMontOfCurrentClient(monthSelected: string) {
-    const params = new HttpParams().set('monthSelected', monthSelected);
-    return this.http.get<any[]>(this.origin + '/api/clientes', { params });
-  }
-
-  public asignarPago(idAdmin: number, infoPago: any): any{
-    const data = {infoPago, accion:'addPago'}
-    return this.http.post(this.origin + '/api/clientes/' + idAdmin, data)
-  }
-
-  public incrementClient(idAdmin: number, porcentaje: number): Observable<any> {
-    const body = { porcentaje, accion:'incrementar' }; 
-    return this.http.put(this.origin + '/api/clientes/' + idAdmin, body);
+  public incrementClient(idAdmin: number, porcentaje: number): Observable<any> { 
+    // ANTES /aumentarPrecio era accion = 'incrementar', apuntaba a /api/clientes/[id], ahora apunta a /api/clientes/[id]/aumentarPrecio
+    return this.http.put(this.origin + '/api/clientes/' + idAdmin + "/aumentarPrecio", {porcentaje: porcentaje});
   }
   
-  public deletePago(idAdmin: number, id: number): Observable<any>{
-    const body = {action:'deletePago', id};
-    return this.http.delete(this.origin + '/api/clientes/' + idAdmin, { body });
-  }
+  // Movido a pagoMensual.service 
+  // Eliminta action: 'deletePago', la accion pasa a ser el metodo HTTP (this.http.delete());
+
+  // public deletePago(idAdmin: number, id: number): Observable<any>{
+  //   const body = {action:'deletePago', id};
+  //   return this.http.delete(this.origin + '/api/clientes/' + idAdmin, { body });
+  // }
 }

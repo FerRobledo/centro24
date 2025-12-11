@@ -1,4 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { RolService } from 'src/app/services/rol.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { Rol } from 'src/assets/dto/rol';
@@ -6,8 +8,9 @@ import { newUsuario, Usuario } from 'src/assets/dto/usuario';
 
 @Component({
   selector: 'app-usuarioCard',
-  templateUrl: './usuarioCard.component.html',
-  styleUrls: ['./usuarioCard.component.css']
+  standalone: true,
+  imports: [MatSlideToggleModule, CommonModule],
+  templateUrl: './usuarioCard.component.html'
 })
 export class UsuarioCardComponent implements OnInit {
 
@@ -36,7 +39,7 @@ export class UsuarioCardComponent implements OnInit {
     } else {
       this.usuario.roles = this.usuario.roles.filter(r => r.id !== rol.id);
     }
-    
+
     this.userService.editUsuario(this.usuario).subscribe({
       error: error => console.log(error),
       complete: () => this.cargandoCardUsuario = false,
@@ -48,7 +51,7 @@ export class UsuarioCardComponent implements OnInit {
     return this.usuario.roles.some(r => r.id === rol.id);
   }
 
-  eliminarUsuario(){
+  eliminarUsuario() {
     this.cargandoCardUsuario = true;
     this.userService.eliminarUsuario(this.usuario).subscribe({
       next: () => location.reload(),

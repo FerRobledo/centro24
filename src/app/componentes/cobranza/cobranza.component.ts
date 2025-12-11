@@ -1,16 +1,19 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from 'src/app/auth/auth.service';
 import { CobranzaService } from 'src/app/services/cobranza.service';
 import { RegisterClienteComponent } from 'src/app/componentes/cobranza/registerCliente/registerCliente.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { HistorialClientsComponent } from '../historial-clients/historial-clients.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-cobranza',
+  standalone: true,
+  imports: [ CommonModule, FormsModule ],
   templateUrl: './cobranza.component.html',
-  styleUrls: ['./cobranza.component.css']
 })
 export class CobranzaComponent implements OnInit, OnDestroy {
   public clientEdit: any = null;
