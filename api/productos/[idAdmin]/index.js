@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'POST') {
-        return handlePost(req.body, res);
+        return handlePost(req.body, idAdmin, res);
     }
 
     return res.status(405).json({ message: 'Método no permitido' });
@@ -54,6 +54,9 @@ async function handleGet(idAdmin, res) {
 
 // POST - Crear UN ÚNICO producto
 async function handlePost(body, idAdmin, res) {
+    if (!idAdmin) {
+        return res.status(400).json({ error: 'ID de administrador es requerido' });
+    }
     try {
         // Validar producto
         validarProducto(body);
