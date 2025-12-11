@@ -11,7 +11,7 @@ function generateToken(user) {
             idAdmin: user.user_padre_id,
             roles: user.roles,
             fecha_pago_valido: user.fecha_ultimo_pago 
-                ? user.fecha_ultimo_pago.toISOString().split('T')[0]
+                ? user.fecha_ultimo_pago
                 : null
         },
         JWT_SECRET,
