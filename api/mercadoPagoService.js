@@ -25,6 +25,7 @@ async function crearPreferenciaConToken(access_token, userId) {
                 "unit_price": 1.00,
                 "category_id": "services"
             }],
+            statement_descriptor: "GESTION ERP",
             back_urls: {
                 success: backUrl,
                 failure: backUrl,
