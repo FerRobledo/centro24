@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ProductoDTO } from 'src/assets/dto/producto';
+import { Producto } from 'src/assets/dto/producto';
 
 @Component({
   selector: 'app-confirmar-delete',
@@ -10,7 +10,7 @@ import { ProductoDTO } from 'src/assets/dto/producto';
 })
 export class ConfirmarDeleteComponent {
   @Input() mostrar: boolean = false;
-  @Input() producto: ProductoDTO | null = null;
+  @Input() producto: Producto | null = null;
   @Input() cargando: boolean = false;
 
   @Output() confirmar = new EventEmitter<void>();

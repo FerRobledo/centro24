@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, from, map, mergeMap, Observable, of, toArray } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
-import { Producto, ProductoDTO } from 'src/assets/dto/producto';
+import { Producto } from 'src/assets/dto/producto';
 
 @Injectable({
   providedIn: 'root'
@@ -12,40 +12,80 @@ export class ProductosService {
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
-  public getProductos(id: number): Observable<any> {
-    return this.http.get(this.origin + '/api/productos/' + id);
+  /**
+   * Obtener TODOS los productos del admin actual
+   * GET /api/productos/[idAdmin]
+   */
+  public getProductos(idAdmin: number): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.origin}/api/productos/${idAdmin}`);
   }
 
-  public actualizarProducto(producto: ProductoDTO): Observable<Producto> {
+  /**
+   * Obtener UN producto específico
+   * GET /api/productos/[idAdmin]/[idProducto]
+   */
+  public getProducto(idAdmin: number, idProducto: string): Observable<Producto> {
+    return this.http.get<Producto>(`${this.origin}/api/productos/${idAdmin}/${idProducto}`);
+  }
+
+  /**
+   * Crear UN único producto
+   * POST /api/productos/[idAdmin]
+   */
+  public crearProducto(producto: Producto): Observable<Producto> {
     const idAdmin = this.authService.getIdAdmin();
-    const updates = producto.getUpdates();
-    const body = { ...updates };
-    return this.http.put<Producto>(this.origin + `/api/productos/${idAdmin}/${producto.id}`, body);
+    return this.http.post<Producto>(
+      `${this.origin}/api/productos/${idAdmin}`,
+      { ...producto, id_admin: idAdmin }
+    );
   }
 
-  public actualizarStock(id: number, stock: number): Observable<any> {
-    return this.http.put(this.origin + '/api/productos', { id, stock });
+  /**
+   * Actualizar UN producto
+   * PUT /api/productos/[idAdmin]/[idProducto]
+   */
+  public actualizarProducto(producto: Producto): Observable<Producto> {
+    const idAdmin = this.authService.getIdAdmin();
+    const { id, precio_costo, descripcion, imagen, stock, categoria, ganancia, precio_venta } = producto;
+
+    const body = {
+      ...(precio_costo !== undefined && { precio_costo }),
+      ...(descripcion !== undefined && { descripcion }),
+      ...(imagen !== undefined && { imagen }),
+      ...(stock !== undefined && { stock }),
+      ...(categoria !== undefined && { categoria }),
+      ...(ganancia !== undefined && { ganancia }),
+      ...(precio_venta !== undefined && { precio_venta })
+    };
+
+    return this.http.put<Producto>(
+      `${this.origin}/api/productos/${idAdmin}/${id}`,
+      body
+    );
   }
 
-  public addProducto(producto: Producto): Observable<any> {
-    const id_admin = this.authService.getIdAdmin();
-    const nuevoProducto = new ProductoDTO({ ...producto, id_admin });
-    return this.http.post(this.origin + '/api/productos/' + id_admin, nuevoProducto);
+  /**
+   * Eliminar UN producto
+   * DELETE /api/productos/[idAdmin]/[idProducto]
+   */
+  public eliminarProducto(idProducto: string): Observable<{ message: string }> {
+    const idAdmin = this.authService.getIdAdmin();
+    return this.http.delete<{ message: string }>(
+      `${this.origin}/api/productos/${idAdmin}/${idProducto}`
+    );
   }
 
-  public eliminarProducto(producto: ProductoDTO): Observable<any> {
-    const id_admin = this.authService.getIdAdmin();
-    const id_producto = producto.id;
-    const url = `${this.origin}/api/productos/${id_admin}/${id_producto}`;
-    return this.http.delete<any>(url);
-  }
+  /**
+   * Crear MÚLTIPLES productos desde Excel (carga masiva)
+   * POST /api/productos/[idAdmin]/agregarTodo
+   */
+  public crearMultiplesProductos(productos: Producto[]): Observable<any> {
+    const idAdmin = this.authService.getIdAdmin();
+    const productosConAdmin = productos.map(p => ({ ...p, id_admin: idAdmin }));
 
-  public addAllProductos(productos: ProductoDTO[]): Observable<void> {
-    const id_admin = this.authService.getIdAdmin();
-    const nuevosProductos = productos.map(producto => ({
-      ...producto,
-      id_admin
-    }));
-    return this.http.post<any>(`${this.origin}/api/productos/${id_admin}/agregarTodo`, {productos: nuevosProductos})
+    return this.http.post<any>(
+      `${this.origin}/api/productos/${idAdmin}/agregarTodo`,
+      { productos: productosConAdmin }
+    );
   }
 }

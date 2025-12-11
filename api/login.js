@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const jwtService = require('./protected/jwt')
-const pool = require('./db');
+const { pool } = require('./db');
 
 module.exports = async (req, res) => {
     const origin = req.headers.origin || '*'; // Usa * si no hay origen
