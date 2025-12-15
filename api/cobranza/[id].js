@@ -35,13 +35,13 @@ export default async function handler(req, res) {
                 const result1 = await pool.query(`
                         SELECT SUM(efectivo + debito + credito + transferencia + cheque - gasto) AS total_caja
                         FROM caja
-                        WHERE user_admin = $1 AND cerrado = false
+                        WHERE user_admin = $1 AND cerrado = false AND estado =true;
                     `, [id]);
 
                 const result2 = await pool.query(`
                         SELECT SUM(monto) AS total_pagos
                         FROM pagos_mensuales
-                        WHERE id_admin = $1 AND cerrado = false
+                        WHERE id_admin = $1 AND cerrado = false;
                     `, [id]);
 
                 const totalCaja = parseFloat(result1.rows[0]?.total_caja ?? 0);
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
                 const cajaDetalle = await pool.query(`
                             SELECT id, (efectivo + debito + credito + transferencia + cheque - gasto) AS monto
                             FROM caja
-                            WHERE user_admin = $1 AND cerrado = false
+                            WHERE user_admin = $1 AND cerrado = false AND estado = true;
                         `, [id]);
 
                 for (const row of cajaDetalle.rows) {
@@ -181,7 +181,7 @@ export default async function handler(req, res) {
                     SELECT * 
                     FROM caja 
                     WHERE user_admin = $1 
-                    AND DATE(fecha) = $2
+                    AND DATE(fecha) = $2 AND estado=true
                     ORDER BY fecha DESC, id DESC
                     `, [id, date]);
 
@@ -211,9 +211,7 @@ export default async function handler(req, res) {
         else {
 
             const { rows } = await pool.query(`
-                SELECT * FROM caja WHERE user_admin = $1 ORDER BY fecha DESC, id DESC
-                `, [id]);
-
+                SELECT * FROM caja WHERE user_admin = $1 AND estado=true ORDER BY fecha DESC, id DESC`, [id]);
             return res.status(200).json(rows);
         }
 
@@ -321,7 +319,10 @@ export default async function handler(req, res) {
 
         try {
             const { rows } = await pool.query(
-                'DELETE FROM public.caja WHERE id=$1 and user_admin=$2 RETURNING id;',
+                `UPDATE public.caja
+                SET estado = false
+                WHERE id = $1 AND user_admin = $2
+                RETURNING id, user_admin, estado`,
                 [idClient, idAdmin]
             );
 
