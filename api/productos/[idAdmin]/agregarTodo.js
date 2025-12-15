@@ -4,13 +4,13 @@
  * POST /api/productos/[idAdmin]/agregarTodo  → Crear múltiples productos desde bulk
  */
 
-const { pool } = require('../../db');
-const { requireAuth } = require('../../protected/requireAuth');
-const validarProducto = require('../../helpers/validarProducto');
-const filtrarProductosUnicos = require('../../helpers/filtrarProductosUnicos');
-const construirInsert = require('../../helpers/construirInsert');
+import pool from '../../db.js';
+import { requireAuth } from '../../protected/requireAuth.js';
+import { validarProducto } from '../../helpers/validarProducto.js';
+import { filtrarProductosUnicos } from '../../helpers/filtrarProductosUnicos.js';
+import { construirInsert } from '../../helpers/construirInsert.js';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
     const origin = req.headers.origin || '*';
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');

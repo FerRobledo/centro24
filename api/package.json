@@ -1,0 +1,23 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vercel dev",
+        "start": "node index.js"
+    },
+    "dependencies": {
+        "axios": "^1.13.2",
+        "bcryptjs": "^3.0.2",
+        "dotenv": "^16.6.1",
+        "formidable": "^3.5.2",
+        "jsonwebtoken": "^9.0.2",
+        "luxon": "^3.6.1",
+        "mercadopago": "^2.11.0",
+        "pg": "^8.13.1",
+        "@vercel/blob": "^1.0.0"
+    },
+    "devDependencies": {
+        "@types/pg": "^8.11.11",
+        "vercel": "^48.10.4"
+    }
+}

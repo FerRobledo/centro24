@@ -1,9 +1,9 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const jwtService = require('./protected/jwt')
-const { pool } = require('./db');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { generateToken } from './protected/jwt.js'
+import pool from './db.js';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
     const origin = req.headers.origin || '*'; // Usa * si no hay origen
 
     res.setHeader('Access-Control-Allow-Origin', origin);
@@ -55,7 +55,7 @@ module.exports = async (req, res) => {
             }
 
             // Generar el JWT
-            const token = jwtService.generateToken(user);
+            const token = generateToken(user);
             return res.status(200).json({ token });
         } catch (error) {
             console.log(error);

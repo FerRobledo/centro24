@@ -1,8 +1,8 @@
-const bcrypt = require('bcryptjs');
-const { pool } = require('./db.js');
+import bcrypt from 'bcryptjs';
+import pool from './db.js';
 
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
     const origin = req.headers.origin || '*'; // Usa * si no hay origen
 
     res.setHeader('Access-Control-Allow-Origin', origin);

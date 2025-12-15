@@ -1,5 +1,5 @@
 // Esta funcion valida que los datos ingresados de un producto sean consistentes
-function validarProducto(producto) {
+export function validarProducto(producto) {
     const { id, precio_costo, stock, categoria, id_admin, ganancia } = producto;
 
     if (!id) {
@@ -28,5 +28,3 @@ function validarProducto(producto) {
 
     return true;
 }
-
-module.exports = validarProducto;

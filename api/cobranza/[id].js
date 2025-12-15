@@ -1,7 +1,7 @@
-const { pool } = require('../db');
-const { requireAuth } = require('../protected/requireAuth');
+import pool from '../db.js';
+import { requireAuth } from '../protected/requireAuth.js';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
     const origin = req.headers.origin || '*';
 
     //seteo los encabzados para http
@@ -35,13 +35,13 @@ module.exports = async (req, res) => {
                 const result1 = await pool.query(`
                         SELECT SUM(efectivo + debito + credito + transferencia + cheque - gasto) AS total_caja
                         FROM caja
-                        WHERE user_admin = $1 AND estado = false
+                        WHERE user_admin = $1 AND cerrado = false
                     `, [id]);
 
                 const result2 = await pool.query(`
                         SELECT SUM(monto) AS total_pagos
                         FROM pagos_mensuales
-                        WHERE id_admin = $1 AND estado = false
+                        WHERE id_admin = $1 AND cerrado = false
                     `, [id]);
 
                 const totalCaja = parseFloat(result1.rows[0]?.total_caja ?? 0);
@@ -58,11 +58,11 @@ module.exports = async (req, res) => {
 
                 if (!idCierre) throw new Error('no se pudo obtener el id del cierre');
 
-                //selecciono todos los detalles de la caja con estado=false y lo agrego a la intermedia
+                //selecciono todos los detalles de la caja con cerrado=false y lo agrego a la intermedia
                 const cajaDetalle = await pool.query(`
                             SELECT id, (efectivo + debito + credito + transferencia + cheque - gasto) AS monto
                             FROM caja
-                            WHERE user_admin = $1 AND estado = false
+                            WHERE user_admin = $1 AND cerrado = false
                         `, [id]);
 
                 for (const row of cajaDetalle.rows) {
@@ -76,10 +76,10 @@ module.exports = async (req, res) => {
                             `, [idCierre, row.id, row.monto]);
                 }
 
-                //selecciono detalles de los pagos mensuales con estado=false y lo agrego a la intermedia
+                //selecciono detalles de los pagos mensuales con cerrado=false y lo agrego a la intermedia
                 const pagosDetalle = await pool.query(`
                             SELECT id, monto FROM pagos_mensuales
-                            WHERE id_admin = $1 AND estado = false
+                            WHERE id_admin = $1 AND cerrado = false
                         `, [id]);
 
                 for (const row of pagosDetalle.rows) {
@@ -93,8 +93,8 @@ module.exports = async (req, res) => {
                             `, [idCierre, row.id, row.monto]);
                 }
                 //marco las tuplas que tengan false como true
-                await pool.query(`UPDATE caja SET estado = true WHERE user_admin = $1 AND estado = false`, [id]);
-                await pool.query(`UPDATE pagos_mensuales SET estado = true WHERE id_admin = $1 AND estado = false`, [id]);
+                await pool.query(`UPDATE caja SET cerrado = true WHERE user_admin = $1 AND cerrado = false`, [id]);
+                await pool.query(`UPDATE pagos_mensuales SET cerrado = true WHERE id_admin = $1 AND cerrado = false`, [id]);
 
                 return res.status(200).json({ total });
 
