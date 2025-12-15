@@ -1,6 +1,6 @@
 // Construye dinámicamente los valores y placeholders para un INSERT masivo de productos
 
-function construirInsert(productos) {
+export function construirInsert(productos) {
     const valores = [];
     const placeholders = [];
 
@@ -29,5 +29,3 @@ function construirInsert(productos) {
 
     return { valores, placeholders };
 }
-
-module.exports = construirInsert;

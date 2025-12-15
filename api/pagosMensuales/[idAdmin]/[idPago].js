@@ -1,7 +1,7 @@
-const { pool } = require('../../db');
-const { requireAuth } = require('../../protected/requireAuth')
+import pool from '../../db';
+import { requireAuth } from '../../protected/requireAuth'
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
     const origin = req.headers.origin || '*'; // Usa * si no hay origen
     // Autenticación
     try {

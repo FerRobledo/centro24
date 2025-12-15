@@ -6,10 +6,10 @@ export const config = {
   },
 };
 
-const axios = require("axios");
-const { getAccessTokenValido } = require("../mercadoPagoService");
+import axios from "axios";
+import { getAccessTokenValido } from "../mercadoPagoService.js";
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
 
   res.setHeader("Access-Control-Allow-Origin", "*");

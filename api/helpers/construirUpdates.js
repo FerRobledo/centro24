@@ -1,6 +1,6 @@
 // Construye dinámicamente los campos a actualizar, recalculando precio_venta si es necesario
 
-function construirUpdates(body, currentProducto) {
+export function construirUpdates(body, currentProducto) {
     const updates = {};
     const fields = ['precio_costo', 'descripcion', 'imagen', 'stock', 'categoria', 'ganancia', 'precio_venta'];
 
@@ -23,5 +23,3 @@ function construirUpdates(body, currentProducto) {
 
     return updates;
 }
-
-module.exports = construirUpdates;

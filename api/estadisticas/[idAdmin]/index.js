@@ -1,6 +1,6 @@
 // api/estadisticas/[idAdmin]/index.js
-const { pool } = require('../../db');
-const { requireAuth } = require('../../protected/requireAuth');
+import pool from '../../db.js';
+import { requireAuth } from '../../protected/requireAuth.js';
 
 const HEADERS = {
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -8,7 +8,7 @@ const HEADERS = {
   'Vary': 'Origin',
 };
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   const origin = req.headers.origin || '*';
 
   Object.entries(HEADERS).forEach(([key, value]) =>

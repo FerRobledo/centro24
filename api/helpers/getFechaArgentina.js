@@ -1,5 +1,5 @@
 // Devuelve la fecha/hora local de Argentina (America/Argentina/Buenos_Aires) en formato 'YYYY-MM-DD HH:mm:ss'
-function getFechaArgentina() {
+export function getFechaArgentina() {
   const now = new Date();
   const options = {
     timeZone: 'America/Argentina/Buenos_Aires',
@@ -18,4 +18,3 @@ function getFechaArgentina() {
   return `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')}:${get('second')}`;
 }
 
-module.exports = getFechaArgentina;

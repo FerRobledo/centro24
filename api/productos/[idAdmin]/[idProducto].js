@@ -1,8 +1,8 @@
-const { pool } = require('../../db');
-const { requireAuth } = require('../../protected/requireAuth');
-const construirUpdates = require('../../helpers/construirUpdates');
+import pool from '../../db.js';
+import { requireAuth } from '../../protected/requireAuth.js';
+import { construirUpdates } from '../../helpers/construirUpdates.js';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
     const origin = req.headers.origin || '*';
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');

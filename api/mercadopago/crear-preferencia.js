@@ -1,7 +1,8 @@
-const { pool } = require('../db');
-const { crearPreferencia } = require('../mercadoPagoService');
+import pool from '../db.js';
+import { crearPreferencia } from '../mercadoPagoService.js';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
+    console.log("dsfas")
     // Autenticación
     try {
         req.user = requireAuth(req);
@@ -18,7 +19,7 @@ module.exports = async (req, res) => {
     const { userId } = req.body;
 
     try {
-        const { rows } = await pool.query('SELECT * FROM mercado_pago');
+        const { rows } = await pool.query('SELECT * FROM mercado_pago WHERE id = 1');
         const datosMp = rows[0];
         if (!datosMp) {
             return res.status(404).json({ error: 'Datos no encontrados' });
