@@ -45,7 +45,7 @@ async function handleGet(idProducto, idAdmin, res) {
 
     try {
         const { rows } = await pool.query(
-            'SELECT * FROM productos WHERE id = $1 AND id_admin = $2',
+            'SELECT * FROM productos WHERE id = $1 AND id_admin = $2 AND estado = true;',
             [idProducto, idAdmin]
         );
 
@@ -113,7 +113,6 @@ async function handleDelete(idProducto, idAdmin, res) {
                 WHERE id = $1 AND id_admin = $2`,
             [idProducto, idAdmin]
         );
-
         if (rowCount === 0) {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
