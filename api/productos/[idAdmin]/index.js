@@ -42,7 +42,7 @@ async function handleGet(idAdmin, res) {
 
     try {
         const { rows } = await pool.query(
-            'SELECT * FROM productos WHERE id_admin = $1',
+            'SELECT * FROM productos WHERE id_admin = $1 AND estado=true',
             [idAdmin]
         );
         return res.status(200).json(rows);
@@ -68,7 +68,7 @@ async function handlePost(body, idAdmin, res) {
 
         // Verificar si el producto ya existe
         const { rows: existingRows } = await pool.query(
-            'SELECT * FROM productos WHERE id = $1 AND id_admin = $2',
+            'SELECT * FROM productos WHERE id = $1 AND id_admin = $2 AND estado = true',
             [id, idAdmin]
         );
 

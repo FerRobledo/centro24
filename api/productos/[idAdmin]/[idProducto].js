@@ -109,7 +109,8 @@ async function handleDelete(idProducto, idAdmin, res) {
 
     try {
         const { rowCount } = await pool.query(
-            'DELETE FROM productos WHERE id = $1 AND id_admin = $2',
+            `UPDATE productos SET estado = false 
+                WHERE id = $1 AND id_admin = $2`,
             [idProducto, idAdmin]
         );
 
