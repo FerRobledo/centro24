@@ -1,6 +1,6 @@
 import axios from 'axios';
 import pool from './db.js';
-import getFechaArgentina from './helpers/getFechaArgentina.js';
+import { getFechaArgentina } from './helpers/getFechaArgentina.js';
 
 async function crearPreferenciaConToken(access_token, userId) {
     let backUrl = 'https://gestionerp.ar';
