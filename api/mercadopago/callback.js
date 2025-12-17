@@ -8,6 +8,7 @@ export const config = {
 
 import axios from "axios";
 import { getAccessTokenValido } from "../mercadoPagoService.js";
+import pool from '../db.js'
 
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -40,12 +41,34 @@ export default async function handler(req, res) {
       }
     );
 
-    console.log("Detalle del pago:", payment);
-
     const estadoPago = payment.status;
     const referencia = payment.external_reference;
 
-    console.log(`Pago ${payment.id} | Estado: ${estadoPago} | Ref: ${referencia}`);
+    if (estadoPago === 'approved') {
+      const user = await pool.query(
+        'SELECT * FROM users WHERE id = $1',
+        [referencia]
+      )
+
+      const fechaUltimoPago = user.rows[0].fecha_ultimo_pago // 
+
+      // Convertir a Date
+      const fecha = new Date(fechaUltimoPago)
+
+      // Sumar 1 mes (javascript maneja automaticamente el cambio de año)
+      fecha.setMonth(fecha.getMonth() + 1)
+
+      // Volver a formato YYYY-MM-DD
+      const nuevaFecha = fecha.toISOString().split('T')[0]
+
+      console.log(nuevaFecha)
+
+      // Guardar en BD
+      await pool.query(
+        'UPDATE users SET fecha_ultimo_pago = $1 WHERE id = $2',
+        [nuevaFecha, referencia]
+      )
+    }
 
   } catch (error) {
     console.error("Error en webhook:", error?.response?.data || error);

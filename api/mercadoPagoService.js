@@ -29,7 +29,7 @@ async function crearPreferenciaConToken(access_token, userId) {
             },
             notification_url: `${backUrl}/api/mercadopago/callback`,
             auto_return: 'approved',
-            external_reference: `USER_ID_${userId}`,
+            external_reference: `${userId}`,
         },
         {
             headers: {
