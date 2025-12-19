@@ -93,19 +93,16 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     const fecha = this.authService.getFechaVencimiento();
     // Si no hay fecha → no calcular nada
     if (!fecha) {
-      this.diasRestantes = 0;
+      this.diasRestantes = -1;
       return;
     }
-    // Evitar interpretación UTC
-    const fechaLocal = fecha + "T00:00:00";
-
     const oneDay = 24 * 60 * 60 * 1000;
+    
     const hoy = new Date();
-    const vencimiento = new Date(fechaLocal);
+    const vencimiento = new Date(fecha);
 
     const diff = vencimiento.getTime() - hoy.getTime();
     this.diasRestantes = Math.ceil(diff / oneDay);
-    console.log(this.diasRestantes);
   }
 
   mostrarAdvertencia() {
@@ -128,7 +125,7 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     if (this.authService.esAdmin()) {
       const idAdmin = this.authService.getIdAdmin();
       this.esperandoPago = true;
-      
+
       // Creo preferencia y redirigo al POINT de MP
       this.mercadoPagoService.crearPreferencia(idAdmin).subscribe({
         next: (response) => {
