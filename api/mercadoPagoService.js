@@ -3,7 +3,7 @@ import pool from './db.js';
 import { getFechaArgentina } from './helpers/getFechaArgentina.js';
 
 async function crearPreferenciaConToken(access_token, userId) {
-    let backUrl = 'https://dev.gestionerp.ar';
+    let backUrl = 'https://gestionerp.ar';
 
     if (process.env.ENV !== 'prod') {
         backUrl = 'https://dev.gestionerp.ar';
