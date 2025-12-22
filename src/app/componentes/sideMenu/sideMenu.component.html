@@ -9,7 +9,7 @@
         <a [routerLink]="seccion.nombre === 'Home' ? '' : seccion.nombre.toLowerCase()" routerLinkActive="active-link"
           [routerLinkActiveOptions]="seccion.nombre === 'Home' ? { exact: true } : { exact: false }"
           class="flex items-center text-lg gap-2 px-4 py-2 font-medium text-gray-900 transition-all duration-200 ease-in-out rounded-lg xs:text-lg xs:px-3 xs:py-1.5 hover:bg-green-100 hover:text-green-700 hover:shadow-md hover:scale-[1.02]">
-          <i [ngClass]="seccion.icono" class="p-2"></i>
+          <i [class]="seccion.icono" class="p-2"></i>
           <p>{{ seccion.nombre }}</p>
         </a>
       </li>
@@ -33,4 +33,71 @@
     </div>
   </div>
 
+</div>
+
+
+<div *ngIf="advertenciaVisible"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
+
+  <div class="relative bg-white w-full max-w-md rounded-2xl shadow-xl p-6 animate-fadeIn">
+
+    <!-- Botón X arriba a la derecha -->
+    <button (click)="cerrarAdvertencia()" *ngIf="diasRestantes>=0"
+      class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition text-xl font-bold">
+      ✕
+    </button>
+
+    <h2 class="text-xl font-semibold text-red-600 text-center mb-3">
+      ⚠️ Atención {{ nameUserCurrent }}
+    </h2>
+
+    <!-- Si aún no venció -->
+    <p *ngIf="diasRestantes >= 0" class="text-center text-gray-700">
+      Tu suscripción <span class="font-semibold">caduca en
+        {{ diasRestantes == 1 ? '1 día.' : diasRestantes + ' días.' }}
+      </span>
+    </p>
+
+    <!-- Si ya venció -->
+    <p *ngIf="diasRestantes < 0" class="text-center text-gray-700">
+      Tu suscripción ha <span class="font-semibold text-red-600">caducado</span>.
+    </p>
+
+    <p *ngIf="esAdmin" class="text-center text-gray-800 mt-2">
+      Valor de la suscripción:
+      <span class="font-semibold text-blue-600">
+        $ {{ cuotaMensual | number:'1.0-0' }}
+      </span> / mes
+    </p>
+
+    <!-- Botón para pagar -->
+    <div class="mt-6 flex justify-center space-x-3">
+      <div *ngIf="!creandoPreferencia">
+        <button (click)="logout()"
+          class="px-5 py-2 rounded-xl bg-red-400 text-white hover:bg-red-500 transition shadow-md active:scale-95">
+          Cerrar sesión
+        </button>
+
+        <button *ngIf="esAdmin" (click)="redirigirMercadoPago()"
+          class="px-5 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition shadow-md active:scale-95">
+          Renovar con Mercado Pago
+        </button>
+
+        <button *ngIf="!esAdmin"
+          class="px-5 py-2 rounded-xl bg-gray-400 text-white cursor-not-allowed">
+          Contactá al administrador
+        </button>
+      </div>
+
+      <div *ngIf="creandoPreferencia" class="flex items-center space-x-2 text-blue-600">
+        <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+          viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+        <span class="font-medium">Espera a ser redirigido...</span>
+      </div>
+    </div>
+
+  </div>
 </div>

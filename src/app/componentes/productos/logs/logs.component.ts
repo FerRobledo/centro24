@@ -1,0 +1,103 @@
+import { Component, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { Log } from 'src/assets/dto/log';
+import { LogsService } from 'src/app/services/logs.service';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+
+interface DialogData {
+  titulo?: string;
+}
+
+@Component({
+  selector: 'app-logs',
+  standalone: true,
+  imports: [ FormsModule, MatDialogModule, CommonModule],
+  templateUrl: './logs.component.html'
+})
+export class LogsComponent implements OnInit {
+  
+  // Variable para controlar si el modal está abierto o cerrado
+  mostrarModal: boolean = false;
+
+  // Array para almacenar los logs
+  logs: Log[] = [];
+  logsFiltrados: Log[] = [];
+
+  // Variables para filtros
+  filtroFecha: string = '';
+  filtroAccion: string = '';
+
+  // Variable para estado de carga
+  cargando: boolean = false;
+
+
+  constructor(
+    private logsService: LogsService,
+    public dialogRef: MatDialogRef<LogsComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: DialogData
+  ) {}
+
+  ngOnInit() {
+    this.cargarLogs(); // Carga los logs al abrir el dialog
+  }
+
+  // Metodo para cerrar el dialog
+  onCerrar() {
+    this.dialogRef.close();
+  }
+
+  // Método para cargar los logs desde el backend
+  cargarLogs() {
+    this.cargando = true;
+    this.limpiarFiltros();
+    this.logsService.getLogs().subscribe({
+      next: (logs) => {
+        this.logs = logs;
+        this.logsFiltrados = logs;
+        this.cargando = false;
+      },
+      error: (error: any) => {
+        console.error('Error al cargar logs:', error);
+        this.cargando = false;
+      }
+    });
+  }
+
+  // Método para aplicar filtros (fecha y accion)
+  aplicarFiltros() {
+    this.logsFiltrados = this.logs.filter(log => {
+      let cumpleFiltros = true;
+
+      // Filtro por fecha
+      if (this.filtroFecha) {
+        const fechaString = log.fecha_y_hora;
+        if (fechaString) {
+          // Convertir la fecha del log a formato YYYY-MM-DD
+          const fechaLog = new Date(fechaString);
+          // Extraer solo la parte de la fecha y convertirla a formato YYYY-MM-DD
+          const fechaParts = fechaString.split(' ')[0]; // "DD/MM/YYYY"
+          const [dia, mes, año] = fechaParts.split('/');
+          const fechaLogFormatted = `${año}-${mes}-${dia}`;
+          cumpleFiltros = cumpleFiltros && fechaLogFormatted === this.filtroFecha;
+        }
+      }
+
+      // Filtro por acción
+      if (this.filtroAccion) {
+        cumpleFiltros = cumpleFiltros && log.accion === this.filtroAccion;
+      }
+
+      return cumpleFiltros;
+    });
+  }
+
+  // Método para limpiar filtros
+  limpiarFiltros() {
+    this.filtroFecha = '';
+    this.filtroAccion = '';
+    this.logsFiltrados = this.logs;
+  }
+
+  
+}

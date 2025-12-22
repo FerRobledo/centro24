@@ -1,16 +1,22 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from 'src/app/auth/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
 import { InsertarClienteComponent } from '../insertarCliente/insertarCliente.component';
 import { Subscription } from 'rxjs';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { AgregarPagoModalComponent } from '../agregarPagoModal/agregarPagoModal.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { MatDividerModule } from '@angular/material/divider';
+import { CommonModule } from '@angular/common';
+import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
 
 @Component({
   selector: 'app-listaClientes',
-  templateUrl: './listaClientes.component.html',
-  styleUrls: ['./listaClientes.component.css']
+  standalone: true,
+  imports: [RouterModule, FormsModule, ReactiveFormsModule, MatDividerModule, CommonModule, FiltroClientesPipe],
+  templateUrl: './listaClientes.component.html'
 })
 export class ListaClientesComponent implements OnInit, OnDestroy {
   private dialogRef: MatDialogRef<any> | null = null;
@@ -49,9 +55,6 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     this.clientesService.getClientsOfMonth(idAdmin).subscribe({
       next: (data) => {
         this.clientsOfMonth = data;
-        //this.clientsOfMonth = data.sort((a, b) => a.id - b.id);  
-        //agarra dos elements y pregunta si el A es menor a B va a dar negativo y lo deja asi
-        //si es positivo quiere decir que A es mas grande que B y lo intercambia de lugar
       },
       error: (error) => {
         console.error("Error en el pedido de clientes del día: ", error);
@@ -99,7 +102,7 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     const idAdmin = this.authService.getIdAdmin();
 
     console.log("que id es? :" + idClient);
-    
+
     if (idAdmin) {
       this.clientesService.deleteClient(idAdmin, idClient).subscribe({
         next: () => {
@@ -194,16 +197,14 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
 
   mapearMesesClientes() {
     const hoy = new Date;
+    console.log(this.clientsOfMonth);
     this.clientsOfMonth = this.clientsOfMonth.map(client => {
 
-      let pagos = client.pagos;
-      pagos.sort((a: any, b: any) => new Date(a.periodo_hasta).getTime() - new Date(b.periodo_hasta).getTime());
-      const ultimoPago = pagos[pagos.length - 1];
       let mesesVigente = 0;
       let periodoHasta: { anio: number, mes: number } = { anio: 0, mes: 0 };
       // Si tiene pagos hacer el calculo de cuantos meses le quedan
-      if (ultimoPago) {
-        const [anio, mes] = ultimoPago.periodo_hasta.split('-').map(Number);
+      if (client.pago_id) {
+        const [anio, mes] = client.pago_hasta.split('-').map(Number);
         periodoHasta = { anio, mes };
         mesesVigente = this.calcularMesesDiferencia(hoy, periodoHasta);
       }
@@ -215,10 +216,6 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
         periodoHasta: periodoHasta,
       }
     });
-  }
-
-  getPeriodoHasta(client: any): Date {
-    return new Date(client.periodoHasta.anio, client.periodoHasta.mes - 1, 1);
   }
   
   calcularMesesDiferencia(desde: Date, hasta: { anio: number, mes: number }): number {

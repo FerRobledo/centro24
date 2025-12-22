@@ -3,7 +3,7 @@
 
     <!-- Encabezado -->
     <div class="flex justify-center items-center gap-4 mb-4">
-      <div [ngClass]="accion == 'gasto' ? 'bg-red-500' : 'bg-emerald-500'" class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-md">
+      <div [class]="accion == 'gasto' ? 'bg-red-500' : 'bg-emerald-500'" class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-md">
         <i class="fa-solid fa-user-plus text-white"></i>
       </div>
       <h6 class="text-lg font-bold text-gray-900">
@@ -59,7 +59,7 @@
           <!-- Resumen monto total -->
           <div class="flex justify-between items-center border-t border-slate-200 pt-4">
             <p class="text-sm font-medium text-slate-600">Monto total:</p>
-            <p class="text-lg font-bold" [ngClass]="accion == 'gasto' ? 'text-red-600' : 'text-green-600'">
+            <p class="text-lg font-bold" [class]="accion == 'gasto' ? 'text-red-600' : 'text-green-600'">
               {{ accion == 'gasto' ? '-' : '+' }} ${{ montoTotal || 0 }} </p>
           </div>
 

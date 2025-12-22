@@ -1,19 +1,34 @@
+import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ProductoDTO } from 'src/assets/dto/producto';
+import { Producto } from 'src/assets/dto/producto';
 
 interface DialogData {
-  producto: ProductoDTO;
+  producto: Producto;
   modoEdicion: boolean;
   esAdmin: boolean;
 }
 
 @Component({
   selector: 'app-product-form-dialog',
+  standalone: true,
+  imports: [ FormsModule, CommonModule ], 
   templateUrl: './product-form-dialog.component.html'
 })
 export class ProductFormDialogComponent implements OnInit {
-  productoLocal: ProductoDTO = new ProductoDTO();
+  productoLocal: Producto = {
+    id: '',
+    precio_costo: 0,
+    descripcion: null,
+    imagen: null,
+    stock: 0,
+    categoria: '',
+    id_admin: 0,
+    ganancia: null,
+    precio_venta: 0,
+    cantidadModificar: null
+  };
   cargando: boolean = false;
   mensaje: string = '';
 
@@ -23,17 +38,13 @@ export class ProductFormDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.productoLocal = new ProductoDTO(this.data.producto);
+    this.productoLocal = { ...this.data.producto };
   }
 
   onGuardar() {
-    // Calcular y asignar el precio de venta antes de validar
-    this.productoLocal.precio_venta = this.precioVenta;
-    
     // Validaciones básicas
-    const error = this.productoLocal.validateRequired();
-    if (error) {
-      this.mensaje = error;
+    if (!this.productoLocal.id || !this.productoLocal.categoria || this.productoLocal.precio_costo < 0) {
+      this.mensaje = 'Por favor completa todos los campos requeridos';
       return;
     }
 

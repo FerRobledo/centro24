@@ -1,7 +1,7 @@
 import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, ReplaySubject, switchMap, tap } from 'rxjs';
+import { Observable, ReplaySubject, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,15 +15,9 @@ export class SheetsService {
 
   constructor(private http: HttpClient) { }
 
-  cargarHojas(): void {
+  cargarHojas(): Observable<any> {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.sheetId}?key=${this.apiKey}`;
-    this.http.get<any>(url).pipe(
-      tap(response => {
-        const hojas = response.sheets.map((sheet: any) => sheet.properties.title);
-        this.hojasSubject.next(hojas);
-      })
-    ).subscribe();
-
+    return this.http.get<any>(url);
   }
 
 

@@ -1,15 +1,18 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Router } from '@angular/router';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from 'src/app/auth/auth.service';
 import { RolService } from 'src/app/services/rol.service';
 import { Rol } from 'src/assets/dto/rol';
 
 @Component({
   selector: 'app-UsuarioModal',
-  templateUrl: './UsuarioModal.component.html',
-  styleUrls: ['./UsuarioModal.component.css']
+  standalone: true,
+  imports:[ReactiveFormsModule, MatSlideToggleModule, CommonModule],
+  templateUrl: './UsuarioModal.component.html'
 })
 export class UsuarioModalComponent implements OnInit {
 

@@ -1,11 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ConfirmDialogComponent } from '../confirmDialog/confirmDialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { AuthService } from 'src/app/services/auth.service';
-import { Router } from '@angular/router';
+import { AuthService } from 'src/app/auth/auth.service';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { MercadopagoService } from 'src/app/services/mercadopago.service';
+import { EstadoCuentaService } from 'src/app/services/estadoCuenta.service';
 
 @Component({
   selector: 'app-sideMenu',
+  standalone: true,
+  imports: [RouterModule, CommonModule],
   templateUrl: './sideMenu.component.html',
   styleUrls: ['./sideMenu.component.css']
 })
@@ -15,10 +20,24 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private authService: AuthService,
     private router: Router,
+    private mercadoPagoService: MercadopagoService,
+    private estadoCuentaService: EstadoCuentaService,
   ) { }
 
   roles: string[] = []
   nameUserCurrent: String = '';
+
+  advertenciaVisible: boolean = false;
+  diasRestantes: any = null;
+  esperandoPago: boolean = false;
+  errorPago: string = '';
+
+  creandoPreferencia: boolean = false;
+  estadoSub: any;
+
+  cuotaMensual = 70000;
+  esAdmin = false;
+
 
   secciones: { nombre: string, icono: string }[] = [
     {
@@ -46,8 +65,24 @@ export class SideMenuComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.roles = this.authService.getUserRoles();
+    this.esAdmin = this.roles.includes('Admin');
+    this.estadoCuentaService.cargarEstadoCuenta();
     this.filtrarSecciones();
     this.nameUserCurrent = this.authService.getUserName();
+
+    this.estadoSub = this.estadoCuentaService.estado$.subscribe(estado => {
+      if (!estado) return;
+
+      if (estado.estado !== 'ACTIVO') {
+        this.mostrarAdvertencia();
+      }
+
+      this.diasRestantes = estado.diasRestantes
+    });
+  }
+
+  mostrarAdvertencia() {
+    this.advertenciaVisible = true;
   }
 
   ngOnDestroy(): void {
@@ -78,5 +113,36 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     });
   }
 
+  cerrarAdvertencia() {
+    this.advertenciaVisible = false;
+    this.errorPago = ''
+  }
 
+  redirigirMercadoPago() {
+    // Solo los admins pueden realizar pago por MP
+    if (this.authService.esAdmin()) {
+      const idAdmin = this.authService.getIdAdmin();
+      this.creandoPreferencia = true;
+
+      // Creo preferencia y redirigo al POINT de MP
+      this.mercadoPagoService.crearPreferencia(idAdmin).subscribe({
+        next: (response) => {
+          console.log("Preferencia creada: " + response.initPoint);
+
+          // REDIRECCION
+          window.location.href = response.initPoint;
+          this.errorPago = '';
+        },
+        error: (error) => {
+          console.log("Error al crear preferencia: " + error.message);
+          this.errorPago = "Error al crear pago.";
+        }
+      });
+    }
+  };
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['login'])
+  }
 }

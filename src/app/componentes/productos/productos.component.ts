@@ -1,44 +1,55 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ProductosService } from 'src/app/services/productos.service';
-import { AuthService } from 'src/app/services/auth.service';
-import { Producto, ProductoDTO } from 'src/assets/dto/producto';
+import { AuthService } from 'src/app/auth/auth.service';
+import { Producto } from 'src/assets/dto/producto';
 import { LogsService } from 'src/app/services/logs.service';
 import { Log } from 'src/assets/dto/log';
 import { Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ProductFormDialogComponent } from './product-form-dialog/product-form-dialog.component';
-import { LogsComponent } from '../logs/logs.component';
-
-interface AddProductoResponse {
-  message: string;
-  producto?: Producto;
-}
-
-
+import { LogsComponent } from './logs/logs.component';
+import { FormsModule } from '@angular/forms';
+import { CargaProductosComponent } from './cargaProductos/cargaProductos.component';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ConfirmarDeleteComponent } from './confirmar-delete/confirmar-delete.component';
+import { CommonModule } from '@angular/common';
+import { FiltroProductosPipe } from 'src/app/pipes/filtro-productos.pipe';
 
 @Component({
   selector: 'app-productos',
+  standalone: true,
+  imports: [CommonModule, FormsModule, CargaProductosComponent, MatSlideToggle, MatTooltipModule, ConfirmarDeleteComponent, FiltroProductosPipe],
   templateUrl: './productos.component.html',
-  styleUrls: ['./productos.component.css'],
 })
-
 export class ProductosComponent implements OnInit, OnDestroy {
-  productos: ProductoDTO[] = [];
+  productos: Producto[] = [];
   categoriasUnicas: string[] = [];
   filtroTexto: string = '';
-
   mostrarSoloStock: boolean = false;
 
   // Estados del diálogo de confirmación
   mostrarConfirmacion: boolean = false;
-  productoAEliminar: ProductoDTO | null = null;
+  productoAEliminar: Producto | null = null;
 
-  productoEditando: ProductoDTO | null = null;
+  productoEditando: Producto | null = null;
 
   // Estados generales
   cargandoProducto: boolean = false;
   mensaje: string = '';
-  nuevoProducto: ProductoDTO = new ProductoDTO();
+  nuevoProducto: Producto = {
+    id: '',
+    precio_costo: 0,
+    descripcion: null,
+    imagen: null,
+    stock: 0,
+    categoria: '',
+    id_admin: 0,
+    ganancia: null,
+    precio_venta: 0,
+    cantidadModificar: null
+  };
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -47,47 +58,40 @@ export class ProductosComponent implements OnInit, OnDestroy {
     private logsService: LogsService,
     private cdr: ChangeDetectorRef,
     public dialog: MatDialog
-  ) {}
+  ) { }
 
   ngOnInit() {
     const idAdmin = this.authService.getIdAdmin();
     this.cargarProductos(idAdmin);
-    ;
   }
 
   ngOnDestroy() {
-    this.subscriptions.unsubscribe(); //limpia todas las suscripciones
+    this.subscriptions.unsubscribe();
   }
 
   // === MÉTODOS DE CARGA ===
   cargarProductos(idAdmin: number) {
     this.cargandoProducto = true;
-    ;
 
     this.subscriptions.add(
       this.productosService.getProductos(idAdmin).subscribe({
         next: (data: Producto[]) => {
-          this.productos = data.map((producto: Producto) => new ProductoDTO(producto));
+          this.productos = data;
           this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           this.cargandoProducto = false;
-          ; 
         },
         error: (error) => {
           console.error('Error al obtener productos:', error);
           this.cargandoProducto = false;
-          ;
         }
       })
-    )
+    );
   }
 
   // === MÉTODOS DE FILTRADO ===
-
-  // Método para el toggle switch
   toggleFiltroStock(checked: boolean) {
     this.mostrarSoloStock = checked;
   }
-
 
   // === MÉTODOS DE FORMULARIO ===
   abrirFormularioAgregar() {
@@ -95,7 +99,18 @@ export class ProductosComponent implements OnInit, OnDestroy {
       width: '500px',
       disableClose: false,
       data: {
-        producto: new ProductoDTO(),
+        producto: {
+          id: '',
+          precio_costo: 0,
+          descripcion: null,
+          imagen: null,
+          stock: 0,
+          categoria: '',
+          id_admin: this.authService.getIdAdmin(),
+          ganancia: null,
+          precio_venta: 0,
+          cantidadModificar: null
+        },
         modoEdicion: false,
         esAdmin: this.esAdmin()
       }
@@ -109,12 +124,12 @@ export class ProductosComponent implements OnInit, OnDestroy {
     });
   }
 
-  editarProducto(producto: ProductoDTO) {
+  editarProducto(producto: Producto) {
     const dialogRef = this.dialog.open(ProductFormDialogComponent, {
       width: '500px',
       disableClose: false,
       data: {
-        producto: producto,
+        producto: { ...producto },
         modoEdicion: true,
         esAdmin: this.esAdmin()
       }
@@ -123,7 +138,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.action === 'guardar') {
         this.nuevoProducto = result.producto;
-        this.productoEditando = new ProductoDTO(producto); // Necesario para actualizarProducto()
+        this.productoEditando = { ...producto };
         this.actualizarProducto();
       }
     });
@@ -132,46 +147,38 @@ export class ProductosComponent implements OnInit, OnDestroy {
   addProducto() {
     this.mensaje = '';
     this.cargandoProducto = true;
+    const idAdmin = this.authService.getIdAdmin();
+
+    // Validación básica
+    if (!this.nuevoProducto.id || !this.nuevoProducto.categoria || this.nuevoProducto.precio_costo < 0) {
+      this.mensaje = 'Por favor completa todos los campos requeridos correctamente';
+      this.cargandoProducto = false;
+      return;
+    }
 
     if (!this.esAdmin()) {
       this.nuevoProducto.precio_costo = 0;
       this.nuevoProducto.ganancia = 0;
     }
 
-    const error = this.nuevoProducto.validateRequired();
-    if (error) {
-      this.mensaje = error;
-      this.cargandoProducto = false;
-      ;
-      return;
-    }
-
-    const user_id = this.authService.getUserId();
-    if (!user_id) {
-      this.mensaje = 'Debes estar logeado para agregar un producto';
-      this.cargandoProducto = false;
-      return;
-    }
-
-    const precio_venta = this.nuevoProducto.precio_costo + (this.nuevoProducto.precio_costo * (this.nuevoProducto.ganancia || 0) / 100);
-    const productoConPrecio = new ProductoDTO({ ...this.nuevoProducto, precio_venta, id_admin: user_id });
+    const productoParaEnviar: Producto = {
+      ...this.nuevoProducto,
+      id_admin: idAdmin,
+      precio_venta: this.nuevoProducto.precio_costo * (1 + (this.nuevoProducto.ganancia || 0) / 100)
+    };
 
     this.subscriptions.add(
-
-      this.productosService.addProducto(productoConPrecio).subscribe({
-        next: (respuesta: AddProductoResponse) => {
-          this.mensaje = respuesta.message || 'Producto agregado con éxito.';
+      this.productosService.crearProducto(productoParaEnviar).subscribe({
+        next: (respuesta: any) => {
+          this.mensaje = 'Producto agregado con éxito.';
           this.cargandoProducto = false;
-          if (respuesta.producto) {
-            this.productos.push(new ProductoDTO(respuesta.producto));
-            this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
-          }
-          ;
+          this.productos.push(respuesta.producto || respuesta);
+          this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           this.cancelar();
         },
         error: (error: any) => {
           console.error('Error al agregar producto', error);
-          this.mensaje = 'Hubo un problema al agregar el producto.';
+          this.mensaje = error?.error?.error || 'Hubo un problema al agregar el producto.';
           this.cargandoProducto = false;
         }
       })
@@ -181,9 +188,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
   actualizarProducto() {
     this.mensaje = '';
     this.cargandoProducto = true;
+    const idAdmin = this.authService.getIdAdmin();
 
-    const user_id = this.authService.getIdAdmin();
-    if (!user_id) {
+    if (!idAdmin) {
       this.mensaje = 'Debes estar logeado para actualizar un producto';
       this.cargandoProducto = false;
       return;
@@ -196,35 +203,31 @@ export class ProductosComponent implements OnInit, OnDestroy {
       productoParaActualizar.ganancia = this.productoEditando.ganancia;
     }
 
-    const precio_venta = productoParaActualizar.precio_costo + (productoParaActualizar.precio_costo * (productoParaActualizar.ganancia || 0) / 100);
-    const productoActualizado = new ProductoDTO({ ...productoParaActualizar, precio_venta });
-
-    const error = productoActualizado.validateRequired();
-    if (error) {
-      this.mensaje = error;
+    // Validación básica
+    if (!productoParaActualizar.id || !productoParaActualizar.categoria) {
+      this.mensaje = 'Por favor completa todos los campos requeridos';
       this.cargandoProducto = false;
       return;
     }
 
     this.subscriptions.add(
-      this.productosService.actualizarProducto(productoActualizado).subscribe({
-        next: (updatedProducto: Producto) => {
+      this.productosService.actualizarProducto(productoParaActualizar).subscribe({
+        next: (updatedProducto: any) => {
           this.mensaje = 'Producto actualizado con éxito.';
           this.cargandoProducto = false;
 
           const index = this.productos.findIndex(p => p.id === updatedProducto.id);
           if (index !== -1) {
-            this.productos[index] = new ProductoDTO(updatedProducto);
+            this.productos[index] = updatedProducto;
             this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           }
 
           this.crearLog(this.productoEditando!.id, 'actualizacion');
           this.cancelar();
-          ;
         },
         error: (error: any) => {
           console.error('Error al actualizar producto:', error);
-          this.mensaje = 'Hubo un problema al actualizar el producto.';
+          this.mensaje = error?.error?.error || 'Hubo un problema al actualizar el producto.';
           this.cargandoProducto = false;
         }
       })
@@ -232,14 +235,24 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   cancelar() {
-    this.nuevoProducto = new ProductoDTO();
+    this.nuevoProducto = {
+      id: '',
+      precio_costo: 0,
+      descripcion: null,
+      imagen: null,
+      stock: 0,
+      categoria: '',
+      id_admin: 0,
+      ganancia: null,
+      precio_venta: 0,
+      cantidadModificar: null
+    };
     this.mensaje = '';
     this.cargandoProducto = false;
   }
 
-
   // === MÉTODOS DE ELIMINACIÓN ===
-  confirmarEliminar(producto: ProductoDTO) {
+  confirmarEliminar(producto: Producto) {
     this.productoAEliminar = producto;
     this.mostrarConfirmacion = true;
   }
@@ -249,20 +262,19 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
     this.cargandoProducto = true;
     this.subscriptions.add(
-      this.productosService.eliminarProducto(this.productoAEliminar).subscribe({
+      this.productosService.eliminarProducto(this.productoAEliminar.id).subscribe({
         next: (response: any) => {
           this.productos = this.productos.filter(p => p.id !== this.productoAEliminar!.id);
           this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           this.crearLog(this.productoAEliminar!.id, 'eliminacion');
           this.cancelarEliminar();
-          ;
         },
         error: (error: any) => {
           console.error('Error al eliminar producto:', error);
           this.cargandoProducto = false;
         }
       })
-    )
+    );
   }
 
   cancelarEliminar() {
@@ -271,16 +283,15 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.cargandoProducto = false;
   }
 
-
   // === LOGS ===
   abrirLogs() {
-    const dialogRef = this.dialog.open(LogsComponent, {
+    this.dialog.open(LogsComponent, {
       width: '90vw',
       maxWidth: '1200px',
       data: {
         titulo: 'Registro de Productos'
       }
-    })
+    });
   }
 
   // === MÉTODOS DE UTILIDAD ===
@@ -313,9 +324,4 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.cargandoProducto = true;
     this.mensaje = 'Procesando productos esto puede tardar unos segundos...';
   }
-
-  detectChanges() {
-    ;
-  }
-
 }

@@ -1,12 +1,8 @@
-const bcrypt = require('bcryptjs');
-const { Pool } = require('pg');
+import bcrypt from 'bcryptjs';
+import pool from './db.js';
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL, // Definir en Vercel
-    ssl: { rejectUnauthorized: false }, // Necesario si usas PostgreSQL en la nube
-});
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
     const origin = req.headers.origin || '*'; // Usa * si no hay origen
 
     res.setHeader('Access-Control-Allow-Origin', origin);

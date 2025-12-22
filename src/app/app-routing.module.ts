@@ -1,32 +1,42 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { RegisterComponent } from './componentes/auth/register/register.component';
 import { LoginComponent } from './componentes/auth/login/login.component';
-import { authGuard } from './auth-guard.guard';
-import { NotFoundComponent } from './componentes/notFound/notFound.component';
+import { COBRANZA_ROUTES } from './componentes/cobranza/cobranza.routes';
+import { AuthGuard } from './auth/auth.guard';
+import { CLIENTES_ROUTES } from './componentes/clientes/clientes.routes';
+import { PRODUCTO_ROUTES } from './componentes/productos/productos.routes';
+import { DashboardComponent } from './componentes/dashboard/dashboard.component';
+import { USUARIOS_ROUTES } from './componentes/usuarios/usuarios.routes';
 
-const routes: Routes = [
-  {
-    path: 'login',
-    component: LoginComponent,
-  },
-  {
-    path: 'register',
-    component: RegisterComponent,
-  },
+export const routes: Routes = [
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
   {
     path: '',
-    loadChildren: () => import('./module/dashboard.module').then(m => m.DashboardModule),
-    canActivate: [authGuard]
-  },
-  {
-    path: '**',
-    component: NotFoundComponent,
+    canActivate: [AuthGuard],
+    loadComponent: () => import('./componentes/admin-layout.component').then(m => m.AdminLayoutComponent),
+    children: [
+      {
+        path: '',
+        component: DashboardComponent,
+      },
+      {
+        path: 'cobranza',
+        children: COBRANZA_ROUTES,
+      },
+      {
+        path: 'clientes',
+        children: CLIENTES_ROUTES,
+      },
+      {
+        path: 'productos',
+        children: PRODUCTO_ROUTES,
+      },
+      {
+        path: 'usuarios',
+        children: USUARIOS_ROUTES,
+      },
+      { path: '**', redirectTo: '/login' }
+    ]
   }
 ];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes, { onSameUrlNavigation: 'reload' })],
-  exports: [RouterModule]
-})
-export class AppRoutingModule { }
