@@ -119,22 +119,4 @@ export class AuthService {
     }
 
   }
-
-  getFechaVencimiento() {
-    const token = this.getToken();
-
-    if (!token) return null;
-
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const fechaVencimiento = payload.fecha_pago_valido;
-      //console.log("el objeto es", payload);
-      //console.log("el nombre del cliente es: " + username);
-
-      return fechaVencimiento || null;
-    } catch (error) {
-      console.error('Error al decodificar el token', error);
-      return null;
-    }
-  }
 }

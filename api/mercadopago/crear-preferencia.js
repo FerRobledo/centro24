@@ -3,7 +3,6 @@ import { crearPreferencia } from '../mercadoPagoService.js';
 import { requireAuth } from '../protected/requireAuth.js';
 
 export default async function handler(req, res) {
-    console.log("dsfas")
     // Autenticación
     try {
         req.user = requireAuth(req);

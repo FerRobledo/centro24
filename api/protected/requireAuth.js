@@ -13,5 +13,5 @@ export function requireAuth(req) {
     throw new Error('Token inválido o expirado');
   }
   // Puedes agregar más validaciones si querés (por ejemplo, chequear usuario en DB)
-  return { userId: payload.userId, username: payload.username };
+  return { userId: payload.userId, username: payload.username, idAdmin: payload.idAdmin? payload.idAdmin : payload.userId };
 }

@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     } catch (error) {
         return res.status(401).json({ error: 'No autorizado', details: error.message });
     }
-
+    
     const { idAdmin } = req.query;
 
     if (req.method === 'GET') {

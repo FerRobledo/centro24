@@ -5,6 +5,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MercadopagoService } from 'src/app/services/mercadopago.service';
+import { EstadoCuentaService } from 'src/app/services/estadoCuenta.service';
 
 @Component({
   selector: 'app-sideMenu',
@@ -20,15 +21,23 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private mercadoPagoService: MercadopagoService,
+    private estadoCuentaService: EstadoCuentaService,
   ) { }
 
   roles: string[] = []
   nameUserCurrent: String = '';
 
-  advertenciaVisible: boolean = true;
+  advertenciaVisible: boolean = false;
   diasRestantes: any = null;
   esperandoPago: boolean = false;
   errorPago: string = '';
+
+  creandoPreferencia: boolean = false;
+  estadoSub: any;
+
+  cuotaMensual = 70000;
+  esAdmin = false;
+
 
   secciones: { nombre: string, icono: string }[] = [
     {
@@ -56,9 +65,24 @@ export class SideMenuComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.roles = this.authService.getUserRoles();
-    this.calcularDiasRestantes();
+    this.esAdmin = this.roles.includes('Admin');
+    this.estadoCuentaService.cargarEstadoCuenta();
     this.filtrarSecciones();
     this.nameUserCurrent = this.authService.getUserName();
+
+    this.estadoSub = this.estadoCuentaService.estado$.subscribe(estado => {
+      if (!estado) return;
+
+      if (estado.estado !== 'ACTIVO') {
+        this.mostrarAdvertencia();
+      }
+
+      this.diasRestantes = estado.diasRestantes
+    });
+  }
+
+  mostrarAdvertencia() {
+    this.advertenciaVisible = true;
   }
 
   ngOnDestroy(): void {
@@ -89,32 +113,6 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     });
   }
 
-  calcularDiasRestantes() {
-    const fecha = this.authService.getFechaVencimiento();
-    // Si no hay fecha → no calcular nada
-    if (!fecha) {
-      this.diasRestantes = -1;
-      return;
-    }
-    const oneDay = 24 * 60 * 60 * 1000;
-    
-    const hoy = new Date();
-    const vencimiento = new Date(fecha);
-
-    const diff = vencimiento.getTime() - hoy.getTime();
-    this.diasRestantes = Math.ceil(diff / oneDay);
-  }
-
-  mostrarAdvertencia() {
-    const isAdmin = this.roles.includes('Admin');
-    if (!isAdmin) return false;
-    // Si no hay días calculados (fecha vencimiento null) → mostrar advertencia
-    if (this.diasRestantes === null) return true;
-
-    // Si está habilitado, mostrar solo si faltan 5 días o menos
-    return this.diasRestantes <= 5;
-  }
-
   cerrarAdvertencia() {
     this.advertenciaVisible = false;
     this.errorPago = ''
@@ -124,7 +122,7 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     // Solo los admins pueden realizar pago por MP
     if (this.authService.esAdmin()) {
       const idAdmin = this.authService.getIdAdmin();
-      this.esperandoPago = true;
+      this.creandoPreferencia = true;
 
       // Creo preferencia y redirigo al POINT de MP
       this.mercadoPagoService.crearPreferencia(idAdmin).subscribe({

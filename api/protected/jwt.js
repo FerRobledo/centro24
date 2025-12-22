@@ -10,9 +10,6 @@ export function generateToken(user) {
             username: user.nombre,
             idAdmin: user.user_padre_id,
             roles: user.roles,
-            fecha_pago_valido: user.fecha_ultimo_pago 
-                ? user.fecha_ultimo_pago
-                : null
         },
         JWT_SECRET,
         { expiresIn: JWT_EXPIRES_IN }
