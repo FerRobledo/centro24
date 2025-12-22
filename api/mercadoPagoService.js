@@ -18,7 +18,7 @@ async function crearPreferenciaConToken(access_token, userId) {
                 description: 'Acceso por 1 mes al sistema Gestión ERP',
                 currency_id: 'ARS',
                 quantity: 1,
-                unit_price: 1.00,
+                unit_price: 70000.00,
                 category_id: 'services'
             }],
             statement_descriptor: 'GESTION ERP',
