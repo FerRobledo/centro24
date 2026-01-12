@@ -76,6 +76,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.productosService.getProductos(idAdmin).subscribe({
         next: (data: Producto[]) => {
+          console.log('📦 Productos recibidos del backend:', data);
+          console.log('📊 Cantidad de productos:', data.length);
           this.productos = data;
           this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           this.cargandoProducto = false;
