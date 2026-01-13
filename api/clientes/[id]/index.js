@@ -22,41 +22,66 @@ export default async function handler(req, res) {
 
     // GET
     if (req.method === 'GET') {
-        const { id } = req.query;
-
+        const { id, page = 1, pageSize = 10, search = '', selectedFiltroPago = '' } = req.query;
+        const offset = (parseInt(page) - 1) * parseInt(pageSize);
         // id = id_admin
         if (!id) {
             return res.status(400).json({ error: "Debe enviar id (id_admin)" });
         }
 
         try {
-            let where = `WHERE cm.user_admin = $1 AND cm.activo = true`;
-            let params = [id];
+            let where = 'WHERE cm.user_admin = $1 AND cm.activo = true';
+            const params = [id];
+            let paramIndex = 2;
+            console.log(req.query)
+            if (search) {
+                where += ` AND (
+                    CAST(cm.id_client AS TEXT) ILIKE $${paramIndex}
+                    OR cm.cliente ILIKE $${paramIndex}
+                    OR cm.tipo ILIKE $${paramIndex}
+                    )
+            `;
+                params.push(`%${search}%`);
+                paramIndex++;
+            }
 
+            if (selectedFiltroPago && selectedFiltroPago != '') {
+                if (selectedFiltroPago === 'al-dia') {
+                    where += `
+                        AND (
+                        to_date(pm.periodo_hasta || '-01', 'YYYY-MM-DD')
+                        + interval '1 month'
+                        - interval '1 day'
+                        ) >= CURRENT_DATE
+                    `;
+                }
 
-            // ESTO ES IMPORTANTE PARA AGREGAR $1, $2, SEGUN LA CANTIDAD DE PARAMETROS QUE TENGAN
-            // ESTA BUENO PARA UNA CONSULTA QUE TENGA MUCHOS FILTROS DE FORMA DINAMICA
-            // WHERE nombre = $1 AND localidad = $2
-            // WHERE localidad = $1, en el caso de que no venga nombre por parametros (es solo un ejemplo de como se puede aplicar)
-            // EN ESTE CASO NO TENEMOS FILTROS DINAMICOS XD
-            let paramsIndex = 0;
+                if (selectedFiltroPago === 'atrasado') {
+                    where += `
+                        AND (
+                        to_date(pm.periodo_hasta || '-01', 'YYYY-MM-DD')
+                        + interval '1 month'
+                        - interval '1 day'
+                        ) < CURRENT_DATE
+                    `;
+                }
 
-            // // Si tuvieramos un filtro dinamico podriamos hacer:
-            // if(filtro){
+                if (selectedFiltroPago === 'sin-pagos') {
+                    where += ` AND pm.id IS NULL`;
+                }
+            }
 
-            // SE USA `` PARA QUE LOS ESPACIOS LOS TOME DE FORMA LITERAL
+            // --- Total ---
+            const totalQuery = `
+            SELECT COUNT(*) 
+            FROM clientes_mensuales cm
+            LEFT JOIN pagos_mensuales pm ON cm.id_client = pm.id_client
+            ${where}
+            `;
 
-            //     where += ` AND cm.filtro = $${i}`
-            //     params.push(filtro);
-
-            // DESPUES DE MODIFICAR EL WHERE AUMENTAMOS EL paramIndex POR SI HAY MAS FILTROS
-
-            //     paramIndex++;
-            // }
-
-
-            // Consulta que trae todos los clientes mensuales y (SI TIENE) el ultimo pago mensual realizado
-            const query = `
+            const totalResult = await pool.query(totalQuery, params);
+            const total = parseInt(totalResult.rows[0].count);
+            const dataQuery = `
                 SELECT 
                     cm.*,
                     pm.id AS pago_id,
@@ -67,16 +92,19 @@ export default async function handler(req, res) {
                     AND pm.periodo_hasta = (
                         SELECT MAX(periodo_hasta)
                         FROM pagos_mensuales
-                        WHERE id_client = cm.id_client and pm.activo = true
+                        WHERE id_client = cm.id_client 
+                        AND pm.activo = true
                     )
                 ${where}
-                ORDER BY cm.id_client ASC;
-        `;
+                ORDER BY cm.id_client ASC
+                LIMIT $${params.length + 1} 
+                OFFSET $${params.length + 2}
+                `
 
-            const { rows } = await pool.query(query, params);
+            const dataParams = [...params, pageSize, offset];
+            const dataResult = await pool.query(dataQuery, dataParams);
 
-            return res.status(200).json(rows);
-
+            return res.status(200).json({ clientes: dataResult.rows, total });
         } catch (error) {
             console.error(error);
             return res.status(500).json({
