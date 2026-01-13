@@ -30,7 +30,7 @@ export default async function handler(req, res) {
         }
 
         try {
-            let where = `WHERE cm.user_admin = $1 AND cm.estado = 'Activo'`;
+            let where = `WHERE cm.user_admin = $1 AND cm.activo = true`;
             let params = [id];
 
 
@@ -96,8 +96,8 @@ export default async function handler(req, res) {
         try {
             const { rows } = await pool.query(
                 `INSERT INTO public.clientes_mensuales
-                    (tipo, cliente, monto, user_admin)
-                    VALUES ($2, $3, $4, $1) RETURNING *`,
+                    (tipo, cliente, monto, user_admin, activo)
+                    VALUES ($2, $3, $4, $1, true) RETURNING *`,
                 [id, payload.tipo, payload.cliente, payload.monto]
             );
             return res.status(201).json(rows[0]);
@@ -121,7 +121,7 @@ export default async function handler(req, res) {
         }
         try {
             const { rows } = await pool.query(
-                `UPDATE public.clientes_mensuales
+                `UPDATE clientes_mensuales
                  SET tipo = $1,
                      cliente = $2,
                      monto = $3
@@ -168,7 +168,7 @@ export default async function handler(req, res) {
         try {
             const result = await pool.query(
                 `UPDATE public.clientes_mensuales 
-                     SET estado = 'Desactivo' 
+                     SET activo = false 
                      WHERE id_client = $1 AND user_admin = $2`,
                 [idClient, idAdmin]
             );
