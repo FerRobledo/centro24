@@ -9,7 +9,7 @@ export function construirInsert(productos) {
         const ganancia = p.ganancia ?? null;
         const precio_venta = p.precio_venta || (precio_costo * (1 + (ganancia || 0) / 100));
 
-        const baseIndex = index * 9;
+        const baseIndex = index * 10;
         valores.push(
             p.id || '',
             precio_costo,
@@ -19,11 +19,12 @@ export function construirInsert(productos) {
             p.categoria || '',
             p.id_admin || 0,
             ganancia,
-            precio_venta
+            precio_venta,
+            true
         );
 
         placeholders.push(
-            `($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, $${baseIndex + 4}, $${baseIndex + 5}, $${baseIndex + 6}, $${baseIndex + 7}, $${baseIndex + 8}, $${baseIndex + 9})`
+            `($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, $${baseIndex + 4}, $${baseIndex + 5}, $${baseIndex + 6}, $${baseIndex + 7}, $${baseIndex + 8}, $${baseIndex + 9}, $${baseIndex + 10})`
         );
     });
 

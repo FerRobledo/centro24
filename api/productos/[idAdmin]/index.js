@@ -78,12 +78,12 @@ async function handlePost(body, idAdmin, res) {
 
         // Insertar el nuevo producto
         const query = `
-            INSERT INTO productos (id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            INSERT INTO productos (id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta, estado)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             RETURNING *
         `;
 
-        const values = [id, precio_costo, descripcion || null, imagen || null, stock, categoria, idAdmin, ganancia || null, precio_venta];
+        const values = [id, precio_costo, descripcion || null, imagen || null, stock, categoria, idAdmin, ganancia || null, precio_venta, true];
         const { rows } = await pool.query(query, values);
 
         return res.status(201).json({

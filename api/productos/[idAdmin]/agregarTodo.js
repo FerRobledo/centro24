@@ -54,7 +54,7 @@ async function handlePost(body, res) {
         const { valores, placeholders } = construirInsert(productosSinDuplicados);
 
         const query = `
-            INSERT INTO productos (id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta)
+            INSERT INTO productos (id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta, estado)
             VALUES ${placeholders.join(', ')}
             ON CONFLICT (id, id_admin)
             DO UPDATE SET
@@ -63,7 +63,8 @@ async function handlePost(body, res) {
                 imagen = EXCLUDED.imagen,
                 stock = EXCLUDED.stock,
                 categoria = EXCLUDED.categoria,
-                precio_venta = EXCLUDED.precio_venta
+                precio_venta = EXCLUDED.precio_venta,
+                estado = EXCLUDED.estado
             RETURNING *;
         `;
 
