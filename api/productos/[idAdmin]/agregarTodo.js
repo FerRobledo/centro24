@@ -105,8 +105,7 @@ async function handlePost(body, res, idAdmin) {
             FROM productos
             WHERE id_admin = $1`, [idAdmin])
         precioTotalNuevo = precioTotal.rows[0].total_despues
-        console.log(precioTotalOriginal)
-        console.log(precioTotalNuevo)
+
         const variacion =
             precioTotalOriginal === 0
                 ? 0
