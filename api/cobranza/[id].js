@@ -35,7 +35,7 @@ export default async function handler(req, res) {
                 const result1 = await pool.query(`
                         SELECT SUM(efectivo + debito + credito + transferencia + cheque - gasto) AS total_caja
                         FROM caja
-                        WHERE user_admin = $1 AND cerrado = false AND estado =true;
+                        WHERE user_admin = $1 AND cerrado = false AND activo = true;
                     `, [id]);
 
                 const result2 = await pool.query(`
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
                 const cajaDetalle = await pool.query(`
                             SELECT id, (efectivo + debito + credito + transferencia + cheque - gasto) AS monto
                             FROM caja
-                            WHERE user_admin = $1 AND cerrado = false AND estado = true;
+                            WHERE user_admin = $1 AND cerrado = false AND activo = true;
                         `, [id]);
 
                 for (const row of cajaDetalle.rows) {
@@ -181,7 +181,7 @@ export default async function handler(req, res) {
                     SELECT * 
                     FROM caja 
                     WHERE user_admin = $1 
-                    AND DATE(fecha) = $2 AND estado=true
+                    AND DATE(fecha) = $2 AND activo=true
                     ORDER BY fecha DESC, id DESC
                     `, [id, date]);
 
@@ -211,7 +211,7 @@ export default async function handler(req, res) {
         else {
 
             const { rows } = await pool.query(`
-                SELECT * FROM caja WHERE user_admin = $1 AND estado=true ORDER BY fecha DESC, id DESC`, [id]);
+                SELECT * FROM caja WHERE user_admin = $1 AND activo=true ORDER BY fecha DESC, id DESC`, [id]);
             return res.status(200).json(rows);
         }
 
@@ -260,7 +260,7 @@ export default async function handler(req, res) {
                 INSERT INTO public.caja
                     (fecha, detalle, observacion, efectivo, debito, credito, transferencia, cheque, gasto, user_admin)
                 VALUES
-                    (CURRENT_DATE, $1, $2, $3, $4, $5, $6, $7, $8, $9)
+                    (now(), $1, $2, $3, $4, $5, $6, $7, $8, $9)
                 RETURNING *;
                 `;
 
@@ -320,9 +320,9 @@ export default async function handler(req, res) {
         try {
             const { rows } = await pool.query(
                 `UPDATE public.caja
-                SET estado = false
+                SET activo = false
                 WHERE id = $1 AND user_admin = $2
-                RETURNING id, user_admin, estado`,
+                RETURNING id, user_admin, activo`,
                 [idClient, idAdmin]
             );
 

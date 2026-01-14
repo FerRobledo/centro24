@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from 'src/app/auth/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
@@ -10,12 +10,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatDividerModule } from '@angular/material/divider';
 import { CommonModule } from '@angular/common';
-import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-listaClientes',
   standalone: true,
-  imports: [RouterModule, FormsModule, ReactiveFormsModule, MatDividerModule, CommonModule, FiltroClientesPipe],
+  imports: [RouterModule, FormsModule, ReactiveFormsModule, MatDividerModule, CommonModule, MatPaginatorModule],
   templateUrl: './listaClientes.component.html'
 })
 export class ListaClientesComponent implements OnInit, OnDestroy {
@@ -35,11 +35,17 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     this.dialog.closeAll();
   }
 
+  // FILTRO Y PAGINADO
+  page = 1;
+  pageSize = 10;
+  total = 0;
+  search = '';
+
   clientsOfMonth: any[] = [];
   clicked: Boolean = false;
   clientEdit: any = null;
   eliminandoClienteId: number | null = null;
-  filtroClients: string = '';
+  selectedFiltroPago = '';
   porcentaje: number = 0; // enlazado al input
   isLoading: boolean = true;
 
@@ -52,9 +58,11 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
-    this.clientesService.getClientsOfMonth(idAdmin).subscribe({
+    this.clientesService.getClientsOfMonth(idAdmin, { page: this.page, pageSize: this.pageSize, search: this.search, selectedFiltroPago: this.selectedFiltroPago })
+      .subscribe({
       next: (data) => {
-        this.clientsOfMonth = data;
+        this.clientsOfMonth = data.clientes;
+        this.total = data.total;
       },
       error: (error) => {
         console.error("Error en el pedido de clientes del día: ", error);
@@ -217,7 +225,7 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   calcularMesesDiferencia(desde: Date, hasta: { anio: number, mes: number }): number {
     const yearDiff = hasta.anio - desde.getFullYear();
     const monthDiff = hasta.mes - (desde.getMonth() + 1);
@@ -242,5 +250,25 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
 
   isAdmin() {
     return this.authService.esAdmin();
+  }
+
+  onSearchChange() {
+    this.loadClientsMonthly();
+  }
+ 
+  // METODOS PAGINADO
+  setPageSize(size: number) {
+    this.pageSize = size;
+    this.page = 1;
+    this.loadClientsMonthly();
+  }
+
+  handlePageEvent(event: PageEvent) {
+    this.page = event.pageIndex + 1;
+    this.loadClientsMonthly();
+  }
+
+  get totalPages() {
+    return Math.ceil(this.total / this.pageSize);
   }
 }

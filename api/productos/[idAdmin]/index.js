@@ -42,7 +42,7 @@ async function handleGet(idAdmin, res) {
 
     try {
         const { rows } = await pool.query(
-            'SELECT * FROM productos WHERE id_admin = $1 AND estado=true',
+            'SELECT * FROM productos WHERE id_admin = $1 AND activo=true',
             [idAdmin]
         );
         return res.status(200).json(rows);
@@ -68,7 +68,7 @@ async function handlePost(body, idAdmin, res) {
 
         // Verificar si el producto ya existe
         const { rows: existingRows } = await pool.query(
-            'SELECT * FROM productos WHERE id = $1 AND id_admin = $2 AND estado = true',
+            'SELECT * FROM productos WHERE id = $1 AND id_admin = $2 AND activo = true',
             [id, idAdmin]
         );
 
@@ -78,7 +78,7 @@ async function handlePost(body, idAdmin, res) {
 
         // Insertar el nuevo producto
         const query = `
-            INSERT INTO productos (id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta, estado)
+            INSERT INTO productos (id, precio_costo, descripcion, imagen, stock, categoria, id_admin, ganancia, precio_venta, activo)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             RETURNING *
         `;

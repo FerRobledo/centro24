@@ -45,7 +45,7 @@ async function handleGet(idProducto, idAdmin, res) {
 
     try {
         const { rows } = await pool.query(
-            'SELECT * FROM productos WHERE id = $1 AND id_admin = $2 AND estado = true;',
+            'SELECT * FROM productos WHERE id = $1 AND id_admin = $2 AND activo = true;',
             [idProducto, idAdmin]
         );
 
@@ -109,7 +109,7 @@ async function handleDelete(idProducto, idAdmin, res) {
 
     try {
         const { rowCount } = await pool.query(
-            `UPDATE productos SET estado = false 
+            `UPDATE productos SET activo = false 
                 WHERE id = $1 AND id_admin = $2`,
             [idProducto, idAdmin]
         );
