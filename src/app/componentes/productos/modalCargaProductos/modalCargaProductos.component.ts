@@ -31,10 +31,19 @@ export class ModalCargaProductosComponent implements OnInit {
     this.loadPage();
   }
 
-  loadPage(){
+  loadPage() {
     this.sheetsService.cargarHojas().subscribe({
       next: (data) => {
         this.hojas = data.sheets.map((sheet: any) => sheet.properties.title);
+
+        // Inicializar checkboxes en false
+        this.hojas.forEach(hoja => {
+          if (hoja !== '¿Quienes somos?' && hoja !== 'KITS' && hoja !== 'OUTLET') {
+            this.estadoCheckboxes[hoja] = false;
+          }
+        });
+
+        this.todasSeleccionadas = false;
       },
       error: (error) => {
         console.log(error);
@@ -42,21 +51,24 @@ export class ModalCargaProductosComponent implements OnInit {
     })
   }
 
-  toggleSeleccion() {
-    this.actualizarTodasSeleccionadas();
-  }
 
   toggleSeleccionarTodas() {
-    const nuevoEstado = this.todasSeleccionadas;
     Object.keys(this.estadoCheckboxes).forEach(hoja => {
       if (hoja !== '¿Quienes somos?' && hoja !== 'KITS' && hoja !== 'OUTLET') {
-        this.estadoCheckboxes[hoja] = nuevoEstado;
+        this.estadoCheckboxes[hoja] = this.todasSeleccionadas;
       }
     });
   }
-
   actualizarTodasSeleccionadas() {
-    this.todasSeleccionadas = Object.values(this.estadoCheckboxes).every(v => v);
+    const valores = Object.entries(this.estadoCheckboxes)
+      .filter(([hoja]) =>
+        hoja !== '¿Quienes somos?' &&
+        hoja !== 'KITS' &&
+        hoja !== 'OUTLET'
+      )
+      .map(([_, v]) => v);
+
+    this.todasSeleccionadas = valores.length > 0 && valores.every(v => v);
   }
 
   confirmar() {

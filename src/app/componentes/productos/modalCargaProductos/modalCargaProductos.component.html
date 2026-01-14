@@ -16,7 +16,7 @@
       *ngFor="let hoja of hojas"
       color="primary"
       [(ngModel)]="estadoCheckboxes[hoja]"
-      (change)="toggleSeleccion()"
+      (change)="actualizarTodasSeleccionadas()"
       class="block"
       [disabled]="hoja === '¿Quienes somos?' || hoja === 'KITS' || hoja === 'OUTLET'"
     >
