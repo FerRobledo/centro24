@@ -24,27 +24,36 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
         const { id, page = 1, pageSize = 10, search = '', selectedFiltroPago = '' } = req.query;
         const offset = (parseInt(page) - 1) * parseInt(pageSize);
+
         // id = id_admin
         if (!id) {
             return res.status(400).json({ error: "Debe enviar id (id_admin)" });
         }
 
         try {
+            // WHERE POR DEFECTO
             let where = 'WHERE cm.user_admin = $1 AND cm.activo = true';
+
+            // array de params dinamico en caso de tener varios filtros
             const params = [id];
             let paramIndex = 2;
-            console.log(req.query)
+
+            // Si escribimos algo en el input entra aca, dentro de los () van las columnas por las que va a filtrar el buscador
             if (search) {
                 where += ` AND (
                     CAST(cm.id_client AS TEXT) ILIKE $${paramIndex}
                     OR cm.cliente ILIKE $${paramIndex}
                     OR cm.tipo ILIKE $${paramIndex}
                     )
-            `;
+            `; 
+            // Pushear parametros y aumentar el index
+            // El index sirve para agregar en la consulta $1, $2, $3, segun la cantidad de params
                 params.push(`%${search}%`);
                 paramIndex++;
             }
 
+            // De este modo podemos agregar la cantidad de filtros que querramos
+            // Si viene el filtro, modificar 'where'
             if (selectedFiltroPago && selectedFiltroPago != '') {
                 if (selectedFiltroPago === 'al-dia') {
                     where += `
@@ -72,6 +81,7 @@ export default async function handler(req, res) {
             }
 
             // --- Total ---
+            // Obtener la totalidad de los clientes (este dato es para el paginado)
             const totalQuery = `
             SELECT COUNT(*) 
             FROM clientes_mensuales cm
@@ -81,6 +91,8 @@ export default async function handler(req, res) {
 
             const totalResult = await pool.query(totalQuery, params);
             const total = parseInt(totalResult.rows[0].count);
+
+            // Consulta principal (se le agrega LIMIT Y OFFSET)
             const dataQuery = `
                 SELECT 
                     cm.*,
@@ -104,6 +116,7 @@ export default async function handler(req, res) {
             const dataParams = [...params, pageSize, offset];
             const dataResult = await pool.query(dataQuery, dataParams);
 
+            // Enviar datos por separado clientes y total
             return res.status(200).json({ clientes: dataResult.rows, total });
         } catch (error) {
             console.error(error);
