@@ -7,11 +7,12 @@ import { ProductosService } from 'src/app/services/productos.service';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-cargaProductos',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './cargaProductos.component.html',
   styleUrls: []
 })
@@ -27,6 +28,8 @@ export class CargaProductosComponent implements OnInit, OnDestroy {
   @Output() cargaFinalizada = new EventEmitter<void>();
   @Output() cargaIniciada = new EventEmitter<void>();
   productos: Producto[] = [];
+  metricasImportacion: any = {}
+  mostrarResumen = false;
 
   ngOnInit() {
   }
@@ -54,12 +57,12 @@ export class CargaProductosComponent implements OnInit, OnDestroy {
               }
 
               return data
-                .filter((fila: any[]) => fila.length === 3)
+                .filter((fila: any[]) => fila?.length >= 3)
                 .map((fila: any[]) => {
                   const [id, descripcion, precio_costo_str] = fila;
-                  const precio_costo = Number(precio_costo_str.replace(/[^0-9]/g, ''));
+                  const precio_costo = Number(String(precio_costo_str ?? '0').replace(/[^0-9]/g, ''));
                   const ganancia = 65;
-                  
+
                   return {
                     id,
                     id_admin: 0,
@@ -80,15 +83,17 @@ export class CargaProductosComponent implements OnInit, OnDestroy {
             this.productos = todosLosProductos;
 
             this.productosService.crearMultiplesProductos(this.productos).subscribe({
-              complete: () => {
-                this.cargaFinalizada.emit();
+              next: (response) => {
+                this.metricasImportacion = response.metricas;
+                console.log(this.metricasImportacion);
+                // opcional: mostrar resumen antes de navegar
+                this.mostrarResumen = true;
               },
               error: err => {
                 console.error('Error durante la carga de productos', err);
               }
             });
 
-            this.router.navigate(['/productos']);
           }),
           (err) => {
             console.error('Error al procesar alguna hoja:', err);
@@ -96,6 +101,12 @@ export class CargaProductosComponent implements OnInit, OnDestroy {
         );
       }
     });
+  }
+
+  cerrarMetricas() {
+    this.mostrarResumen = false;
+    this.router.navigate(['/productos']);
+    this.cargaFinalizada.emit();
   }
 }
 
