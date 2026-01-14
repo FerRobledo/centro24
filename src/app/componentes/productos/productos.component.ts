@@ -61,8 +61,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    const idAdmin = this.authService.getIdAdmin();
-    this.cargarProductos(idAdmin);
+    this.cargarProductos();
   }
 
   ngOnDestroy() {
@@ -70,9 +69,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   // === MÉTODOS DE CARGA ===
-  cargarProductos(idAdmin: number) {
+  cargarProductos() {
     this.cargandoProducto = true;
-
+    const idAdmin = this.authService.getIdAdmin();
     this.subscriptions.add(
       this.productosService.getProductos(idAdmin).subscribe({
         next: (data: Producto[]) => {
@@ -177,6 +176,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.productos.push(respuesta.producto || respuesta);
           this.categoriasUnicas = [...new Set(this.productos.map(p => p.categoria))];
           this.cancelar();
+          this.cargarProductos();
         },
         error: (error: any) => {
           console.error('Error al agregar producto', error);
@@ -225,7 +225,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
           }
 
           this.crearLog(this.productoEditando!.id, 'actualizacion');
-          this.cancelar();
+          this.cargarProductos();
         },
         error: (error: any) => {
           console.error('Error al actualizar producto:', error);
@@ -318,8 +318,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   // === MÉTODOS DE EVENTOS DE CARGA ===
   onCargaCompleta() {
     this.cargandoProducto = false;
-    const idAdmin = this.authService.getIdAdmin();
-    this.cargarProductos(idAdmin);
+    this.cargarProductos();
   }
 
   onCargaIniciada() {

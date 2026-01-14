@@ -22,7 +22,8 @@ export default async function handler(req, res) {
 
     // GET
     if (req.method === 'GET') {
-        const { id } = req.query;
+        const { id, page = 1, pageSize = 10, search = '', selectedFiltroPago = '' } = req.query;
+        const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
         // id = id_admin
         if (!id) {
@@ -30,33 +31,69 @@ export default async function handler(req, res) {
         }
 
         try {
-            let where = `WHERE cm.user_admin = $1 AND cm.estado = 'Activo'`;
-            let params = [id];
+            // WHERE POR DEFECTO
+            let where = 'WHERE cm.user_admin = $1 AND cm.activo = true';
 
+            // array de params dinamico en caso de tener varios filtros
+            const params = [id];
+            let paramIndex = 2;
 
-            // ESTO ES IMPORTANTE PARA AGREGAR $1, $2, SEGUN LA CANTIDAD DE PARAMETROS QUE TENGAN
-            // ESTA BUENO PARA UNA CONSULTA QUE TENGA MUCHOS FILTROS DE FORMA DINAMICA
-            // WHERE nombre = $1 AND localidad = $2
-            // WHERE localidad = $1, en el caso de que no venga nombre por parametros (es solo un ejemplo de como se puede aplicar)
-            // EN ESTE CASO NO TENEMOS FILTROS DINAMICOS XD
-            let paramsIndex = 0;
+            // Si escribimos algo en el input entra aca, dentro de los () van las columnas por las que va a filtrar el buscador
+            if (search) {
+                where += ` AND (
+                    CAST(cm.id_client AS TEXT) ILIKE $${paramIndex}
+                    OR cm.cliente ILIKE $${paramIndex}
+                    OR cm.tipo ILIKE $${paramIndex}
+                    )
+            `; 
+            // Pushear parametros y aumentar el index
+            // El index sirve para agregar en la consulta $1, $2, $3, segun la cantidad de params
+                params.push(`%${search}%`);
+                paramIndex++;
+            }
 
-            // // Si tuvieramos un filtro dinamico podriamos hacer:
-            // if(filtro){
+            // De este modo podemos agregar la cantidad de filtros que querramos
+            // Si viene el filtro, modificar 'where'
+            if (selectedFiltroPago && selectedFiltroPago != '') {
+                if (selectedFiltroPago === 'al-dia') {
+                    where += `
+                        AND (
+                        to_date(pm.periodo_hasta || '-01', 'YYYY-MM-DD')
+                        + interval '1 month'
+                        - interval '1 day'
+                        ) >= CURRENT_DATE
+                    `;
+                }
 
-            // SE USA `` PARA QUE LOS ESPACIOS LOS TOME DE FORMA LITERAL
+                if (selectedFiltroPago === 'atrasado') {
+                    where += `
+                        AND (
+                        to_date(pm.periodo_hasta || '-01', 'YYYY-MM-DD')
+                        + interval '1 month'
+                        - interval '1 day'
+                        ) < CURRENT_DATE
+                    `;
+                }
 
-            //     where += ` AND cm.filtro = $${i}`
-            //     params.push(filtro);
+                if (selectedFiltroPago === 'sin-pagos') {
+                    where += ` AND pm.id IS NULL`;
+                }
+            }
 
-            // DESPUES DE MODIFICAR EL WHERE AUMENTAMOS EL paramIndex POR SI HAY MAS FILTROS
+            // --- Total ---
+            // Obtener la totalidad de los clientes (este dato es para el paginado)
+            const totalQuery = `
+            SELECT COUNT(*) 
+            FROM clientes_mensuales cm
+            LEFT JOIN pagos_mensuales pm ON cm.id_client = pm.id_client
+            ${where}
+            `;
 
-            //     paramIndex++;
-            // }
+            const totalResult = await pool.query(totalQuery, params);
+            const total = parseInt(totalResult.rows[0].count);
 
-
-            // Consulta que trae todos los clientes mensuales y (SI TIENE) el ultimo pago mensual realizado
-            const query = `
+            // Consulta principal (se le agrega LIMIT Y OFFSET)
+            const dataQuery = `
                 SELECT 
                     cm.*,
                     pm.id AS pago_id,
@@ -67,16 +104,20 @@ export default async function handler(req, res) {
                     AND pm.periodo_hasta = (
                         SELECT MAX(periodo_hasta)
                         FROM pagos_mensuales
-                        WHERE id_client = cm.id_client and pm.activo = true
+                        WHERE id_client = cm.id_client 
+                        AND pm.activo = true
                     )
                 ${where}
-                ORDER BY cm.id_client ASC;
-        `;
+                ORDER BY cm.id_client ASC
+                LIMIT $${params.length + 1} 
+                OFFSET $${params.length + 2}
+                `
 
-            const { rows } = await pool.query(query, params);
+            const dataParams = [...params, pageSize, offset];
+            const dataResult = await pool.query(dataQuery, dataParams);
 
-            return res.status(200).json(rows);
-
+            // Enviar datos por separado clientes y total
+            return res.status(200).json({ clientes: dataResult.rows, total });
         } catch (error) {
             console.error(error);
             return res.status(500).json({
@@ -96,8 +137,8 @@ export default async function handler(req, res) {
         try {
             const { rows } = await pool.query(
                 `INSERT INTO public.clientes_mensuales
-                    (tipo, cliente, monto, user_admin)
-                    VALUES ($2, $3, $4, $1) RETURNING *`,
+                    (tipo, cliente, monto, user_admin, activo)
+                    VALUES ($2, $3, $4, $1, true) RETURNING *`,
                 [id, payload.tipo, payload.cliente, payload.monto]
             );
             return res.status(201).json(rows[0]);
@@ -121,7 +162,7 @@ export default async function handler(req, res) {
         }
         try {
             const { rows } = await pool.query(
-                `UPDATE public.clientes_mensuales
+                `UPDATE clientes_mensuales
                  SET tipo = $1,
                      cliente = $2,
                      monto = $3
@@ -168,7 +209,7 @@ export default async function handler(req, res) {
         try {
             const result = await pool.query(
                 `UPDATE public.clientes_mensuales 
-                     SET estado = 'Desactivo' 
+                     SET activo = false 
                      WHERE id_client = $1 AND user_admin = $2`,
                 [idClient, idAdmin]
             );
