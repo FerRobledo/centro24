@@ -5,9 +5,13 @@ export function construirInsert(productos) {
     const placeholders = [];
 
     productos.forEach((p, index) => {
-        const precio_costo = p.precio_costo || 0;
-        const ganancia = p.ganancia ?? null;
-        const precio_venta = p.precio_venta || (precio_costo * (1 + (ganancia || 0) / 100));
+        const precio_costo = Number.isFinite(p.precio_costo)
+            ? p.precio_costo
+            : 0;
+        const ganancia = Number.isFinite(p.ganancia) ? p.ganancia : 0;
+        const precio_venta = Math.round(
+            precio_costo * (1 + ganancia / 100)
+        ).toFixed(2);
 
         const baseIndex = index * 10;
         valores.push(
