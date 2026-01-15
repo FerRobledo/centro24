@@ -205,44 +205,66 @@
       <!-- BODY -->
       <div class="flex flex-col text-center">
         <h3 class="text-green-600 text-xl font-bold p-2">Detalles del cierre de caja</h3>
-        <table class="w-full text-left table-auto">
-          <thead>
+        <table class="w-full table-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm"
+          *ngIf="!cargandoDatosCierre && datosCierreCaja">
+
+          <thead class="bg-slate-100">
             <tr>
-              <th class="p-4 border-y border-slate-200 bg-slate-50 text-center">Ventas y gastos</th>
-              <th class="p-4 border-y border-slate-200 bg-slate-50 text-center">Pagos mensuales</th>
-              <th class="p-4 border-y border-slate-200 bg-slate-50 text-center font-bold">Total</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-slate-700">
+                Ventas y gastos
+              </th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-slate-700">
+                Pagos mensuales
+              </th>
+              <th class="px-6 py-4 text-center text-sm font-bold text-slate-900">
+                Total
+              </th>
             </tr>
           </thead>
+
           <tbody>
-            <tr class="bg-white">
+            <tr class="bg-white hover:bg-slate-50 transition-colors">
 
               <!-- Ventas y gastos -->
-              <td class="p-4 border-b border-slate-200">
-                <div class="flex flex-col items-center">
-                  <p class="font-semibold">10</p>
-                  <p class="text-zinc-700 text-sm">{{ 123000 | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</p>
+              <td class="px-6 py-5 border-t border-slate-200">
+                <div class="flex flex-col items-center gap-1">
+                  <span class="text-lg font-semibold text-slate-900">
+                    {{ datosCierreCaja.caja.cantidad }}
+                  </span>
+                  <span class="text-sm text-slate-600">
+                    {{ datosCierreCaja.caja.total | currency:'ARS':'symbol':'1.2-2':'es-AR' }}
+                  </span>
                 </div>
               </td>
 
               <!-- Pagos mensuales -->
-              <td class="p-4 border-b border-slate-200">
-                <div class="flex flex-col items-center">
-                  <p class="font-semibold">10</p>
-                  <p class="text-zinc-700 text-sm">{{ 123000 | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</p>
+              <td class="px-6 py-5 border-t border-slate-200">
+                <div class="flex flex-col items-center gap-1">
+                  <span class="text-lg font-semibold text-slate-900">
+                    {{ datosCierreCaja.pagos_mensuales.cantidad }}
+                  </span>
+                  <span class="text-sm text-slate-600">
+                    {{ datosCierreCaja.pagos_mensuales.total | currency:'ARS':'symbol':'1.2-2':'es-AR' }}
+                  </span>
                 </div>
               </td>
 
               <!-- Total -->
-              <td class="p-4 border-b border-slate-200">
-                <div class="flex flex-col items-center">
-                  <p class="font-bold">100</p>
-                  <p class="text-zinc-700">{{ 123000 | currency:'ARS':'symbol':'1.2-2':'es-AR' }}</p>
+              <td class="px-6 py-5 border-t border-slate-200 bg-slate-50">
+                <div class="flex justify-center">
+                  <span class="text-xl font-bold text-emerald-600">
+                    {{ datosCierreCaja.total_general | currency:'ARS':'symbol':'1.2-2':'es-AR' }}
+                  </span>
                 </div>
               </td>
 
             </tr>
           </tbody>
         </table>
+
+        <div class="flex justify-center w-full p-6" *ngIf="cargandoDatosCierre">
+          <app-spinner></app-spinner>
+        </div>
       </div>
 
 
@@ -252,8 +274,20 @@
           class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
           Cerrar
         </button>
-        <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition" (click)="">
-          Cerrar caja
+        <button [disabled]="cargandoDatosCierre || datosCierreCaja.total_general == 0" (click)="closeDay()" class="
+            px-5 py-2.5 rounded-lg font-semibold transition-all duration-200
+            bg-green-600 text-white
+            hover:bg-green-700
+            disabled:bg-slate-300
+            disabled:text-slate-500
+            disabled:cursor-not-allowed
+            disabled:hover:bg-slate-300
+            disabled:shadow-none
+            shadow-sm
+          ">
+          <span>
+            Cerrar caja
+          </span>
         </button>
       </div>
 

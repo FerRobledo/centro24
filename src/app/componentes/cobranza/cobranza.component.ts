@@ -8,11 +8,12 @@ import { HistorialClientsComponent } from '../historial-clients/historial-client
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SpinnerComponent } from '../shared/spinner.component';
 
 @Component({
   selector: 'app-cobranza',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SpinnerComponent],
   templateUrl: './cobranza.component.html',
 })
 export class CobranzaComponent implements OnInit, OnDestroy {
@@ -29,8 +30,8 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   // Variables modal cierre de caja
   mostrarModalCierre = false;
   successMessage = false;
-
-
+  cargandoDatosCierre = false;
+  datosCierreCaja: any = {};
 
   selectedDate: string = '';
   private subscriptions: Subscription = new Subscription();
@@ -42,7 +43,6 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     private cobranzaService: CobranzaService,
     private authService: AuthService,
     public dialog: MatDialog,
-    private cdr: ChangeDetectorRef //inyecta ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -59,56 +59,46 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   }
 
   closeDay() {
-    const id = this.authService.getIdAdmin();
     const nameUser = this.authService.getUserName();
+    this.cargandoDatosCierre = true;
 
-    if (id) {
-      this.subscriptions.add(
-        this.cobranzaService.cerrarCaja(id, nameUser).subscribe({
-          next: (data) => {
-            console.log(data)
-            this.collectionDay = data.total;
-            this.mostrarMensajeExito();
-          },
-          error: (error) => {
-            console.log("Error en el calculo de recaudacion: ", error);
-          },
-        })
-      );
-    }
+    this.subscriptions.add(
+      this.cobranzaService.cerrarCaja(nameUser).subscribe({
+        next: (data) => {
+          console.log(data)
+          this.collectionDay = data.total;
+          this.cargandoDatosCierre = false;
+          this.mostrarMensajeExito();
+        },
+        error: (error) => {
+          console.log("Error en el calculo de recaudacion: ", error);
+        },
+      })
+    );
   }
 
   public loadClientsDaily() {
-    const id = this.authService.getIdAdmin();
     this.isLoadingCobranza = true;
     // Fuerza el spinner a mostrarse
 
-    if (id) {
-      this.subscriptions.add(
-        this.cobranzaService.getClientsOfDay(id).subscribe({
-          next: (data) => {
-            this.clientsOfDay = data;
-            this.clientsOfDay = this.clientsOfDay.map(client => {
-              return {
-                ...client,
-                fecha: client.fecha.replace('T', ' ').replace('Z', '')
-              };
-            });
-            //this.ngOnInit();
-            this.isLoadingCobranza = false;
-          },
-          error: (error) => {
-            console.log("Error en el pedido de clientes del dia: ", error);
-            this.isLoadingCobranza = false;
-            ;
-          },
-        })
-      );
-    } else {
-      this.clientsOfDay = [];
-      this.isLoadingCobranza = false;
-      ;
-    }
+    this.cobranzaService.getClientsOfDay().subscribe({
+      next: (data) => {
+        this.clientsOfDay = data;
+        this.clientsOfDay = this.clientsOfDay.map(client => {
+          return {
+            ...client,
+            fecha: client.fecha.replace('T', ' ').replace('Z', '')
+          };
+        });
+        this.isLoadingCobranza = false;
+      },
+      error: (error) => {
+        console.log("Error en el pedido de clientes del dia: ", error);
+        this.isLoadingCobranza = false;
+        ;
+      },
+    })
+
   }
 
   isAdmin() {
@@ -131,20 +121,18 @@ export class CobranzaComponent implements OnInit, OnDestroy {
 
   public deleteClient(client: any) {
     const idClient = client.id;
-    const idAdmin = this.authService.getIdAdmin();
-    if (idAdmin) {
-      this.subscriptions.add(
-        this.cobranzaService.deleteClient(idAdmin, idClient).subscribe({
-          next: () => {
-            this.loadClientsDaily();
-            ;
-          },
-          error: (error) => {
-            console.log("Error en la eliminacion del cliente: ", error);
-          },
-        })
-      );
-    }
+
+    this.subscriptions.add(
+      this.cobranzaService.deleteClient(idClient).subscribe({
+        next: () => {
+          this.loadClientsDaily();
+          ;
+        },
+        error: (error) => {
+          console.log("Error en la eliminacion del cliente: ", error);
+        },
+      })
+    );
   }
 
   nuevaCobranza(accion: string, data: any = null) {
@@ -211,6 +199,18 @@ export class CobranzaComponent implements OnInit, OnDestroy {
 
   openModalCloseDay() {
     this.mostrarModalCierre = true;
+    this.cargandoDatosCierre = true;
+
+    this.cobranzaService.getCierreCaja().subscribe({
+      next: (data) => {
+        console.log(data);
+        this.datosCierreCaja = data;
+        this.cargandoDatosCierre = false;
+      },
+      error: (error) => {
+        console.log(error);
+      }
+    })
   }
 
   getTotal(cliente: any): number {
@@ -274,6 +274,8 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     this.successMessage = true;
     setTimeout(() => {
       this.successMessage = false;
+      this.mostrarModalCierre = false;
+      this.loadClientsDaily();
     }, 1000);
   }
 }
