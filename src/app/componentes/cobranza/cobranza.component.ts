@@ -4,7 +4,7 @@ import { CobranzaService } from 'src/app/services/cobranza.service';
 import { RegisterClienteComponent } from 'src/app/componentes/cobranza/registerCliente/registerCliente.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
-import { HistorialClientsComponent } from '../historial-clients/historial-clients.component';
+import { HistorialClientsComponent } from './historial-clients/historial-clients.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -162,10 +162,6 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   }
 
   openHistorial() {
-
-    const id = this.authService.getIdAdmin();
-    if (!id) return;
-
     this.dialogRef2 = this.dialog.open(HistorialClientsComponent, {
       width: '47vw',
       maxWidth: '100vw',
@@ -181,7 +177,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     });
 
     this.subscriptions.add(
-      this.cobranzaService.getHistory(id).subscribe({
+      this.cobranzaService.getHistory().subscribe({
         next: (data) => {
 
           this.historyCierres = data ?? [];
@@ -230,9 +226,8 @@ export class CobranzaComponent implements OnInit, OnDestroy {
       this.loadClientsDaily();
     }
 
-    const idAdmin = this.authService.getIdAdmin();
     this.subscriptions.add(
-      this.cobranzaService.getClientsByDate(idAdmin, this.selectedDate).subscribe({
+      this.cobranzaService.getClientsByDate(this.selectedDate).subscribe({
         next: (data) => {
           this.clientsOfDay = data;
         },

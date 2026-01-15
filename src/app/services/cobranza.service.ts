@@ -22,12 +22,12 @@ export class CobranzaService {
     return this.http.get(`${this.origin}/api/cobranza/cerrarCaja`);
   }
 
-  public getClientsByDate(idAdmin: number, date: string): Observable<any> {
-    return this.http.get(`${this.origin}/api/cobranza/${idAdmin}/ventasPorDia?date=${date}`)
+  public getClientsByDate(date: string): Observable<any> {
+    return this.http.get(`${this.origin}/api/cobranza/ventasPorDia?date=${date}`)
   }
 
-  public getHistorialByDate(idAdmin: number, date: string): Observable<any> {
-    return this.http.get(`${this.origin}/api/cobranza/${idAdmin}/historialCierrePorDia?date=${date}`)
+  public getHistorialByDate(date: string): Observable<any> {
+    return this.http.get(`${this.origin}/api/cobranza/historialCierrePorDia?date=${date}`)
   }
 
   public postClientDaily(payload: any): Observable<any> {
@@ -44,11 +44,11 @@ export class CobranzaService {
     return this.http.delete(`${this.origin}/api/cobranza`, { body });
   }
 
-  public getHistory(id: number): Observable<any> {
-    return this.http.get( `${this.origin}/api/cobranza/${id}/historialCierres`)
+  public getHistory(): Observable<any> {
+    return this.http.get( `${this.origin}/api/cobranza/historialCierres`)
   }
 
-  public getDetailsId(id: number, idCierre: number): Observable<any> {
-    return this.http.get( `${this.origin}/api/cobranza/${id}/detallesCierre/?idCierre= ` + idCierre)
+  public getDetailsId(idCierre: number): Observable<any> {
+    return this.http.get( `${this.origin}/api/cobranza/detallesCierre/?idCierre= ` + idCierre)
   }
 }

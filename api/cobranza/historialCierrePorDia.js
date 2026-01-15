@@ -1,5 +1,5 @@
-import pool from '../../db.js';
-import { requireAuth } from '../../protected/requireAuth.js';
+import pool from '../db.js';
+import { requireAuth } from '../protected/requireAuth.js';
 
 export default async function handler(req, res) {
     const origin = req.headers.origin || '*';
@@ -23,9 +23,11 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'No autorizado', details: e.message });
     }
 
+    const id = req.user.idAdmin
+
     if (req.method === 'GET') {
         try {
-            const { id, date } = req.query;
+            const { date } = req.query;
             const { rows } = await pool.query(`
                     SELECT id, fecha, monto, nombre_usuario
                     FROM public.historial_cierres
