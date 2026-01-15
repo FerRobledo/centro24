@@ -23,8 +23,10 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'No autorizado', details: e.message });
     }
 
+    const { idAdmin } = req.user;
+    const id = idAdmin;
+
     if (req.method === 'GET') {
-        const { id } = req.query;
 
         if (!id) {
             return res.status(400).json({ error: 'Error falta id para obtener los clientes del dia' });
@@ -43,7 +45,6 @@ export default async function handler(req, res) {
 
     //POST
     if (req.method === 'POST') {
-        const { id } = req.query;
         const payload = req.body;
 
         if (!id) {
@@ -111,8 +112,7 @@ export default async function handler(req, res) {
     }
     //PUT
     if (req.method === 'PUT') {
-        const idClient = req.query.id;
-        const { idAdmin } = req.body; //el {} quiere decir del objeto req.body, extraeme la propiedad llamada idAdmin
+        const idClient = req.body;
         const payload = req.body; //sin {} porque es un objeto, los objetos se toman completos
 
         if (!idClient) {
@@ -133,7 +133,6 @@ export default async function handler(req, res) {
 
     // DELETE 
     if (req.method === 'DELETE') {
-        const idAdmin = req.query.id;
         const { idClient } = req.body;
 
         if (!idAdmin || !idClient) {

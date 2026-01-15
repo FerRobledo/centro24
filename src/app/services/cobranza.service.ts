@@ -10,41 +10,45 @@ export class CobranzaService {
 
   constructor(private http: HttpClient) { }
 
-  public getClientsOfDay(id: number): Observable<any> {
-    return this.http.get(this.origin + '/api/cobranza/' + id)
+  public getClientsOfDay(): Observable<any> {
+    return this.http.get(`${this.origin}/api/cobranza`)
   }
 
-  public closeClientsOfDay(id: number, nameUser: string): Observable<any> {
-    return this.http.post( `${this.origin}/api/cobranza/${id}/cerrarCaja/?nameUser=${nameUser}`, {});
+  public cerrarCaja(nameUser: string): Observable<any> {
+    return this.http.post( `${this.origin}/api/cobranza/cerrarCaja/?nameUser=${nameUser}`, {});
   }
 
-  public getClientsByDate(idAdmin: number, date: string): Observable<any> {
-    return this.http.get(`${this.origin}/api/cobranza/${idAdmin}/ventasPorDia?date=${date}`)
+  public getCierreCaja(): Observable<any>{
+    return this.http.get(`${this.origin}/api/cobranza/cerrarCaja`);
   }
 
-  public getHistorialByDate(idAdmin: number, date: string): Observable<any> {
-    return this.http.get(`${this.origin}/api/cobranza/${idAdmin}/historialCierrePorDia?date=${date}`)
+  public getClientsByDate(date: string): Observable<any> {
+    return this.http.get(`${this.origin}/api/cobranza/ventasPorDia?date=${date}`)
   }
 
-  public postClientDaily(payload: any, idAdmin: number): Observable<any> {
-    return this.http.post(this.origin + '/api/cobranza/' + idAdmin, payload);
+  public getHistorialByDate(date: string): Observable<any> {
+    return this.http.get(`${this.origin}/api/cobranza/historialCierrePorDia?date=${date}`)
   }
 
-  public updateClient(idClient: number, idAdmin: number, payload: any) {
-    const body = { ...payload, idAdmin };
-    return this.http.put(this.origin + '/api/cobranza/' + idClient, body);
+  public postClientDaily(payload: any): Observable<any> {
+    return this.http.post(`${this.origin}/api/cobranza`, payload);
   }
 
-  public deleteClient(idAdmin: number, idClient: number) {
+  public updateClient(idClient: number, payload: any) {
+    const body = { ...payload, idClient };
+    return this.http.put(`${this.origin}/api/cobranza`, body);
+  }
+
+  public deleteClient(idClient: number) {
     const body = { idClient };
-    return this.http.delete(this.origin + '/api/cobranza/' + idAdmin, { body });
+    return this.http.delete(`${this.origin}/api/cobranza`, { body });
   }
 
-  public getHistory(id: number): Observable<any> {
-    return this.http.get( `${this.origin}/api/cobranza/${id}/historialCierres`)
+  public getHistory(): Observable<any> {
+    return this.http.get( `${this.origin}/api/cobranza/historialCierres`)
   }
 
-  public getDetailsId(id: number, idCierre: number): Observable<any> {
-    return this.http.get( `${this.origin}/api/cobranza/${id}/detallesCierre/?idCierre= ` + idCierre)
+  public getDetailsId(idCierre: number): Observable<any> {
+    return this.http.get( `${this.origin}/api/cobranza/detallesCierre/?idCierre= ` + idCierre)
   }
 }

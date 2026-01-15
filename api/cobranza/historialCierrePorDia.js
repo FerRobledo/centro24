@@ -1,5 +1,5 @@
-import pool from '../../db.js';
-import { requireAuth } from '../../protected/requireAuth.js';
+import pool from '../db.js';
+import { requireAuth } from '../protected/requireAuth.js';
 
 export default async function handler(req, res) {
     const origin = req.headers.origin || '*';
@@ -23,24 +23,27 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'No autorizado', details: e.message });
     }
 
+    const id = req.user.idAdmin
+
     if (req.method === 'GET') {
         try {
-            const { id, date } = req.query;
-
+            const { date } = req.query;
             const { rows } = await pool.query(`
-                    SELECT * 
-                    FROM caja 
+                    SELECT id, fecha, monto, nombre_usuario
+                    FROM public.historial_cierres
                     WHERE user_admin = $1 
-                    AND DATE(fecha) = $2 AND activo=true
+                    AND DATE(fecha) = $2
                     ORDER BY fecha DESC, id DESC
                     `, [id, date]);
 
             return res.status(200).json(rows);
+
         } catch (error) {
             console.log(error);
-            return res.status(500).json({ error: 'Error al filtrar ventas por fecha', details: error.message })
+            return res.status(500).json({ error: 'Error no se pudo obtener detalles', details: error.message });
         }
     }
 
     res.status(405).json({ message: 'Método no permitido' });
+
 }
