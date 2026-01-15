@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-cobranza',
   standalone: true,
-  imports: [ CommonModule, FormsModule ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './cobranza.component.html',
 })
 export class CobranzaComponent implements OnInit, OnDestroy {
@@ -24,6 +24,13 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   isLoadingCobranza: boolean = false;
   dialogRef: MatDialogRef<any> | null = null;
   dialogRef2!: MatDialogRef<HistorialClientsComponent>;
+
+
+  // Variables modal cierre de caja
+  mostrarModalCierre = false;
+  successMessage = false;
+
+
 
   selectedDate: string = '';
   private subscriptions: Subscription = new Subscription();
@@ -51,19 +58,17 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe(); //limpia todas las suscripciones
   }
 
-  public closeDay() {
+  closeDay() {
     const id = this.authService.getIdAdmin();
     const nameUser = this.authService.getUserName();
 
     if (id) {
       this.subscriptions.add(
-        this.cobranzaService.closeClientsOfDay(id, nameUser).subscribe({
+        this.cobranzaService.cerrarCaja(id, nameUser).subscribe({
           next: (data) => {
+            console.log(data)
             this.collectionDay = data.total;
-            if (data === 0) {
-              this.collectionDay = 0;
-            }
-            ; //revisá este componente ya mismo por si hay algo que cambió y actualizá el HTML.
+            this.mostrarMensajeExito();
           },
           error: (error) => {
             console.log("Error en el calculo de recaudacion: ", error);
@@ -76,7 +81,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   public loadClientsDaily() {
     const id = this.authService.getIdAdmin();
     this.isLoadingCobranza = true;
- // Fuerza el spinner a mostrarse
+    // Fuerza el spinner a mostrarse
 
     if (id) {
       this.subscriptions.add(
@@ -147,7 +152,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
       maxWidth: '100%',
       disableClose: false,
       autoFocus: true,
-      data: {accion, data},
+      data: { accion, data },
     });
 
     this.dialogRef.afterClosed().subscribe(result => {
@@ -205,22 +210,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   }
 
   openModalCloseDay() {
-    let titulo = 'Confirmar cierre de caja';
-    let mensaje = '';
-
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
-      data: {
-        title: titulo,
-        message: mensaje
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.closeDay();
-      }
-    })
+    this.mostrarModalCierre = true;
   }
 
   getTotal(cliente: any): number {
@@ -274,5 +264,16 @@ export class CobranzaComponent implements OnInit, OnDestroy {
         this.deleteClient(client);
       }
     })
+  }
+
+  cerrarModalCierre() {
+    this.mostrarModalCierre = false;
+  }
+
+  mostrarMensajeExito() {
+    this.successMessage = true;
+    setTimeout(() => {
+      this.successMessage = false;
+    }, 1000);
   }
 }
