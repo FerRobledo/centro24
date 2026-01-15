@@ -8,7 +8,7 @@ import { CobranzaService } from 'src/app/services/cobranza.service';
 @Component({
   selector: 'app-detailsHistorial',
   standalone: true,
-  imports: [ FormsModule, CommonModule ],
+  imports: [FormsModule, CommonModule],
   templateUrl: './detailsHistorial.component.html'
 })
 export class DetailsHistorialComponent implements OnInit {
@@ -30,26 +30,22 @@ export class DetailsHistorialComponent implements OnInit {
   }
 
   getDetailsById() {
-    const idAdmin = this.authService.getIdAdmin();
     this.isLoading = true;
 
-    if (idAdmin) {
-      this.subscriptions.add(
-        this.cobranzaService.getDetailsId(idAdmin, this.idCierre).subscribe({
-          next: (data) => {
-            this.detailsCurrent = data.data;//data tiene dos objetos y accedo con .detalles o .totales
-            console.log(this.detailsCurrent);
-            this.isLoading = false;
-          },
-          error: (error) => {
-            console.log("Error en el GET de details: ", error);
-            this.isLoading = false;
-          },
-        })
-      );
-    } else {
-      console.log("Error falta el id admin");
-    }
+    this.subscriptions.add(
+      this.cobranzaService.getDetailsId(this.idCierre).subscribe({
+        next: (data) => {
+          this.detailsCurrent = data.data;//data tiene dos objetos y accedo con .detalles o .totales
+          console.log(this.detailsCurrent);
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.log("Error en el GET de details: ", error);
+          this.isLoading = false;
+        },
+      })
+    );
+
   }
 
   getTotal(cliente: any): number {

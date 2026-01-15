@@ -22,37 +22,41 @@ export default async function handler(req, res) {
     } catch (e) {
         return res.status(401).json({ error: 'No autorizado', details: e.message });
     }
+    const id = req.user.idAdmin;
 
     if (req.method === 'GET') {
-        const { id, action } = req.query;
 
         if (!id) {
             return res.status(400).json({ error: 'Error falta id para obtener los clientes del dia' });
         }
 
-        else if (action === 'getHistorialByDate') {
-            try {
-                const { id, date } = req.query;
-                console.log(date);
+        try {
+            const { date } = req.query;
+            let result;
+            if (date != '') {
                 const { rows } = await pool.query(`
-                    SELECT id, fecha, monto, nombre_usuario
-                    FROM public.historial_cierres
+                    SELECT *
+                    FROM caja
                     WHERE user_admin = $1 
                     AND DATE(fecha) = $2
                     ORDER BY fecha DESC, id DESC
                     `, [id, date]);
 
-                return res.status(200).json(rows);
-            } catch (error) {
-                console.log(error);
-                return res.status(500).json({ error: 'Error al filtrar ventas por fecha', details: error.message })
+                result = rows;
+            } else {
+                const { rows } = await pool.query(`
+                    SELECT *
+                    FROM caja
+                    WHERE user_admin = $1 
+                    ORDER BY fecha DESC, id DESC
+                    `, [id]);
+                result = rows;
             }
-        }
-        else {
 
-            const { rows } = await pool.query(`
-                SELECT * FROM caja WHERE user_admin = $1 AND activo=true ORDER BY fecha DESC, id DESC`, [id]);
-            return res.status(200).json(rows);
+            return res.status(200).json(result);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ error: 'Error al filtrar ventas por fecha', details: error.message })
         }
 
     }

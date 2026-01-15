@@ -16,7 +16,7 @@ const tiposDePagos: string[] = [
 @Component({
   selector: 'app-registerCliente',
   standalone: true,
-  imports: [ FormsModule, SelectorDePagosComponent, CommonModule ],
+  imports: [FormsModule, SelectorDePagosComponent, CommonModule],
   templateUrl: './registerCliente.component.html',
   styleUrls: []
 })
@@ -44,29 +44,28 @@ export class RegisterClienteComponent implements OnInit {
   detalle: string = '';
 
   agregarVenta() {
-    
+
     const payload = { detalle: this.detalle, observacion: this.observacion, pagos: this.pagos };
-    const idAdmin = this.authService.getIdAdmin();
-    
+
     console.log(payload);
-    this.cobranzaService.postClientDaily(payload, idAdmin).subscribe({
+    this.cobranzaService.postClientDaily(payload).subscribe({
+      next: () => {
+        this.dialogRef.close("submit");
+        this.loadClientes.emit;
+        this.dialogRef.close("submit"); //cierro modal
+      },
       error: (err) => {
         console.error('Error al registrar:', err);
-      },
-      complete: () => {
-        this.dialogRef.close("submit");
       }
-    });    
-    this.loadClientes.emit;
-    this.dialogRef.close("submit"); //cierro modal
+    });
   }
 
   ngOnInit() {
-    if(this.data && this.data.accion){
+    if (this.data && this.data.accion) {
       this.accion = this.data.accion;
-      
-      if(this.accion == 'gasto'){
-        this.pagos.push({ tipo:'Gasto', monto: 0 });
+
+      if (this.accion == 'gasto') {
+        this.pagos.push({ tipo: 'Gasto', monto: 0 });
       }
     }
   }
