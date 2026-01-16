@@ -59,7 +59,6 @@ export default async function handler(req, res) {
             `;
 
             const totalResult = await pool.query(totalQuery, params);
-            console.log(totalResult.rows);
             const total = parseInt(totalResult.rows[0].count);
             // Consulta principal (se le agrega LIMIT Y OFFSET)
 

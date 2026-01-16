@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    const idAdmin = req.user.id;
+    const idAdmin = req.user.idAdmin;
     const { id } = req.query;
 
 
@@ -29,15 +29,8 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'PUT') {
-        const { idClient, ...payload } = req.body;
+        const { ...payload } = req.body;
 
-        if (!idAdmin) {
-            return res.status(400).json({ error: 'Error falta id ' });
-        }
-
-        if (!id) {
-            return res.status(400).json({ error: 'Falta id del cliente para actualizar' });
-        }
         try {
             const { rows } = await pool.query(
                 `UPDATE clientes_mensuales
@@ -64,9 +57,6 @@ export default async function handler(req, res) {
     // DELETE
     if (req.method === 'DELETE') {
 
-        if (!idAdmin || !id) {
-            return res.status(400).json({ error: 'Falta id o idClient' });
-        }
         try {
             const result = await pool.query(
                 `UPDATE public.clientes_mensuales 
