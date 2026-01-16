@@ -12,47 +12,39 @@ export class ClientesService {
   constructor(private http: HttpClient) { }
 
   public getClientsOfMonth(
-    idAdmin: number,
     params: {
       page: number,
       pageSize: number,
       search?: string,
       selectedFiltroPago?: string,
-    }): Observable<any> {
+    }
+  ): Observable<any> {
+
     let httpParams = new HttpParams()
       .set('page', params.page)
       .set('pageSize', params.pageSize);
-    console.log(params)
+
     if (params.search) httpParams = httpParams.set('search', params.search);
     if (params.selectedFiltroPago) httpParams = httpParams.set('filtroPago', params.selectedFiltroPago);
 
-    return this.http.get(this.origin + '/api/clientes/' + idAdmin, { params })
+    return this.http.get(`${this.origin}/api/clientes`, { params })
   }
 
-  public postClientDaily(payload: any, idAdmin: number): Observable<any> {
-    return this.http.post(this.origin + '/api/clientes/' + idAdmin, payload);
+  public postClientDaily(payload: any): Observable<any> {
+    return this.http.post(`${this.origin}/api/clientes`, payload);
   }
 
-  public deleteClient(idAdmin: number, idClient: number) {
-    const body = { idClient };
-    return this.http.delete(this.origin + '/api/clientes/' + idAdmin, { body });
+  public deleteClient(idClient: number) {
+    return this.http.delete(`${this.origin}/api/clientes/${idClient}`);
   }
 
-  public updateClient(idClient: number, idAdmin: number, payload: any) {
-    const body = { ...payload, idClient };
-    return this.http.put(this.origin + '/api/clientes/' + idAdmin, body);
+  public updateClient(idClient: number, payload: any) {
+    const body = { ...payload };
+    return this.http.put(`${this.origin}/api/clientes/${idClient}`, body);
   }
 
-  public incrementClient(idAdmin: number, porcentaje: number): Observable<any> {
-    // ANTES /aumentarPrecio era accion = 'incrementar', apuntaba a /api/clientes/[id], ahora apunta a /api/clientes/[id]/aumentarPrecio
-    return this.http.put(this.origin + '/api/clientes/' + idAdmin + "/aumentarPrecio", { porcentaje: porcentaje });
+  public incrementClient(porcentaje: number): Observable<any> {
+    return this.http.put(`${this.origin}/api/clientes/aumentarPrecio`, { porcentaje: porcentaje });
   }
 
-  // Movido a pagoMensual.service 
-  // Eliminta action: 'deletePago', la accion pasa a ser el metodo HTTP (this.http.delete());
-
-  // public deletePago(idAdmin: number, id: number): Observable<any>{
-  //   const body = {action:'deletePago', id};
-  //   return this.http.delete(this.origin + '/api/clientes/' + idAdmin, { body });
-  // }
 }

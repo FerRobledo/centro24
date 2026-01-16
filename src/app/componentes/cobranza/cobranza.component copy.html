@@ -1,0 +1,307 @@
+<div
+  class="relative flex flex-col w-[75vw] h-[95vh] text-slate-700 bg-white shadow-2xl rounded-2xl overflow-hidden bg-clip-border">
+  <div class="grid grid-cols-3 items-center w-full p-4 text-slate-700 bg-white bg-clip-border">
+
+    <!-- Izquierda -->
+    <div class="flex flex-col space-y-1 justify-start">
+      <div>
+        <h3 class="text-lg font-semibold text-slate-800">
+          <i class="fa-solid fa-cash-register"></i> Caja de cobranza
+        </h3>
+        <p class="text-slate-500">Lista de movimientos diarios</p>
+      </div>
+    </div>
+
+    <!-- Centro -->
+    <div class="flex justify-center items-center gap-2">
+      <label class="text-sm font-semibold text-gray-500 whitespace-nowrap">
+        Filtrar por fecha:
+      </label>
+      <div class="w-36">
+        <div
+          class="flex items-center gap-2 px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-200">
+          <input type="date" [(ngModel)]="selectedDate" (ngModelChange)="fitrarFecha()"
+            class="w-full bg-transparent focus:outline-none text-slate-700 text-sm leading-tight">
+        </div>
+      </div>
+    </div>
+
+    <!-- Derecha -->
+    <div class="flex justify-end gap-8">
+      <div class="flex flex-col gap-4">
+        <button
+          class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-amber-500 hover:bg-amber-600 transition-all duration-200 ease-in-out"
+          (click)="openModalCloseDay()" type="button">
+          <i class="fa-solid fa-lock"></i> Cerrar caja
+        </button>
+        <button
+          class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-blue-500 hover:bg-blue-600 transition-all duration-200 ease-in-out"
+          (click)="openHistorial()" type="button">
+          <i class="fa-solid fa-clock-rotate-left"></i> Historial
+        </button>
+      </div>
+      <div class="flex flex-col gap-4">
+        <button
+          class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 ease-in-out"
+          (click)="nuevaCobranza('venta')" type="button">
+          <i class="fa-solid fa-user-plus"></i> Agregar venta
+        </button>
+        <button
+          class="flex items-center justify-center gap-1 rounded py-3 text-xs font-bold text-white w-36 bg-red-500 hover:bg-red-600 transition-all duration-200 ease-in-out"
+          (click)="nuevaCobranza('gasto')" type="button">
+          <i class="fa-solid fa-user-plus"></i> Agregar gasto
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+
+  <ng-container *ngIf="!isLoadingCobranza else carga">
+
+    <!-- sin rounded aquí -->
+    <div class="overflow-y-auto h-full rounded-scroll border-t border-gray-300">
+      <table class="w-full text-left table-auto min-w-max rounded-t-2xl">
+        <thead>
+          <tr>
+            <th class="p-4 w-28 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-1 text-sm font-normal leading-none text-slate-500">
+                Fecha
+              </p>
+            </th>
+            <th class="p-4 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
+                Detalle
+              </p>
+            </th>
+            <th class="p-4 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
+                Efectivo
+              </p>
+            </th>
+            <th class="p-4 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
+                Débito
+              </p>
+            </th>
+            <th class="p-4 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
+                Crédito
+              </p>
+            </th>
+            <th class="p-2 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
+                Transferencia
+              </p>
+            </th>
+            <th class="p-2 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
+                Cheque
+              </p>
+            </th>
+            <th class="p-2 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
+                Gasto
+              </p>
+            </th>
+            <th class="p-2 w-4 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex items-center justify-between gap-2 text-sm font-normal leading-none text-slate-500">
+                Total
+              </p>
+            </th>
+            <th class="p-1 w-20 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex justify-center items-center gap-2 text-sm font-normal leading-none text-slate-500">
+                Observación
+              </p>
+            </th>
+            <th class="p-2 w-5 border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+              <p class="flex justify-center items-center gap-2 text-sm font-normal leading-none text-slate-500"
+                *ngIf="isAdmin()">
+                Modificar
+              </p>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody *ngIf="clientsOfDay.length > 0 else noData">
+          <tr *ngFor="let cliente of clientsOfDay" [ngClass]="getTotal(cliente) < 0 ? 'bg-red-50' : 'bg-green-50'">
+            <td class="p-4 border-b border-slate-200">
+              <p class="text-xs text-slate-500">{{cliente.fecha | date: 'dd-MM-yyyy'}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <p class="text-xs font-semibold text-slate-700">{{cliente.detalle}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <p class="text-xs font-semibold text-slate-500">{{cliente.efectivo |
+                currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <p class="text-xs font-semibold text-slate-500">{{cliente.debito |
+                currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <p class="text-xs font-semibold text-slate-500">{{cliente.credito |
+                currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <p class="text-xs font-semibold text-slate-500">{{cliente.transferencia |
+                currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <p class="text-xs font-semibold text-slate-500">{{cliente.cheque |
+                currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <p class="text-xs font-semibold text-slate-500">{{cliente.gasto |
+                currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <p class="text-xs font-bold text-slate-500">{{getTotal(cliente) |
+                currency:'ARS':'symbol-narrow':'1.2-2':'es-AR'}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <p class="text-xs font-semibold text-slate-500">{{cliente.observacion}}</p>
+            </td>
+            <td class="p-4 border-b border-slate-200">
+              <div class="flex gap-2">
+                <button (click)="nuevaCobranza('update', cliente)" *ngIf="isAdmin()"
+                  class="text-slate-500 hover:text-blue-600" title="Editar">
+                  <i class="fa-solid fa-pencil"></i>
+                </button>
+                <button (click)="openDeleteConfirm(cliente)" *ngIf="isAdmin()" class="text-slate-500 hover:text-red-600"
+                  title="Eliminar">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+
+        <ng-template #noData>
+          <tbody>
+            <tr>
+              <td colspan="11" class="text-center py-6 text-slate-500">
+                No se encontraron registros para la fecha seleccionada.
+              </td>
+            </tr>
+          </tbody>
+        </ng-template>
+      </table>
+    </div>
+  </ng-container>
+
+  <ng-template #carga>
+    <div class="flex justify-center items-center h-full">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-green-600 border-solid"></div>
+    </div>
+  </ng-template>
+
+  <!-- MODAL CIERRE DE CAJA -->
+  <div *ngIf="mostrarModalCierre"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden animate-fadeIn">
+
+      <!-- BODY -->
+      <div class="flex flex-col text-center">
+        <h3 class="text-green-600 text-xl font-bold p-2">Detalles del cierre de caja</h3>
+        <table class="w-full table-auto border border-slate-200 rounded-xl overflow-hidden shadow-sm"
+          *ngIf="!cargandoDatosCierre && datosCierreCaja">
+
+          <thead class="bg-slate-100">
+            <tr>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-slate-700">
+                Ventas y gastos
+              </th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-slate-700">
+                Pagos mensuales
+              </th>
+              <th class="px-6 py-4 text-center text-sm font-bold text-slate-900">
+                Total
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr class="bg-white hover:bg-slate-50 transition-colors">
+
+              <!-- Ventas y gastos -->
+              <td class="px-6 py-5 border-t border-slate-200">
+                <div class="flex flex-col items-center gap-1">
+                  <span class="text-lg font-semibold text-slate-900">
+                    {{ datosCierreCaja.caja.cantidad }}
+                  </span>
+                  <span class="text-sm text-slate-600">
+                    {{ datosCierreCaja.caja.total | currency:'ARS':'symbol':'1.2-2':'es-AR' }}
+                  </span>
+                </div>
+              </td>
+
+              <!-- Pagos mensuales -->
+              <td class="px-6 py-5 border-t border-slate-200">
+                <div class="flex flex-col items-center gap-1">
+                  <span class="text-lg font-semibold text-slate-900">
+                    {{ datosCierreCaja.pagos_mensuales.cantidad }}
+                  </span>
+                  <span class="text-sm text-slate-600">
+                    {{ datosCierreCaja.pagos_mensuales.total | currency:'ARS':'symbol':'1.2-2':'es-AR' }}
+                  </span>
+                </div>
+              </td>
+
+              <!-- Total -->
+              <td class="px-6 py-5 border-t border-slate-200 bg-slate-50">
+                <div class="flex justify-center">
+                  <span class="text-xl font-bold text-emerald-600">
+                    {{ datosCierreCaja.total_general | currency:'ARS':'symbol':'1.2-2':'es-AR' }}
+                  </span>
+                </div>
+              </td>
+
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="flex justify-center w-full p-6" *ngIf="cargandoDatosCierre">
+          <app-spinner></app-spinner>
+        </div>
+      </div>
+
+
+      <!-- Footer -->
+      <div class="flex justify-between px-6 py-4 border-t bg-gray-50">
+        <button (click)="cerrarModalCierre()"
+          class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
+          Cerrar
+        </button>
+        <button [disabled]="cargandoDatosCierre || datosCierreCaja.total_general == 0" (click)="closeDay()" class="
+            px-5 py-2.5 rounded-lg font-semibold transition-all duration-200
+            bg-green-600 text-white
+            hover:bg-green-700
+            disabled:bg-slate-300
+            disabled:text-slate-500
+            disabled:cursor-not-allowed
+            disabled:hover:bg-slate-300
+            disabled:shadow-none
+            shadow-sm
+          ">
+          <span>
+            Cerrar caja
+          </span>
+        </button>
+      </div>
+
+      <div *ngIf="successMessage" class="fixed inset-0 flex items-center justify-center z-50 bg-black/20">
+        <div class="bg-green-500 text-white px-8 py-4 rounded-lg shadow-xl flex items-center gap-3 animate-pulse">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <span class="font-medium text-lg">Cambios guardados con éxito</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

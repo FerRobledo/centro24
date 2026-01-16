@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-insertarCliente',
   standalone: true,
-  imports: [ FormsModule, ReactiveFormsModule, MatRadioModule, CommonModule ],
+  imports: [FormsModule, ReactiveFormsModule, MatRadioModule, CommonModule],
   templateUrl: './insertarCliente.component.html'
 })
 export class InsertarClienteComponent implements OnInit {
@@ -20,7 +20,7 @@ export class InsertarClienteComponent implements OnInit {
   @Input() clientEdit: any;
   accion: string = '';
   form!: FormGroup;
-  client: any = { tipo: '', cliente: '', monto: ''};
+  client: any = { tipo: '', cliente: '', monto: '' };
   cargando: boolean = false;
 
   constructor(
@@ -36,11 +36,10 @@ export class InsertarClienteComponent implements OnInit {
       return;
     }
 
-    const idAdmin = this.authService.getIdAdmin();
     this.cargando = true;
 
     if (this.accion == 'editar' && this.data.client?.id_client) {
-      this.clientstService.updateClient(this.data.client.id_client, idAdmin, this.form.value).subscribe({
+      this.clientstService.updateClient(this.data.client.id_client, this.form.value).subscribe({
         error: (err) => {
           console.error('Error al actualizar:', err);
         },
@@ -50,7 +49,7 @@ export class InsertarClienteComponent implements OnInit {
         }
       });
     } else {
-      this.clientstService.postClientDaily(this.form.value, idAdmin).subscribe({
+      this.clientstService.postClientDaily(this.form.value).subscribe({
         error: (err) => {
           console.error('Error al registrar:', err);
         },

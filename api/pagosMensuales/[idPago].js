@@ -1,5 +1,5 @@
-import pool from '../../db';
-import { requireAuth } from '../../protected/requireAuth'
+import pool from '../db';
+import { requireAuth } from '../protected/requireAuth'
 
 export default async function handler(req, res) {
     const origin = req.headers.origin || '*'; // Usa * si no hay origen
@@ -20,9 +20,10 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
+    const { idAdmin } = req.user
     // DELETE
     if (req.method === 'DELETE') {
-        const { idAdmin, idPago } = req.query;
+        const { idPago } = req.query;
 
         if (!idPago) {
             return res.status(400).json({ error: "Faltan datos para eliminar el pago" });
