@@ -16,7 +16,7 @@ const fechaFormateada = new Date().toLocaleDateString('es-AR', {
 @Component({
   selector: 'app-agregarPagoModal',
   standalone: true,
-  imports: [ ReactiveFormsModule, SelectorClientesComponent, CommonModule, MatDividerModule ],
+  imports: [ReactiveFormsModule, SelectorClientesComponent, CommonModule, MatDividerModule],
   templateUrl: './agregarPagoModal.component.html'
 })
 export class AgregarPagoModalComponent implements OnInit {
@@ -97,7 +97,7 @@ export class AgregarPagoModalComponent implements OnInit {
     let fechaDesde = this.pagoForm.get('fechaDesde')?.value;
     let fechaHasta = this.pagoForm.get('fechaHasta')?.value;
 
-    if(fechaHasta == ''){
+    if (fechaHasta == '') {
       fechaHasta = fechaDesde;
     }
     // Armá el objeto a enviar con fechas formateadas
@@ -109,9 +109,8 @@ export class AgregarPagoModalComponent implements OnInit {
       metodoPago: this.pagoForm.get('metodoPago')?.value
     };
 
-    const adminId = this.authService.getIdAdmin();
 
-    this.pagoMensualService.asignarPago(adminId, pagoData).subscribe({
+    this.pagoMensualService.asignarPago(pagoData).subscribe({
       error: (error: any) => console.log(error),
     });
 

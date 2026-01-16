@@ -1,5 +1,5 @@
-import pool from '../../db.js';
-import { requireAuth } from '../../protected/requireAuth.js';
+import pool from '../db.js';
+import { requireAuth } from '../protected/requireAuth.js';
 
 export default async function handler(req, res) {
     const origin = req.headers.origin || '*';
@@ -19,10 +19,10 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
+    const idAdmin = req.user.idAdmin;
 
     if (req.method === 'PUT') {
         const { porcentaje } = req.body;
-        const idAdmin = req.query.id;
 
         if (!idAdmin) {
             return res.status(400).json({ error: 'Error falta id ' });

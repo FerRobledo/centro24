@@ -3,7 +3,6 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from 'src/app/auth/auth.service';
 import { ClientesService } from 'src/app/services/clientes.service';
 import { InsertarClienteComponent } from '../insertarCliente/insertarCliente.component';
-import { Subscription } from 'rxjs';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { AgregarPagoModalComponent } from '../agregarPagoModal/agregarPagoModal.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -20,7 +19,6 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 })
 export class ListaClientesComponent implements OnInit, OnDestroy {
   private dialogRef: MatDialogRef<any> | null = null;
-  private subscriptions: Subscription = new Subscription();
   constructor(
     private authService: AuthService,
     public clientesService: ClientesService,
@@ -50,29 +48,23 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
 
   loadClientsMonthly() {
-    const idAdmin = this.authService.getIdAdmin();
-    if (!idAdmin) {
-      this.clientsOfMonth = [];
-      this.isLoading = false;
-      return;
-    }
-
     this.isLoading = true;
-    this.clientesService.getClientsOfMonth(idAdmin, { page: this.page, pageSize: this.pageSize, search: this.search, selectedFiltroPago: this.selectedFiltroPago })
+
+    this.clientesService.getClientsOfMonth({ page: this.page, pageSize: this.pageSize, search: this.search, selectedFiltroPago: this.selectedFiltroPago })
       .subscribe({
-      next: (data) => {
-        this.clientsOfMonth = data.clientes;
-        this.total = data.total;
-      },
-      error: (error) => {
-        console.error("Error en el pedido de clientes del día: ", error);
-        this.clientsOfMonth = [];
-      },
-      complete: () => {
-        this.isLoading = false;
-        this.mapearClientes();
-      }
-    })
+        next: (data) => {
+          this.clientsOfMonth = data.clientes;
+          this.total = data.total;
+        },
+        error: (error) => {
+          console.error("Error en el pedido de clientes del día: ", error);
+          this.clientsOfMonth = [];
+        },
+        complete: () => {
+          this.isLoading = false;
+          this.mapearClientes();
+        }
+      })
   }
 
   public updateClient(client: any) {
@@ -107,25 +99,20 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
   public deleteClient(client: any) {
     this.eliminandoClienteId = client.id_client;
     const idClient = client.id_client;
-    const idAdmin = this.authService.getIdAdmin();
 
-    console.log("que id es? :" + idClient);
+    this.clientesService.deleteClient(idClient).subscribe({
+      next: () => {
+        ;
+        this.eliminandoClienteId = null;
+        this.loadClientsMonthly();
 
-    if (idAdmin) {
-      this.clientesService.deleteClient(idAdmin, idClient).subscribe({
-        next: () => {
-          ;
-          this.eliminandoClienteId = null;
-          this.loadClientsMonthly();
-
-        },
-        error: (error) => {
-          ;
-          this.eliminandoClienteId = null;
-          console.log("Error en la eliminacion del cliente: ", error)
-        },
-      })
-    }
+      },
+      error: (error) => {
+        ;
+        this.eliminandoClienteId = null;
+        console.log("Error en la eliminacion del cliente: ", error)
+      },
+    })
   }
 
   openDeleteConfirm(client: any) {
@@ -169,18 +156,16 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
 
-        const idAdmin = this.authService.getIdAdmin();
-        if (idAdmin && this.porcentaje !== null) {
-          this.subscriptions.add(
-            this.clientesService.incrementClient(idAdmin, this.porcentaje).subscribe({
-              error: (error) => {
-                console.error(error);
-              },
-              complete: () => {
-                this.loadClientsMonthly();
-              }
-            })
-          );
+        if (this.porcentaje !== null) {
+
+          this.clientesService.incrementClient(this.porcentaje).subscribe({
+            error: (error) => {
+              console.error(error);
+            },
+            complete: () => {
+              this.loadClientsMonthly();
+            }
+          })
         }
       }
     });
@@ -255,7 +240,7 @@ export class ListaClientesComponent implements OnInit, OnDestroy {
   onSearchChange() {
     this.loadClientsMonthly();
   }
- 
+
   // METODOS PAGINADO
   setPageSize(size: number) {
     this.pageSize = size;

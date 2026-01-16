@@ -1,5 +1,5 @@
-import pool from '../../db.js';
-import { requireAuth } from '../../protected/requireAuth.js';
+import pool from '../db.js';
+import { requireAuth } from '../protected/requireAuth.js';
 
 export default async function handler(req, res) {
     const origin = req.headers.origin || '*';
@@ -20,9 +20,11 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
+    const id = req.user.idAdmin;
+
     // GET
     if (req.method === 'GET') {
-        const { id, page = 1, pageSize = 10, search = '', selectedFiltroPago = '' } = req.query;
+        const { page = 1, pageSize = 10, search = '', selectedFiltroPago = '' } = req.query;
         const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
         // id = id_admin
@@ -45,9 +47,9 @@ export default async function handler(req, res) {
                     OR cm.cliente ILIKE $${paramIndex}
                     OR cm.tipo ILIKE $${paramIndex}
                     )
-            `; 
-            // Pushear parametros y aumentar el index
-            // El index sirve para agregar en la consulta $1, $2, $3, segun la cantidad de params
+            `;
+                // Pushear parametros y aumentar el index
+                // El index sirve para agregar en la consulta $1, $2, $3, segun la cantidad de params
                 params.push(`%${search}%`);
                 paramIndex++;
             }
@@ -85,7 +87,13 @@ export default async function handler(req, res) {
             const totalQuery = `
             SELECT COUNT(*) 
             FROM clientes_mensuales cm
-            LEFT JOIN pagos_mensuales pm ON cm.id_client = pm.id_client
+            LEFT JOIN LATERAL (
+                SELECT id, id_client, periodo_hasta, activo
+                FROM pagos_mensuales
+                WHERE id_client = cm.id_client
+                ORDER BY periodo_hasta DESC
+                LIMIT 1
+            ) pm ON true
             ${where}
             `;
 
@@ -94,22 +102,21 @@ export default async function handler(req, res) {
 
             // Consulta principal (se le agrega LIMIT Y OFFSET)
             const dataQuery = `
-                SELECT 
+                SELECT
                     cm.*,
                     pm.id AS pago_id,
                     pm.periodo_hasta AS pago_hasta
                 FROM clientes_mensuales cm
-                LEFT JOIN pagos_mensuales pm 
-                    ON pm.id_client = cm.id_client
-                    AND pm.periodo_hasta = (
-                        SELECT MAX(periodo_hasta)
-                        FROM pagos_mensuales
-                        WHERE id_client = cm.id_client 
-                        AND pm.activo = true
-                    )
+                LEFT JOIN LATERAL (
+                    SELECT id, id_client, periodo_hasta, activo
+                    FROM pagos_mensuales
+                    WHERE id_client = cm.id_client
+                    ORDER BY periodo_hasta DESC
+                    LIMIT 1
+                ) pm ON true
                 ${where}
-                ORDER BY cm.id_client ASC
-                LIMIT $${params.length + 1} 
+                ORDER BY cm.id_client DESC
+                LIMIT $${params.length + 1}
                 OFFSET $${params.length + 2}
                 `
 
@@ -128,8 +135,6 @@ export default async function handler(req, res) {
     }
     // POST
     if (req.method === 'POST') {
-        const { id } = req.query;
-
         const payload = req.body;
         if (!id) {
             return res.status(400).json({ error: 'Error falta id para insertar usuario' });
@@ -151,9 +156,8 @@ export default async function handler(req, res) {
 
     if (req.method === 'PUT') {
         const { idClient, ...payload } = req.body;
-        const idAdmin = req.query.id;
 
-        if (!idAdmin) {
+        if (!id) {
             return res.status(400).json({ error: 'Error falta id ' });
         }
 
@@ -168,7 +172,7 @@ export default async function handler(req, res) {
                      monto = $3
                  WHERE id_client = $4 AND user_admin = $5
                  RETURNING *;`,
-                [payload.tipo, payload.cliente, payload.monto, idClient, idAdmin]
+                [payload.tipo, payload.cliente, payload.monto, idClient, id]
             );
 
             if (rows.length === 0) {
@@ -185,33 +189,17 @@ export default async function handler(req, res) {
 
     // DELETE
     if (req.method === 'DELETE') {
-        const idAdmin = req.query.id;
         const { idClient } = req.body;
 
-        // Movido a /pagosMensuales/[idAdmin]/[idPago].js, action pasa a ser req.method === 'DELETE'
-
-        // if (action === 'deletePago') {
-        //     if (!id) {
-        //         return res.status(400).json({ error: "Faltan datos para eliminar el pago" });
-        //     }
-        //     try {
-        //         await pool.query(`DELETE FROM pagos_mensuales WHERE id = $1 AND id_admin = $2`, [id, idAdmin]);
-        //         return res.status(200).json({ success: true });
-        //     } catch (error) {
-        //         console.log(error);
-        //         return res.status(500).json({ error: 'Error no se pudo eliminar el pago', details: error.message });
-        //     }
-        // } else {
-
-        if (!idAdmin || !idClient) {
-            return res.status(400).json({ error: 'Falta idAdmin o idClient' });
+        if (!id || !idClient) {
+            return res.status(400).json({ error: 'Falta id o idClient' });
         }
         try {
             const result = await pool.query(
                 `UPDATE public.clientes_mensuales 
                      SET activo = false 
                      WHERE id_client = $1 AND user_admin = $2`,
-                [idClient, idAdmin]
+                [idClient, id]
             );
 
             if (result.rowCount > 0) {

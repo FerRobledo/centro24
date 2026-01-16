@@ -1,17 +1,16 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AuthService } from 'src/app/auth/auth.service';
+import { Component, OnInit } from '@angular/core';
 import { AgregarPagoModalComponent } from '../agregarPagoModal/agregarPagoModal.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { FiltroClientesPipe } from 'src/app/pipes/filtro-clientes.pipe';
 import { PagoMensualService } from 'src/app/services/pagoMensual.service';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-listaPagos',
   standalone: true,
-  imports: [RouterModule, FormsModule, CommonModule, FiltroClientesPipe],
+  imports: [RouterModule, FormsModule, CommonModule, MatPaginatorModule],
   templateUrl: './listaPagos.component.html'
 })
 export class ListaPagosComponent implements OnInit {
@@ -19,7 +18,6 @@ export class ListaPagosComponent implements OnInit {
   constructor(
     private pagoMensualService: PagoMensualService,
     public dialog: MatDialog,
-    private authService: AuthService,
   ) { }
 
   pagos: any[] = [];
@@ -27,23 +25,25 @@ export class ListaPagosComponent implements OnInit {
   filtroPago: string = '';
   isLoading: boolean = true;
 
+
+  // FILTRO Y PAGINADO
+  page = 1;
+  pageSize = 10;
+  total = 0;
+  search = '';
+
   ngOnInit() {
     this.loadData();
   }
 
   loadData() {
-    const idAdmin = this.authService.getIdAdmin();
     this.pagos = [];
     this.isLoading = true;
-    if (!idAdmin) {
-      this.isLoading = false;
-      return;
-    }
 
-    this.pagoMensualService.getPagosMensuales(idAdmin).subscribe({
+    this.pagoMensualService.getPagosMensuales({ page: this.page, pageSize: this.pageSize, search: this.search }).subscribe({
       next: (data) => {
-        this.pagos = data;
-        console.log(data);
+        this.pagos = data.pagos;
+        this.total = data.total;
       },
       error: (error) => {
         console.error("Error en el pedido de clientes del día: ", error);
@@ -57,14 +57,9 @@ export class ListaPagosComponent implements OnInit {
 
 
   deletePago(id: number) {
-    const idAdmin = this.authService.getIdAdmin();
     this.isLoading = true;
-    if (!idAdmin) {
-      this.isLoading = false;
-      return;
-    }
 
-    this.pagoMensualService.deletePago(idAdmin, id).subscribe({
+    this.pagoMensualService.deletePago(id).subscribe({
       next: () => {
         this.loadData();
       },
@@ -104,5 +99,20 @@ export class ListaPagosComponent implements OnInit {
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     return `${year}-${month}`;
+  }
+
+  onSearchChange() {
+    this.loadData();
+  }
+
+  setPageSize(size: number) {
+    this.pageSize = size;
+    this.page = 1;
+    this.loadData();
+  }
+
+  handlePageEvent(event: PageEvent) {
+    this.page = event.pageIndex + 1;
+    this.loadData();
   }
 }
