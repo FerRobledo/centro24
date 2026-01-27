@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from 'src/app/auth/auth.service';
 import { CobranzaService } from 'src/app/services/cobranza.service';
 import { RegisterClienteComponent } from 'src/app/componentes/cobranza/registerCliente/registerCliente.component';
@@ -9,23 +9,29 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SpinnerComponent } from '../shared/spinner.component';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-cobranza',
   standalone: true,
-  imports: [CommonModule, FormsModule, SpinnerComponent],
+  imports: [CommonModule, FormsModule, SpinnerComponent, MatPaginatorModule],
   templateUrl: './cobranza.component.html',
 })
 export class CobranzaComponent implements OnInit, OnDestroy {
   public clientEdit: any = null;
-  clientsOfDay: any[] = [];
+  ventas: any[] = [];
   historyCierres: any = [];
   collectionDay = -1;
-  today: Date = new Date();
-  isLoadingCobranza: boolean = false;
+  loading: boolean = false;
   dialogRef: MatDialogRef<any> | null = null;
   dialogRef2!: MatDialogRef<HistorialClientsComponent>;
 
+  // FILTRO Y PAGINADO
+  page = 1;
+  pageSize = 10;
+  total = 0;
+  search = '';
+  selectedDate: string = '';
 
   // Variables modal cierre de caja
   mostrarModalCierre = false;
@@ -33,11 +39,6 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   cargandoDatosCierre = false;
   datosCierreCaja: any = {};
 
-  selectedDate: string = '';
-  private subscriptions: Subscription = new Subscription();
-  dias: number[] = [];
-  anios: number[] = [];
-  meses: any = []
 
   constructor(
     private cobranzaService: CobranzaService,
@@ -46,7 +47,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.loadClientsDaily();
+    this.loadData();
   }
 
   ngOnDestroy() {
@@ -55,46 +56,44 @@ export class CobranzaComponent implements OnInit, OnDestroy {
       this.dialogRef = null;
     }
     this.dialog.closeAll();
-    this.subscriptions.unsubscribe(); //limpia todas las suscripciones
   }
 
   closeDay() {
     const nameUser = this.authService.getUserName();
     this.cargandoDatosCierre = true;
 
-    this.subscriptions.add(
-      this.cobranzaService.cerrarCaja(nameUser).subscribe({
-        next: (data) => {
-          console.log(data)
-          this.collectionDay = data.total;
-          this.cargandoDatosCierre = false;
-          this.mostrarMensajeExito();
-        },
-        error: (error) => {
-          console.log("Error en el calculo de recaudacion: ", error);
-        },
-      })
-    );
+    this.cobranzaService.cerrarCaja(nameUser).subscribe({
+      next: (data) => {
+        this.collectionDay = data.total;
+        this.cargandoDatosCierre = false;
+        this.mostrarMensajeExito();
+      },
+      error: (error) => {
+        console.log("Error en el calculo de recaudacion: ", error);
+      },
+    })
   }
 
-  public loadClientsDaily() {
-    this.isLoadingCobranza = true;
+  loadData() {
+    this.loading = true;
     // Fuerza el spinner a mostrarse
 
-    this.cobranzaService.getClientsOfDay().subscribe({
+    this.cobranzaService.getVentas({ page: this.page, pageSize: this.pageSize, search: this.search, selectedDate: this.selectedDate }).subscribe({
       next: (data) => {
-        this.clientsOfDay = data;
-        this.clientsOfDay = this.clientsOfDay.map(client => {
+        console.log(data)
+        this.ventas = data.ventas;
+        this.ventas = this.ventas.map(client => {
           return {
             ...client,
             fecha: client.fecha.replace('T', ' ').replace('Z', '')
           };
         });
-        this.isLoadingCobranza = false;
+        this.total = data.total;
+        this.loading = false;
       },
       error: (error) => {
         console.log("Error en el pedido de clientes del dia: ", error);
-        this.isLoadingCobranza = false;
+        this.loading = false;
         ;
       },
     })
@@ -105,7 +104,7 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     return this.authService.esAdmin();
   }
 
-  public updateClient(client: any) {
+  updateClient(client: any) {
 
     const dialogRef = this.dialog.open(RegisterClienteComponent, {
       maxWidth: '100%',
@@ -114,25 +113,23 @@ export class CobranzaComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result == 'submit') {
-        this.loadClientsDaily();
+        this.loadData();
       }
     });
   }
 
-  public deleteClient(client: any) {
+  deleteClient(client: any) {
     const idClient = client.id;
 
-    this.subscriptions.add(
-      this.cobranzaService.deleteClient(idClient).subscribe({
-        next: () => {
-          this.loadClientsDaily();
-          ;
-        },
-        error: (error) => {
-          console.log("Error en la eliminacion del cliente: ", error);
-        },
-      })
-    );
+    this.cobranzaService.deleteClient(idClient).subscribe({
+      next: () => {
+        this.loadData();
+        ;
+      },
+      error: (error) => {
+        console.log("Error en la eliminacion del cliente: ", error);
+      },
+    })
   }
 
   nuevaCobranza(accion: string, data: any = null) {
@@ -147,17 +144,17 @@ export class CobranzaComponent implements OnInit, OnDestroy {
       this.dialogRef = null;
       if (result == 'submit') {
         this.resetComponent();
-        this.loadClientsDaily();
+        this.loadData();
       }
     });
 
   }
 
   private resetComponent() {
-    this.clientsOfDay = [];
+    this.ventas = [];
     this.clientEdit = null;
     this.collectionDay = -1;
-    //this.loadClientsDaily();
+    //this.loadData();
     ;
   }
 
@@ -176,20 +173,18 @@ export class CobranzaComponent implements OnInit, OnDestroy {
       this.dialogRef2 = null!;
     });
 
-    this.subscriptions.add(
-      this.cobranzaService.getHistory().subscribe({
-        next: (data) => {
+    this.cobranzaService.getHistory().subscribe({
+      next: (data) => {
 
-          this.historyCierres = data ?? [];
+        this.historyCierres = data ?? [];
 
-          this.dialogRef2.componentInstance.isLoading = false;
-          this.dialogRef2.componentInstance.historial = data;
-        },
-        error: (error) => {
-          console.error(error);
-        },
-      })
-    );
+        this.dialogRef2.componentInstance.isLoading = false;
+        this.dialogRef2.componentInstance.historial = data;
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    })
 
   }
 
@@ -221,25 +216,22 @@ export class CobranzaComponent implements OnInit, OnDestroy {
   }
 
   fitrarFecha() {
-    this.isLoadingCobranza = true;
+    this.loading = true;
     if (this.selectedDate == '') {
-      this.loadClientsDaily();
+      this.loadData();
     }
 
-    this.subscriptions.add(
-      this.cobranzaService.getClientsByDate(this.selectedDate).subscribe({
-        next: (data) => {
-          this.clientsOfDay = data;
-        },
-        error: (error) => {
-          console.log("Error en el pedido de clientes del dia: ", error);
-        },
-        complete: () => {
-          this.isLoadingCobranza = false;
-        }
-      })
-    )
-      ;
+    this.cobranzaService.getClientsByDate(this.selectedDate).subscribe({
+      next: (data) => {
+        this.ventas = data;
+      },
+      error: (error) => {
+        console.log("Error en el pedido de clientes del dia: ", error);
+      },
+      complete: () => {
+        this.loading = false;
+      }
+    })
   }
 
   openDeleteConfirm(client: any) {
@@ -270,7 +262,27 @@ export class CobranzaComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.successMessage = false;
       this.mostrarModalCierre = false;
-      this.loadClientsDaily();
+      this.loadData();
     }, 1000);
+  }
+
+  // METODOS PAGINADO y FILTRO BUSQUEDA
+  setPageSize(size: number) {
+    this.pageSize = size;
+    this.page = 1;
+    this.loadData();
+  }
+
+  handlePageEvent(event: PageEvent) {
+    this.page = event.pageIndex + 1;
+    this.loadData();
+  }
+
+  get totalPages() {
+    return Math.ceil(this.total / this.pageSize);
+  }
+
+  onSearchChange() {
+    this.loadData();
   }
 }

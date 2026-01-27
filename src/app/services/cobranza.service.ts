@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -10,15 +10,30 @@ export class CobranzaService {
 
   constructor(private http: HttpClient) { }
 
-  public getClientsOfDay(): Observable<any> {
-    return this.http.get(`${this.origin}/api/cobranza`)
+  public getVentas(
+    params: {
+      page: number,
+      pageSize: number,
+      search?: string,
+      selectedDate?: string,
+    }
+  ): Observable<any> {
+
+    let httpParams = new HttpParams()
+      .set('page', params.page)
+      .set('pageSize', params.pageSize);
+
+    if (params.search) httpParams = httpParams.set('search', params.search);
+    if (params.selectedDate) httpParams = httpParams.set('selectedDate', params.selectedDate);
+
+    return this.http.get(`${this.origin}/api/cobranza`, { params })
   }
 
   public cerrarCaja(nameUser: string): Observable<any> {
-    return this.http.post( `${this.origin}/api/cobranza/cerrarCaja/?nameUser=${nameUser}`, {});
+    return this.http.post(`${this.origin}/api/cobranza/cerrarCaja/?nameUser=${nameUser}`, {});
   }
 
-  public getCierreCaja(): Observable<any>{
+  public getCierreCaja(): Observable<any> {
     return this.http.get(`${this.origin}/api/cobranza/cerrarCaja`);
   }
 
@@ -45,10 +60,10 @@ export class CobranzaService {
   }
 
   public getHistory(): Observable<any> {
-    return this.http.get( `${this.origin}/api/cobranza/historialCierres`)
+    return this.http.get(`${this.origin}/api/cobranza/historialCierres`)
   }
 
   public getDetailsId(idCierre: number): Observable<any> {
-    return this.http.get( `${this.origin}/api/cobranza/detallesCierre/?idCierre= ` + idCierre)
+    return this.http.get(`${this.origin}/api/cobranza/detallesCierre/?idCierre= ` + idCierre)
   }
 }

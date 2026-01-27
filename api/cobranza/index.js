@@ -27,19 +27,79 @@ export default async function handler(req, res) {
     const id = idAdmin;
 
     if (req.method === 'GET') {
+        const { page = 1, pageSize = 10, search = '', selectedDate = '' } = req.query;
+        const offset = (parseInt(page) - 1) * parseInt(pageSize);
 
+        // id = id_admin
         if (!id) {
-            return res.status(400).json({ error: 'Error falta id para obtener los clientes del dia' });
+            return res.status(400).json({ error: "Debe enviar id (id_admin)" });
         }
+
         try {
+            // WHERE POR DEFECTO
+            let where = `WHERE user_admin = $1 AND activo=true`;
 
-            const { rows } = await pool.query(`
-            SELECT * FROM caja WHERE user_admin = $1 AND activo=true ORDER BY fecha DESC, id DESC`, [id]);
-            return res.status(200).json(rows);
-        } catch {
-            return res.status(500).json({ error: 'Error al obtener venta' })
+            // array de params dinamico en caso de tener varios filtros
+            const params = [id];
+            let paramIndex = 2;
+
+            // Si escribimos algo en el input entra aca, dentro de los () van las columnas por las que va a filtrar el buscador
+            if (search) {
+                where += ` AND (
+                    c.detalle ILIKE $${paramIndex} OR
+                    c.observacion ILIKE $${paramIndex}
+                    )
+                `;
+                // Pushear parametros y aumentar el index
+                // El index sirve para agregar en la consulta $1, $2, $3, segun la cantidad de params
+                params.push(`%${search}%`);
+                paramIndex++;
+            }
+
+            // De este modo podemos agregar la cantidad de filtros que querramos
+            // Si viene el filtro, modificar 'where'
+            if (selectedDate != '') {
+                where += ` AND (
+                    fecha == $${paramIndex}
+                    )
+                `;
+                // Pushear parametros y aumentar el index
+                // El index sirve para agregar en la consulta $1, $2, $3, segun la cantidad de params
+                params.push(`%${selectedDate}%`);
+                paramIndex++;
+            }
+
+            const totalQuery = `
+                SELECT COUNT(*) 
+                FROM caja c
+                ${where}
+            `;
+
+            const totalResult = await pool.query(totalQuery, params);
+            const total = parseInt(totalResult.rows[0].count);
+
+            // Consulta principal (se le agrega LIMIT Y OFFSET)
+            const dataQuery = `
+                SELECT * 
+                FROM caja c
+                ${where}
+                ORDER BY fecha DESC, id DESC
+                LIMIT $${params.length + 1}
+                OFFSET $${params.length + 2}
+                `
+
+            const dataParams = [...params, pageSize, offset];
+            const dataResult = await pool.query(dataQuery, dataParams);
+
+            // Enviar datos por separado clientes y total
+            return res.status(200).json({ ventas: dataResult.rows, total: total });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({
+                error: 'Error al obtener datos',
+                details: error.message
+            });
         }
-
     }
 
 
